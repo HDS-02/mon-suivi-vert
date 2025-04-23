@@ -97,6 +97,9 @@ export const insertPlantAnalysisSchema = createInsertSchema(plantAnalyses).omit(
 
 export const insertTaskSchema = createInsertSchema(tasks).omit({
   id: true,
+  dateCompleted: true, // On omet la date de complétion puisqu'elle n'est définie que lorsque la tâche est complétée
+}).extend({
+  completed: z.boolean().default(false).optional(), // On rend le champ "completed" optionnel avec false par défaut
 });
 
 // Types 

@@ -125,20 +125,28 @@ export default function NewTaskDialog({
 
     try {
       // Formater les données pour l'API
-      const taskData: InsertTask = {
+      const taskData = {
         plantId: data.plantId,
         type: data.type,
         description: data.description,
         dueDate: data.dueDate,
-        completed: false, // Ajouter explicitement le champ 'completed' pour éviter l'erreur de validation
+        // Le champ 'completed' sera fourni par défaut avec le schéma modifié
       };
 
-      // Envoyer les données à l'API
-      const response = await apiRequest("POST", "/api/tasks", taskData);
+      // Utiliser fetch directement plutôt que apiRequest pour un meilleur contrôle
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(taskData),
+        credentials: "include" // Important pour les sessions
+      });
       
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.message || "Erreur lors de la création de la tâche");
+        console.error("Détails erreur:", errorData);
+        throw new Error(errorData.message || `Erreur ${response.status} lors de la création de la tâche`);
       }
 
       // Rafraîchir les données de tâches dans le cache
