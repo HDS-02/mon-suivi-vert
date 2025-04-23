@@ -1,12 +1,24 @@
 import { 
   plants, Plant, InsertPlant, 
   tasks, Task, InsertTask,
-  plantAnalyses, PlantAnalysis, InsertPlantAnalysis
+  plantAnalyses, PlantAnalysis, InsertPlantAnalysis,
+  users, User, InsertUser
 } from "@shared/schema";
+import session from "express-session";
+import createMemoryStore from "memorystore";
 
 export interface IStorage {
+  // User CRUD methods
+  getUsers(): Promise<User[]>;
+  getUser(id: number): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  updateUser(id: number, user: Partial<User>): Promise<User | undefined>;
+  deleteUser(id: number): Promise<boolean>;
+
   // Plant CRUD methods
   getPlants(): Promise<Plant[]>;
+  getPlantsByUserId(userId: number): Promise<Plant[]>;
   getPlant(id: number): Promise<Plant | undefined>;
   createPlant(plant: InsertPlant): Promise<Plant>;
   updatePlant(id: number, plant: Partial<Plant>): Promise<Plant | undefined>;
@@ -25,27 +37,81 @@ export interface IStorage {
   getPlantAnalyses(plantId: number): Promise<PlantAnalysis[]>;
   getLatestPlantAnalysis(plantId: number): Promise<PlantAnalysis | undefined>;
   createPlantAnalysis(analysis: InsertPlantAnalysis): Promise<PlantAnalysis>;
+  
+  // Session store
+  sessionStore: session.Store;
 }
 
 export class MemStorage implements IStorage {
+  private users: Map<number, User>;
   private plants: Map<number, Plant>;
   private tasks: Map<number, Task>;
   private plantAnalyses: Map<number, PlantAnalysis>;
+  private userIdCounter: number;
   private plantIdCounter: number;
   private taskIdCounter: number;
   private analysisIdCounter: number;
+  public sessionStore: session.Store;
 
   constructor() {
+    this.users = new Map();
     this.plants = new Map();
     this.tasks = new Map();
     this.plantAnalyses = new Map();
     
+    this.userIdCounter = 1;
     this.plantIdCounter = 1;
     this.taskIdCounter = 1;
     this.analysisIdCounter = 1;
     
+    // Create session store
+    const MemoryStore = createMemoryStore(session);
+    this.sessionStore = new MemoryStore({
+      checkPeriod: 86400000, // 24h
+    });
+    
     // Initialize with sample data
     this.initSampleData();
+  }
+  
+  // User CRUD methods
+  async getUsers(): Promise<User[]> {
+    return Array.from(this.users.values());
+  }
+
+  async getUser(id: number): Promise<User | undefined> {
+    return this.users.get(id);
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    return Array.from(this.users.values())
+      .find(user => user.username === username);
+  }
+
+  async createUser(user: InsertUser): Promise<User> {
+    const id = this.userIdCounter++;
+    const createdAt = new Date();
+    const newUser: User = { ...user, id, createdAt };
+    this.users.set(id, newUser);
+    return newUser;
+  }
+
+  async updateUser(id: number, updates: Partial<User>): Promise<User | undefined> {
+    const user = this.users.get(id);
+    if (!user) return undefined;
+    
+    const updatedUser = { ...user, ...updates };
+    this.users.set(id, updatedUser);
+    return updatedUser;
+  }
+
+  async deleteUser(id: number): Promise<boolean> {
+    return this.users.delete(id);
+  }
+  
+  async getPlantsByUserId(userId: number): Promise<Plant[]> {
+    return Array.from(this.plants.values())
+      .filter(plant => plant.userId === userId);
   }
 
   private initSampleData() {

@@ -20,12 +20,13 @@ function AppRoutes() {
   return (
     <Layout>
       <Switch>
-        <Route path="/" component={Home} />
-        <Route path="/analyze" component={Analyze} />
-        <Route path="/plants" component={MyPlants} />
-        <Route path="/plants/:id" component={PlantDetail} />
-        <Route path="/calendar" component={Calendar} />
-        <Route path="/tips" component={Tips} />
+        <ProtectedRoute path="/" component={Home} />
+        <ProtectedRoute path="/analyze" component={Analyze} />
+        <ProtectedRoute path="/plants" component={MyPlants} />
+        <ProtectedRoute path="/plants/:id" component={PlantDetail} />
+        <ProtectedRoute path="/calendar" component={Calendar} />
+        <ProtectedRoute path="/tips" component={Tips} />
+        <Route path="/auth" component={AuthPage} />
         <Route component={NotFound} />
       </Switch>
     </Layout>
@@ -36,10 +37,12 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
-        <Router>
-          <Toaster />
-          <AppRoutes />
-        </Router>
+        <AuthProvider>
+          <Router>
+            <Toaster />
+            <AppRoutes />
+          </Router>
+        </AuthProvider>
       </TooltipProvider>
     </QueryClientProvider>
   );
