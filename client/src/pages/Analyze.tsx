@@ -123,7 +123,6 @@ export default function Analyze() {
         toast({
           title: "Service limité",
           description: "L'analyse est actuellement limitée. Certaines informations peuvent être incomplètes.",
-          variant: "warning",
         });
       }
       
@@ -262,7 +261,11 @@ export default function Analyze() {
               </div>
             </div>
           ) : (
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-center">
+            <div 
+              className="border-2 border-dashed border-gray-300 rounded-lg p-8 flex flex-col items-center justify-center text-center"
+              onDragOver={handleDragOver}
+              onDrop={handleDrop}
+            >
               <span className="material-icons text-gray-400 text-4xl mb-4">add_photo_alternate</span>
               <h3 className="font-medium mb-2">Déposez votre photo ici</h3>
               <p className="text-sm text-gray-500 mb-4">ou utilisez l'une des options ci-dessous</p>
