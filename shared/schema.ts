@@ -100,6 +100,7 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({
   dateCompleted: true, // On omet la date de complétion puisqu'elle n'est définie que lorsque la tâche est complétée
 }).extend({
   completed: z.boolean().default(false).optional(), // On rend le champ "completed" optionnel avec false par défaut
+  dueDate: z.string().transform(str => new Date(str)).or(z.date()).optional(), // Accepte une date ou une chaîne (qui sera convertie en date)
 });
 
 // Types 
@@ -114,6 +115,19 @@ export type InsertPlantAnalysis = z.infer<typeof insertPlantAnalysisSchema>;
 
 export type Task = typeof tasks.$inferSelect;
 export type InsertTask = z.infer<typeof insertTaskSchema>;
+
+// Badges types
+export interface Badge {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  category: "entretien" | "analyse" | "collection" | "progression";
+  unlocked: boolean;
+  unlockedAt?: Date;
+  progress?: number;
+  maxProgress?: number;
+}
 
 // API response types for AI analysis
 export interface PlantAnalysisResponse {

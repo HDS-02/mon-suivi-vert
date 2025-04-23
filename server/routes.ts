@@ -9,6 +9,7 @@ import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
 import { setupAuth } from "./auth";
+import { badgeService } from "./badgeService";
 
 // Configure multer for in-memory file storage
 const upload = multer({
@@ -329,11 +330,88 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Update plant status based on analysis
       await storage.updatePlant(plantId, { status: analysis.status });
       
-      res.status(201).json(analysis);
+      // Vérifier les badges d'analyse si l'utilisateur est authentifié
+      let unlockedBadges = [];
+      if (req.isAuthenticated() && req.user?.id) {
+        const userId = req.user.id;
+        const analysisCount = (await storage.getPlantAnalyses(plantId)).length;
+        unlockedBadges = badgeService.checkAnalysisBadges(userId, analysisCount);
+      }
+      
+      res.status(201).json({
+        analysis,
+        unlockedBadges: unlockedBadges.length > 0 ? unlockedBadges : undefined,
+      });
     } catch (error: any) {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Données invalides", errors: error.errors });
       }
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // BADGES ROUTES
+  app.get("/api/badges", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Utilisateur non authentifié" });
+      }
+      
+      const badges = badgeService.getBadgesByUserId(req.user.id);
+      res.json(badges);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Mettre à jour les badges liés aux plantes (après ajout/suppression de plante)
+  app.post("/api/badges/update-plant-collection", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Utilisateur non authentifié" });
+      }
+      
+      const userId = req.user.id;
+      const plants = await storage.getPlantsByUserId(userId);
+      const unlockedBadges = badgeService.checkPlantCollectionBadges(userId, plants.length);
+      
+      res.json({ unlockedBadges });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Mettre à jour les badges liés aux tâches complétées
+  app.post("/api/badges/update-tasks", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Utilisateur non authentifié" });
+      }
+      
+      const userId = req.user.id;
+      const tasks = await storage.getTasks();
+      const completedTasks = tasks.filter(task => task.completed).length;
+      const unlockedBadges = badgeService.checkTaskCompletionBadges(userId, completedTasks);
+      
+      res.json({ unlockedBadges });
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // Enregistrer une connexion (pour le badge de connexion consécutive)
+  app.post("/api/badges/login-streak", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      if (!req.user?.id) {
+        return res.status(401).json({ message: "Utilisateur non authentifié" });
+      }
+      
+      const daysStreak = req.body.daysStreak || 1;
+      const userId = req.user.id;
+      const updatedBadge = badgeService.updateConsecutiveLoginBadge(userId, daysStreak);
+      
+      res.json({ updatedBadge });
+    } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
