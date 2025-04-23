@@ -8,6 +8,7 @@ import multer from "multer";
 import fs from "fs";
 import path from "path";
 import { nanoid } from "nanoid";
+import { setupAuth } from "./auth";
 
 // Configure multer for in-memory file storage
 const upload = multer({
@@ -24,6 +25,8 @@ if (!fs.existsSync(uploadsDir)) {
 }
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Setup authentication routes
+  setupAuth(app);
   // PLANTS ROUTES
   app.get("/api/plants", async (_req: Request, res: Response) => {
     try {
