@@ -14,6 +14,7 @@ import PlantDetail from "@/pages/PlantDetail";
 import MyPlants from "@/pages/MyPlants";
 import Calendar from "@/pages/Calendar";
 import Tips from "@/pages/Tips";
+import Badges from "@/pages/Badges";
 import AuthPage from "@/pages/auth-page";
 
 function AppRoutes() {
@@ -26,6 +27,7 @@ function AppRoutes() {
         <ProtectedRoute path="/plants/:id" component={PlantDetail} />
         <ProtectedRoute path="/calendar" component={Calendar} />
         <ProtectedRoute path="/tips" component={Tips} />
+        <ProtectedRoute path="/badges" component={Badges} />
         <Route path="/auth" component={AuthPage} />
         <Route component={NotFound} />
       </Switch>
