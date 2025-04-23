@@ -1,0 +1,109 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 105 37% 97%;
+    --foreground: 220 14.3% 26%;
+    --muted: 60 4.8% 95.9%;
+    --muted-foreground: 25 5.3% 44.7%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 20 14.3% 4.1%;
+    --card: 0 0% 100%;
+    --card-foreground: 20 14.3% 4.1%;
+    --border: 20 5.9% 90%;
+    --input: 20 5.9% 90%;
+    --primary: 123 46% 34%;
+    --primary-foreground: 211 100% 99%;
+    --secondary: 122 43% 57%;
+    --secondary-foreground: 24 9.8% 10%;
+    --accent: 84 42% 68%;
+    --accent-foreground: 24 9.8% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 60 9.1% 97.8%;
+    --ring: 120 47% 33%;
+    --radius: 0.5rem;
+
+    /* Charts */
+    --chart-1: 123 46% 34%;
+    --chart-2: 122 43% 57%;
+    --chart-3: 84 48% 58%;
+    --chart-4: 84 42% 68%;
+    --chart-5: 105 37% 97%;
+
+    /* Info color */
+    --info: 200 98% 56%;
+    --info-foreground: 0 0% 100%;
+
+    /* Warning color */
+    --warning: 48 96% 53%;
+    --warning-foreground: 0 0% 10%;
+    
+    /* Alert color */
+    --alert: 0 78% 58%;
+    --alert-foreground: 0 0% 100%;
+    
+    /* Sidebar */
+    --sidebar-background: 123 46% 34%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 123 46% 34%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 122 43% 57%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 122 43% 37%;
+    --sidebar-ring: 0 0% 100%;
+  }
+  .dark {
+    --background: 126 9% 5%;
+    --foreground: 0 0% 98%;
+    --muted: 120 7% 12%;
+    --muted-foreground: 240 5% 64.9%;
+    --popover: 120 6% 7%;
+    --popover-foreground: 0 0% 98%;
+    --card: 120 6% 7%;
+    --card-foreground: 0 0% 98%;
+    --border: 120 7% 15%;
+    --input: 120 7% 15%;
+    --primary: 123 46% 34%;
+    --primary-foreground: 211 100% 99%;
+    --secondary: 122 43% 37%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 84 32% 30%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --ring: 123 46% 34%;
+    --radius: 0.5rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    font-family: 'Open Sans', sans-serif;
+    @apply bg-background text-foreground;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Raleway', sans-serif;
+  }
+}
+
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  vertical-align: middle;
+}
