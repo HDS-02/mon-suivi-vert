@@ -10,6 +10,7 @@ import Analyze from "@/pages/Analyze";
 import PlantDetail from "@/pages/PlantDetail";
 import MyPlants from "@/pages/MyPlants";
 import Calendar from "@/pages/Calendar";
+import Tips from "@/pages/Tips";
 
 function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ function AppRoutes() {
         <Route path="/plants" component={MyPlants} />
         <Route path="/plants/:id" component={PlantDetail} />
         <Route path="/calendar" component={Calendar} />
+        <Route path="/tips" component={Tips} />
         <Route component={NotFound} />
       </Switch>
     </Layout>

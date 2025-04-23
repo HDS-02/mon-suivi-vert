@@ -150,10 +150,12 @@ export default function Home() {
               <span className="text-sm font-medium">Calendrier</span>
             </Button>
           </Link>
-          <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-            <span className="material-icons text-primary mb-2">tips_and_updates</span>
-            <span className="text-sm font-medium">Conseils</span>
-          </Button>
+          <Link href="/tips">
+            <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
+              <span className="material-icons text-primary mb-2">tips_and_updates</span>
+              <span className="text-sm font-medium">Conseils</span>
+            </Button>
+          </Link>
         </div>
       </section>
 

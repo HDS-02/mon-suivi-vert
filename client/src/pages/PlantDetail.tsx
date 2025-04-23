@@ -7,12 +7,14 @@ import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import EditPlantDialog from "@/components/EditPlantDialog";
 
 export default function PlantDetail() {
   const { id } = useParams();
   const [, navigate] = useLocation();
   const { toast } = useToast();
   const [displayTab, setDisplayTab] = useState<"overview" | "history">("overview");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   
   const { data: plant, isLoading: plantLoading } = useQuery<Plant>({
     queryKey: [`/api/plants/${id}`],
@@ -113,7 +115,12 @@ export default function PlantDetail() {
         <div className="p-4">
           <div className="flex justify-between items-start mb-2">
             <h2 className="text-xl font-raleway font-semibold">{plant.name}</h2>
-            <Button variant="ghost" size="icon" className="text-gray-400 hover:text-primary">
+            <Button 
+              variant="ghost" 
+              size="icon" 
+              className="text-gray-400 hover:text-primary"
+              onClick={() => setEditDialogOpen(true)}
+            >
               <span className="material-icons">edit</span>
             </Button>
           </div>
@@ -306,6 +313,13 @@ export default function PlantDetail() {
           )}
         </CardContent>
       </Card>
+      {/* Edit Plant Dialog */}
+      <EditPlantDialog 
+        open={editDialogOpen} 
+        onOpenChange={setEditDialogOpen} 
+        plant={plant}
+        onDelete={() => navigate("/plants")}
+      />
     </div>
   );
 }
