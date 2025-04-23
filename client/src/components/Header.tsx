@@ -1,6 +1,7 @@
 import { useState } from "react";
 import NotificationsDialog from "./NotificationsDialog";
 import SettingsDialog from "./SettingsDialog";
+import logo from "../assets/logo.svg";
 
 export default function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
@@ -9,7 +10,10 @@ export default function Header() {
   return (
     <header className="bg-primary text-white shadow-md">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <h1 className="text-xl font-raleway font-bold">Mon Suivi Vert</h1>
+        <div className="flex items-center">
+          <img src={logo} alt="Logo Mon Suivi Vert" className="h-10 w-10 mr-2" />
+          <h1 className="text-xl font-raleway font-bold">Mon Suivi Vert</h1>
+        </div>
         <div className="flex space-x-2">
           <button 
             className="p-2 rounded-full hover:bg-secondary transition-colors"
