@@ -47,13 +47,12 @@ export default function MyPlants() {
   return (
     <div>
       <div className="mb-6">
-        <button 
-          className="flex items-center text-primary mb-4"
-          onClick={() => history.back()}
-        >
-          <span className="material-icons mr-1">arrow_back</span>
-          Retour
-        </button>
+        <Link href="/">
+          <a className="flex items-center text-primary mb-4">
+            <span className="material-icons mr-1">arrow_back</span>
+            Retour
+          </a>
+        </Link>
         <h2 className="text-xl font-raleway font-semibold">Mes plantes</h2>
         <p className="text-gray-600">Gérez votre collection de plantes</p>
       </div>

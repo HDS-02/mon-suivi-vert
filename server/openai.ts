@@ -26,35 +26,61 @@ export async function analyzePlantImage(base64Image: string): Promise<any> {
     Retourne tes résultats en français, dans un format JSON structuré et facilement analysable.
     `;
 
-    const visionResponse = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [
-        {
-          role: "user",
-          content: [
-            {
-              type: "text",
-              text: prompt
-            },
-            {
-              type: "image_url",
-              image_url: {
-                url: `data:image/jpeg;base64,${base64Image}`
+    try {
+      const visionResponse = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: prompt
+              },
+              {
+                type: "image_url",
+                image_url: {
+                  url: `data:image/jpeg;base64,${base64Image}`
+                }
               }
-            }
+            ],
+          },
+        ],
+        response_format: { type: "json_object" },
+        max_tokens: 800,
+      });
+
+      const content = visionResponse.choices[0].message.content;
+      if (!content) {
+        throw new Error("No response content from OpenAI");
+      }
+
+      return JSON.parse(content);
+    } catch (apiError: any) {
+      // Si l'erreur est liée au quota ou à la facturation
+      if (apiError.message.includes("quota") || apiError.message.includes("429")) {
+        console.error("OpenAI API quota exceeded:", apiError.message);
+        // Retourner des données fictives en mode d'urgence seulement quand l'API est inaccessible pour raison de quota
+        return {
+          plantName: "Plante non identifiée",
+          species: "Espèce inconnue",
+          status: "healthy",
+          healthIssues: [],
+          recommendations: [
+            "Impossible d'analyser la plante pour le moment. Le service d'analyse est temporairement indisponible.",
+            "Veuillez réessayer ultérieurement ou contacter le support."
           ],
-        },
-      ],
-      response_format: { type: "json_object" },
-      max_tokens: 800,
-    });
-
-    const content = visionResponse.choices[0].message.content;
-    if (!content) {
-      throw new Error("No response content from OpenAI");
+          careInstructions: {
+            watering: "Information non disponible pour le moment",
+            light: "Information non disponible pour le moment",
+            temperature: "Information non disponible pour le moment"
+          }
+        };
+      } else {
+        // Pour toute autre erreur
+        throw apiError;
+      }
     }
-
-    return JSON.parse(content);
   } catch (error: any) {
     console.error("Error analyzing plant image:", error.message);
     throw new Error(`Erreur lors de l'analyse de l'image: ${error.message}`);

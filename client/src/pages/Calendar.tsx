@@ -105,13 +105,12 @@ export default function Calendar() {
   return (
     <div>
       <div className="mb-6">
-        <button 
-          className="flex items-center text-primary mb-4"
-          onClick={() => history.back()}
-        >
-          <span className="material-icons mr-1">arrow_back</span>
-          Retour
-        </button>
+        <Link href="/">
+          <a className="flex items-center text-primary mb-4">
+            <span className="material-icons mr-1">arrow_back</span>
+            Retour
+          </a>
+        </Link>
         <h2 className="text-xl font-raleway font-semibold">Calendrier d'entretien</h2>
         <p className="text-gray-600">Suivez les tâches d'entretien de vos plantes</p>
       </div>
@@ -133,14 +132,19 @@ export default function Calendar() {
                 fontWeight: "bold"
               }
             }}
+            classNames={{
+              day_today: "bg-primary-light/20"
+            }}
             components={{
-              DayContent: (props) => {
-                const color = getDotColorForDate(props.date);
+              Day: ({ date, displayMonth }) => {
+                // Ne pas afficher les points pour les jours qui ne sont pas du mois affiché
+                const isCurrentMonth = date.getMonth() === displayMonth.getMonth();
+                const color = isCurrentMonth ? getDotColorForDate(date) : null;
+                const day = date.getDate();
+                
                 return (
                   <div className="relative w-full h-full flex items-center justify-center">
-                    <div className="absolute w-full h-full flex items-center justify-center">
-                      {props.children}
-                    </div>
+                    <div>{day}</div>
                     {color && (
                       <div className="absolute bottom-1">
                         <div className={`h-1 w-1 rounded-full ${color}`} />
@@ -148,7 +152,7 @@ export default function Calendar() {
                     )}
                   </div>
                 );
-              },
+              }
             }}
           />
         </CardContent>
