@@ -2,7 +2,11 @@ import OpenAI from "openai";
 
 // The newest OpenAI model is "gpt-4o" which was released May 13, 2024.
 // Do not change this unless explicitly requested by the user
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY || "" });
+const openai = new OpenAI({ 
+  apiKey: process.env.OPENAI_API_KEY || "", 
+  timeout: 60000, // Augmenter le timeout à 60 secondes
+  maxRetries: 3 // Essayer jusqu'à 3 fois en cas d'erreur temporaire
+});
 
 export async function analyzePlantImage(base64Image: string): Promise<any> {
   try {
@@ -27,6 +31,16 @@ export async function analyzePlantImage(base64Image: string): Promise<any> {
     `;
 
     try {
+      console.log("Démarrage de l'analyse d'image avec OpenAI...");
+      
+      // Vérification de la taille de l'image
+      const imageSize = Math.ceil(base64Image.length / (4/3)); // Taille approximative en octets
+      console.log(`Taille de l'image: ${(imageSize / (1024 * 1024)).toFixed(2)} MB`);
+      
+      if (imageSize > 20 * 1024 * 1024) { // Plus de 20 MB
+        throw new Error("L'image est trop volumineuse. Veuillez utiliser une image de moins de 20 MB.");
+      }
+
       const visionResponse = await openai.chat.completions.create({
         model: "gpt-4o",
         messages: [
@@ -50,17 +64,35 @@ export async function analyzePlantImage(base64Image: string): Promise<any> {
         max_tokens: 800,
       });
 
+      console.log("Analyse OpenAI réussie");
+      
       const content = visionResponse.choices[0].message.content;
       if (!content) {
-        throw new Error("No response content from OpenAI");
+        throw new Error("Aucun contenu reçu de l'API OpenAI");
       }
 
-      return JSON.parse(content);
+      // Vérifier que le contenu est un JSON valide
+      try {
+        const parsedContent = JSON.parse(content);
+        return parsedContent;
+      } catch (parseError) {
+        console.error("Erreur lors du parsing JSON:", content);
+        throw new Error("Le format de réponse reçu n'est pas un JSON valide");
+      }
     } catch (apiError: any) {
-      // Si l'erreur est liée au quota ou à la facturation
-      if (apiError.message.includes("quota") || apiError.message.includes("429")) {
-        console.error("OpenAI API quota exceeded:", apiError.message);
-        // Retourner des données fictives en mode d'urgence seulement quand l'API est inaccessible pour raison de quota
+      console.error("Erreur API OpenAI:", apiError);
+      
+      // Différents types d'erreurs OpenAI possibles
+      if (apiError.status === 429 || 
+          (apiError.error && apiError.error.code === 'rate_limit_exceeded') ||
+          apiError.message?.includes("rate_limit") || 
+          apiError.message?.includes("quota") || 
+          apiError.message?.includes("capacity") ||
+          apiError.message?.includes("exceeded")) {
+        
+        console.error("Limite d'API OpenAI dépassée:", apiError.message);
+        
+        // Réponse spécifique pour les erreurs de quota
         return {
           plantName: "Plante non identifiée",
           species: "Espèce inconnue",
@@ -73,16 +105,23 @@ export async function analyzePlantImage(base64Image: string): Promise<any> {
           careInstructions: {
             watering: "Information non disponible pour le moment",
             light: "Information non disponible pour le moment",
-            temperature: "Information non disponible pour le moment"
+            temperature: "Information non disponible pour le moment",
+            additional: ["Le service d'analyse est actuellement limité par des contraintes d'API."]
           }
         };
+      } else if (apiError.status === 400 || apiError.message?.includes("bad request")) {
+        // Erreur de requête malformée
+        throw new Error("Erreur de requête: format d'image non pris en charge ou requête incorrecte");
+      } else if (apiError.status === 401 || apiError.message?.includes("invalid api key")) {
+        // Erreur d'authentification
+        throw new Error("Erreur d'authentification API: vérifiez votre clé API OpenAI");
       } else {
-        // Pour toute autre erreur
-        throw apiError;
+        // Toute autre erreur API
+        throw new Error(`Erreur d'API OpenAI: ${apiError.message || "Erreur inconnue"}`);
       }
     }
   } catch (error: any) {
-    console.error("Error analyzing plant image:", error.message);
+    console.error("Erreur globale lors de l'analyse d'image:", error);
     throw new Error(`Erreur lors de l'analyse de l'image: ${error.message}`);
   }
 }

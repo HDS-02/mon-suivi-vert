@@ -50,6 +50,16 @@ export default function Analyze() {
       return;
     }
 
+    // Vérifier la taille de l'image (20 MB max)
+    if (selectedImage.size > 20 * 1024 * 1024) {
+      toast({
+        title: "Image trop volumineuse",
+        description: "L'image ne doit pas dépasser 20 Mo",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setAnalyzing(true);
     
     try {
@@ -62,10 +72,32 @@ export default function Analyze() {
       });
       
       if (!response.ok) {
-        throw new Error(`Erreur: ${response.status}`);
+        const errorData = await response.json().catch(() => null);
+        const errorMsg = errorData?.message || `Erreur: ${response.status}`;
+        
+        if (response.status === 429 || errorMsg.includes("quota") || errorMsg.includes("dépassée")) {
+          throw new Error("Le service d'analyse est temporairement indisponible (quota dépassé). Veuillez réessayer plus tard.");
+        } else if (response.status === 413 || errorMsg.includes("taille")) {
+          throw new Error("L'image est trop volumineuse. Veuillez utiliser une image plus petite.");
+        } else {
+          throw new Error(errorMsg);
+        }
       }
       
       const result = await response.json();
+      
+      // Vérification de la réponse d'urgence en cas de problème d'API
+      if (result.recommendations && 
+          result.recommendations.length > 0 && 
+          result.recommendations[0].includes("temporairement indisponible")) {
+        
+        toast({
+          title: "Service limité",
+          description: "L'analyse est actuellement limitée. Certaines informations peuvent être incomplètes.",
+          variant: "warning",
+        });
+      }
+      
       setAnalysisResult(result);
       
       // Auto-fill the plant name if available
@@ -74,10 +106,11 @@ export default function Analyze() {
       }
       
       setShowSaveDialog(true);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Erreur d'analyse:", error);
       toast({
         title: "Erreur d'analyse",
-        description: "Une erreur est survenue lors de l'analyse de l'image",
+        description: error.message || "Une erreur est survenue lors de l'analyse de l'image",
         variant: "destructive",
       });
     } finally {

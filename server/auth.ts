@@ -6,6 +6,7 @@ import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
 import { User } from "@shared/schema";
+import { sendWelcomeEmail } from "./email";
 
 declare global {
   namespace Express {
@@ -77,10 +78,35 @@ export function setupAuth(app: Express) {
         return res.status(400).json({ message: "Ce nom d'utilisateur existe déjà" });
       }
 
+      // Vérifier si l'email est fourni
+      if (!req.body.email) {
+        return res.status(400).json({ message: "L'adresse email est requise" });
+      }
+
       const user = await storage.createUser({
         ...req.body,
         password: await hashPassword(req.body.password),
       });
+
+      // Envoyer l'email de bienvenue en arrière-plan
+      if (user.email) {
+        try {
+          await sendWelcomeEmail(user.email, user.firstName || undefined)
+            .then(success => {
+              if (success) {
+                console.log(`Email de bienvenue envoyé avec succès à ${user.email}`);
+              } else {
+                console.warn(`Échec de l'envoi de l'email de bienvenue à ${user.email}`);
+              }
+            })
+            .catch(emailError => {
+              console.error(`Erreur lors de l'envoi de l'email de bienvenue:`, emailError);
+            });
+        } catch (emailError) {
+          // Ne pas bloquer l'inscription si l'envoi d'email échoue
+          console.error('Erreur lors de l\'envoi de l\'email de bienvenue:', emailError);
+        }
+      }
 
       req.login(user, (err) => {
         if (err) return next(err);
