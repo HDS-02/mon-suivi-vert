@@ -1,8 +1,8 @@
-import type { Express, Request, Response } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
-import { insertPlantSchema, insertTaskSchema, insertPlantAnalysisSchema } from "@shared/schema";
+import { insertPlantSchema, insertTaskSchema, insertPlantAnalysisSchema, insertUserSchema } from "@shared/schema";
 import { analyzePlantImage } from "./openai";
 import multer from "multer";
 import fs from "fs";
@@ -27,6 +27,54 @@ if (!fs.existsSync(uploadsDir)) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
   setupAuth(app);
+  // USER ROUTES
+  // Middleware pour vérifier si l'utilisateur est authentifié
+  const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.status(401).json({ message: "Non authentifié" });
+  };
+
+  // Route pour mettre à jour un utilisateur
+  app.patch("/api/users/:id", isAuthenticated, async (req: Request, res: Response) => {
+    try {
+      // Vérifier que l'utilisateur ne modifie que son propre compte
+      const userId = parseInt(req.params.id);
+      if (isNaN(userId)) {
+        return res.status(400).json({ message: "ID d'utilisateur invalide" });
+      }
+
+      if (req.user?.id !== userId) {
+        return res.status(403).json({ message: "Vous n'êtes pas autorisé à modifier ce compte" });
+      }
+
+      // Validation des données d'entrée - on accepte seulement username, firstName et email
+      const userUpdateSchema = z.object({
+        username: z.string().min(3).optional(),
+        firstName: z.string().min(2).optional(),
+        email: z.string().email().optional().or(z.literal("")),
+      });
+
+      const validatedData = userUpdateSchema.parse(req.body);
+      
+      // Mise à jour de l'utilisateur en base de données
+      const updatedUser = await storage.updateUser(userId, validatedData);
+      
+      if (!updatedUser) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+
+      // Retourne l'utilisateur mis à jour
+      res.json(updatedUser);
+    } catch (error: any) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Données invalides", errors: error.errors });
+      }
+      res.status(500).json({ message: error.message });
+    }
+  });
+
   // PLANTS ROUTES
   app.get("/api/plants", async (_req: Request, res: Response) => {
     try {
