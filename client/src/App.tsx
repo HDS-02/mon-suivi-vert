@@ -3,6 +3,9 @@ import { queryClient } from "./lib/queryClient";
 import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { AuthProvider } from "@/hooks/use-auth";
+import { ProtectedRoute } from "@/lib/protected-route";
+
 import NotFound from "@/pages/not-found";
 import Layout from "@/components/Layout";
 import Home from "@/pages/Home";
@@ -11,6 +14,7 @@ import PlantDetail from "@/pages/PlantDetail";
 import MyPlants from "@/pages/MyPlants";
 import Calendar from "@/pages/Calendar";
 import Tips from "@/pages/Tips";
+import AuthPage from "@/pages/auth-page";
 
 function AppRoutes() {
   return (

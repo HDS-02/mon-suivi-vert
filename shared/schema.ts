@@ -1,6 +1,15 @@
-import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json, pgEnum } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
+import { relations } from "drizzle-orm";
+
+// User table
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  username: text("username").notNull().unique(),
+  password: text("password").notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
+});
 
 // Plant table
 export const plants = pgTable("plants", {
@@ -14,7 +23,7 @@ export const plants = pgTable("plants", {
   light: text("light"), // indirect, direct, shade
   temperature: text("temperature"), // optimal temperature range
   careNotes: text("care_notes"),
-  userId: text("user_id").default("default"), // For future use, can identify different users
+  userId: integer("user_id").notNull().default(1), // Foreign key to users table
 });
 
 // Plant analysis history
@@ -40,7 +49,40 @@ export const tasks = pgTable("tasks", {
   dateCompleted: timestamp("date_completed"),
 });
 
+// Relations
+export const usersRelations = relations(users, ({ many }) => ({
+  plants: many(plants),
+}));
+
+export const plantsRelations = relations(plants, ({ one, many }) => ({
+  user: one(users, {
+    fields: [plants.userId],
+    references: [users.id],
+  }),
+  analyses: many(plantAnalyses),
+  tasks: many(tasks),
+}));
+
+export const plantAnalysesRelations = relations(plantAnalyses, ({ one }) => ({
+  plant: one(plants, {
+    fields: [plantAnalyses.plantId],
+    references: [plants.id],
+  }),
+}));
+
+export const tasksRelations = relations(tasks, ({ one }) => ({
+  plant: one(plants, {
+    fields: [tasks.plantId],
+    references: [plants.id],
+  }),
+}));
+
 // Schemas for inserting data
+export const insertUserSchema = createInsertSchema(users).omit({
+  id: true,
+  createdAt: true,
+});
+
 export const insertPlantSchema = createInsertSchema(plants).omit({
   id: true,
   dateAdded: true,
@@ -56,6 +98,9 @@ export const insertTaskSchema = createInsertSchema(tasks).omit({
 });
 
 // Types 
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
 export type Plant = typeof plants.$inferSelect;
 export type InsertPlant = z.infer<typeof insertPlantSchema>;
 
