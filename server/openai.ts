@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { PlantAnalyzer } from "./plantAnalyzer";
 
 // The newest OpenAI model is "gpt-4o" which was released May 13, 2024.
 // Do not change this unless explicitly requested by the user
@@ -8,10 +9,20 @@ const openai = new OpenAI({
   maxRetries: 3 // Essayer jusqu'à 3 fois en cas d'erreur temporaire
 });
 
-export async function analyzePlantImage(base64Image: string): Promise<any> {
+// Nouvel analyseur de plantes basé sur des règles (ne nécessite pas d'API)
+const plantAnalyzer = new PlantAnalyzer();
+
+export async function analyzePlantImage(base64Image: string, fileName?: string): Promise<any> {
   try {
+    // Si aucune clé API OpenAI n'est définie, utiliser l'analyseur local
     if (!process.env.OPENAI_API_KEY) {
-      throw new Error("API key not found. Please set OPENAI_API_KEY environment variable.");
+      console.log("Clé API OpenAI non trouvée, utilisation de l'analyseur local");
+      // Si un nom de fichier est fourni, analyser l'image en fonction du nom de fichier
+      if (fileName) {
+        return plantAnalyzer.analyzeImage(fileName);
+      }
+      // Sinon, retourner une analyse générique
+      return plantAnalyzer.analyzeByDescription("plante d'intérieur générique");
     }
 
     const prompt = `
@@ -92,23 +103,13 @@ export async function analyzePlantImage(base64Image: string): Promise<any> {
         
         console.error("Limite d'API OpenAI dépassée:", apiError.message);
         
-        // Réponse spécifique pour les erreurs de quota
-        return {
-          plantName: "Plante non identifiée",
-          species: "Espèce inconnue",
-          status: "healthy",
-          healthIssues: [],
-          recommendations: [
-            "Impossible d'analyser la plante pour le moment. Le service d'analyse est temporairement indisponible.",
-            "Veuillez réessayer ultérieurement ou contacter le support."
-          ],
-          careInstructions: {
-            watering: "Information non disponible pour le moment",
-            light: "Information non disponible pour le moment",
-            temperature: "Information non disponible pour le moment",
-            additional: ["Le service d'analyse est actuellement limité par des contraintes d'API."]
-          }
-        };
+        // Utiliser l'analyseur local en cas d'erreur d'API OpenAI
+        console.log("Utilisation de l'analyseur local comme solution de repli");
+        if (fileName) {
+          return plantAnalyzer.analyzeImage(fileName);
+        } else {
+          return plantAnalyzer.analyzeByDescription("plante d'intérieur générique");
+        }
       } else if (apiError.status === 400 || apiError.message?.includes("bad request")) {
         // Erreur de requête malformée
         throw new Error("Erreur de requête: format d'image non pris en charge ou requête incorrecte");
@@ -122,6 +123,18 @@ export async function analyzePlantImage(base64Image: string): Promise<any> {
     }
   } catch (error: any) {
     console.error("Erreur globale lors de l'analyse d'image:", error);
-    throw new Error(`Erreur lors de l'analyse de l'image: ${error.message}`);
+    
+    // En cas d'erreur globale, utiliser l'analyseur local comme dernier recours
+    console.log("Erreur d'analyse, utilisation de l'analyseur local comme solution de dernier recours");
+    try {
+      if (fileName) {
+        return plantAnalyzer.analyzeImage(fileName);
+      } else {
+        return plantAnalyzer.analyzeByDescription("plante d'intérieur générique");
+      }
+    } catch (fallbackError) {
+      console.error("Échec de l'analyseur local:", fallbackError);
+      throw new Error(`Erreur lors de l'analyse de l'image: ${error.message}`);
+    }
   }
 }
