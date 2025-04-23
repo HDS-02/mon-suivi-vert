@@ -8,9 +8,11 @@ import { Task } from "@shared/schema";
 import { Link } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import NewTaskDialog from "@/components/NewTaskDialog";
 
 export default function Calendar() {
   const [date, setDate] = useState<Date | undefined>(new Date());
+  const [isNewTaskDialogOpen, setIsNewTaskDialogOpen] = useState(false);
   const { data: tasks, isLoading } = useTasks();
   const { toast } = useToast();
 
@@ -162,7 +164,10 @@ export default function Calendar() {
         <h3 className="text-lg font-semibold font-raleway">
           Tâches du {date ? formatDate(date) : ""}
         </h3>
-        <Button className="bg-primary text-white text-sm">
+        <Button 
+          className="bg-primary text-white text-sm"
+          onClick={() => setIsNewTaskDialogOpen(true)}
+        >
           <span className="material-icons mr-2 text-sm">add</span>
           Nouvelle tâche
         </Button>
@@ -217,6 +222,13 @@ export default function Calendar() {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialogue pour créer une nouvelle tâche */}
+      <NewTaskDialog 
+        open={isNewTaskDialogOpen} 
+        onOpenChange={setIsNewTaskDialogOpen}
+        selectedDate={date}
+      />
     </div>
   );
 }
