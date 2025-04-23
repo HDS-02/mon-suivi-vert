@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
+import WeatherWidget from "@/components/WeatherWidget";
 
 export default function Home() {
   const { data: plants, isLoading: plantsLoading } = usePlants();
@@ -132,36 +133,41 @@ export default function Home() {
         </div>
       </section>
 
-      {/* QUICK ACTIONS */}
-      <section className="mb-8">
-        <h2 className="text-lg font-raleway font-semibold mb-4">Actions rapides</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Link href="/analyze">
-            <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-              <span className="material-icons text-primary mb-2">add_a_photo</span>
-              <span className="text-sm font-medium">Analyser une plante</span>
-            </Button>
-          </Link>
-          <Link href="/plants">
-            <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-              <span className="material-icons text-primary mb-2">format_list_bulleted</span>
-              <span className="text-sm font-medium">Mes plantes</span>
-            </Button>
-          </Link>
-          <Link href="/calendar">
-            <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-              <span className="material-icons text-primary mb-2">calendar_today</span>
-              <span className="text-sm font-medium">Calendrier</span>
-            </Button>
-          </Link>
-          <Link href="/tips">
-            <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-              <span className="material-icons text-primary mb-2">tips_and_updates</span>
-              <span className="text-sm font-medium">Conseils</span>
-            </Button>
-          </Link>
+      {/* QUICK ACTIONS AND WEATHER */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="md:col-span-2">
+          <h2 className="text-lg font-raleway font-semibold mb-4">Actions rapides</h2>
+          <div className="grid grid-cols-2 gap-4">
+            <Link href="/analyze">
+              <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
+                <span className="material-icons text-primary mb-2">add_a_photo</span>
+                <span className="text-sm font-medium">Analyser une plante</span>
+              </Button>
+            </Link>
+            <Link href="/plants">
+              <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
+                <span className="material-icons text-primary mb-2">format_list_bulleted</span>
+                <span className="text-sm font-medium">Mes plantes</span>
+              </Button>
+            </Link>
+            <Link href="/calendar">
+              <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
+                <span className="material-icons text-primary mb-2">calendar_today</span>
+                <span className="text-sm font-medium">Calendrier</span>
+              </Button>
+            </Link>
+            <Link href="/tips">
+              <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
+                <span className="material-icons text-primary mb-2">tips_and_updates</span>
+                <span className="text-sm font-medium">Conseils</span>
+              </Button>
+            </Link>
+          </div>
         </div>
-      </section>
+        <div>
+          <WeatherWidget />
+        </div>
+      </div>
 
       {/* TODAY'S TASKS */}
       <section className="mb-8">

@@ -295,8 +295,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Convert image to base64 for AI analysis
       const base64Image = file.buffer.toString('base64');
       
-      // Analyze image using OpenAI
-      const analysisResult = await analyzePlantImage(base64Image);
+      // Analyze image using OpenAI or fallback to local analyzer
+      const analysisResult = await analyzePlantImage(base64Image, file.originalname);
       
       // Public URL path for the saved image
       const imagePath = `/uploads/${fileName}`;
