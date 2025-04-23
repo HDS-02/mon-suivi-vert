@@ -130,10 +130,16 @@ export default function NewTaskDialog({
         type: data.type,
         description: data.description,
         dueDate: data.dueDate,
+        completed: false, // Ajouter explicitement le champ 'completed' pour éviter l'erreur de validation
       };
 
       // Envoyer les données à l'API
-      await apiRequest("POST", "/api/tasks", taskData);
+      const response = await apiRequest("POST", "/api/tasks", taskData);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Erreur lors de la création de la tâche");
+      }
 
       // Rafraîchir les données de tâches dans le cache
       queryClient.invalidateQueries({ queryKey: ["/api/tasks"] });
@@ -146,10 +152,11 @@ export default function NewTaskDialog({
 
       // Fermer le dialogue
       onOpenChange(false);
-    } catch (error) {
+    } catch (error: any) {
+      console.error("Erreur création tâche:", error);
       toast({
         title: "Erreur",
-        description: "Une erreur est survenue lors de la création de la tâche",
+        description: error.message || "Une erreur est survenue lors de la création de la tâche",
         variant: "destructive",
       });
     } finally {

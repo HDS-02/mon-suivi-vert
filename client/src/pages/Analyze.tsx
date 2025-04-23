@@ -40,6 +40,35 @@ export default function Analyze() {
     }
   };
 
+  // Gérer le glisser-déposer
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const file = e.dataTransfer.files[0];
+      if (file.type.startsWith('image/')) {
+        setSelectedImage(file);
+        const reader = new FileReader();
+        reader.onload = () => {
+          setImagePreview(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+      } else {
+        toast({
+          title: "Format non supporté",
+          description: "Veuillez déposer uniquement des images",
+          variant: "destructive",
+        });
+      }
+    }
+  };
+
   const handleSubmit = async () => {
     if (!selectedImage) {
       toast({
@@ -240,7 +269,12 @@ export default function Analyze() {
               <div className="flex flex-col sm:flex-row gap-4">
                 <Button
                   className="bg-primary text-white"
-                  onClick={handleCapture}
+                  onClick={() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.setAttribute("capture", "environment");
+                      fileInputRef.current.click();
+                    }
+                  }}
                 >
                   <span className="material-icons mr-2">photo_camera</span>
                   Prendre une photo
@@ -248,10 +282,15 @@ export default function Analyze() {
                 <Button
                   variant="outline"
                   className="border border-primary text-primary"
-                  onClick={handleCapture}
+                  onClick={() => {
+                    if (fileInputRef.current) {
+                      fileInputRef.current.removeAttribute("capture");
+                      fileInputRef.current.click();
+                    }
+                  }}
                 >
                   <span className="material-icons mr-2">photo_library</span>
-                  Galerie
+                  Importer une image
                 </Button>
                 <input
                   type="file"
@@ -259,7 +298,6 @@ export default function Analyze() {
                   onChange={handleFileChange}
                   accept="image/*"
                   className="hidden"
-                  capture="environment"
                 />
               </div>
             </div>
