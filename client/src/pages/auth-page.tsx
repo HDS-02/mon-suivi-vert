@@ -18,6 +18,8 @@ const loginSchema = z.object({
 });
 
 const registerSchema = loginSchema.extend({
+  firstName: z.string().min(2, { message: "Le prénom doit contenir au moins 2 caractères" }),
+  email: z.string().email({ message: "Adresse email invalide" }).optional(),
   confirmPassword: z.string().min(6, { message: "Le mot de passe doit contenir au moins 6 caractères" }),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Les mots de passe ne correspondent pas",
@@ -45,6 +47,8 @@ export default function AuthPage() {
     resolver: zodResolver(registerSchema),
     defaultValues: {
       username: "",
+      firstName: "",
+      email: "",
       password: "",
       confirmPassword: "",
     },
@@ -210,6 +214,32 @@ export default function AuthPage() {
                             <FormLabel>Nom d'utilisateur</FormLabel>
                             <FormControl>
                               <Input placeholder="Choisissez un nom d'utilisateur" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={registerForm.control}
+                        name="firstName"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Prénom</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Entrez votre prénom" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                      <FormField
+                        control={registerForm.control}
+                        name="email"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Email (optionnel)</FormLabel>
+                            <FormControl>
+                              <Input type="email" placeholder="Entrez votre email" {...field} />
                             </FormControl>
                             <FormMessage />
                           </FormItem>

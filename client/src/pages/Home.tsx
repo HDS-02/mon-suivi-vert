@@ -6,11 +6,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Home() {
   const { data: plants, isLoading: plantsLoading } = usePlants();
   const { data: tasks, isLoading: tasksLoading } = useTasks();
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const completeTask = async (taskId: number) => {
     try {
@@ -113,7 +115,9 @@ export default function Home() {
             <span className="material-icons text-primary text-4xl">eco</span>
           </div>
           <div>
-            <h2 className="text-xl font-raleway font-semibold mb-1">Bonjour Jardinier !</h2>
+            <h2 className="text-xl font-raleway font-semibold mb-1">
+              Bonjour {user?.firstName || "Jardinier"} !
+            </h2>
             <p className="text-gray-600">
               Votre collection contient{" "}
               <span className="font-semibold text-primary">
