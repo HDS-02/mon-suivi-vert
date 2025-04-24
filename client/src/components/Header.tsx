@@ -4,12 +4,14 @@ import SettingsDialog from "./SettingsDialog";
 import ProfileDialog from "./ProfileDialog";
 import newLogo from "../assets/logo.png";
 import { useAuth } from "@/hooks/use-auth";
+import useNotifications from "@/hooks/useNotifications";
 
 export default function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const { user } = useAuth();
+  const { unreadCount } = useNotifications();
 
   return (
     <header className="bg-primary/80 backdrop-blur-md text-white shadow-lg sticky top-0 z-20">
@@ -19,11 +21,16 @@ export default function Header() {
         </div>
         <div className="flex space-x-2">
           <button 
-            className="p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 ease-in-out"
+            className="p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 ease-in-out relative"
             onClick={() => setNotificationsOpen(true)}
             title="Notifications"
           >
             <span className="material-icons">notifications</span>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                {unreadCount > 9 ? '9+' : unreadCount}
+              </span>
+            )}
           </button>
           <button 
             className="p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 ease-in-out"
