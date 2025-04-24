@@ -207,23 +207,113 @@ export default function PlantDetail() {
       </div>
 
       {displayTab === "overview" && (
-        <Card className="bg-white rounded-lg shadow-md p-4 mb-6">
-          <CardContent className="p-0">
-            <h3 className="font-raleway font-semibold mb-3">Conseils d'entretien</h3>
-            {plant.careNotes ? (
-              <div className="space-y-3">
-                {plant.careNotes.split('.').filter(note => note.trim()).map((note, index) => (
-                  <div key={index} className="flex items-start">
-                    <span className="material-icons text-primary mr-2 mt-0.5 text-sm">arrow_right</span>
-                    <span className="text-sm">{note.trim()}</span>
+        <>
+          <Card className="bg-white rounded-lg shadow-md p-4 mb-6">
+            <CardContent className="p-0">
+              <h3 className="font-raleway font-semibold mb-3">Conseils d'entretien</h3>
+              {plant.careNotes ? (
+                <div className="space-y-3">
+                  {plant.careNotes.split('.').filter(note => note.trim()).map((note, index) => (
+                    <div key={index} className="flex items-start">
+                      <span className="material-icons text-primary mr-2 mt-0.5 text-sm">arrow_right</span>
+                      <span className="text-sm">{note.trim()}</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-gray-500">Aucun conseil d'entretien disponible.</p>
+              )}
+            </CardContent>
+          </Card>
+          
+          {/* Section pour les maladies fréquentes */}
+          <Card className="bg-white rounded-lg shadow-md p-4 mb-6">
+            <CardContent className="p-0">
+              <h3 className="font-raleway font-semibold mb-3">Maladies fréquentes</h3>
+              {plant.commonDiseases && Array.isArray(plant.commonDiseases) && plant.commonDiseases.length > 0 ? (
+                <div className="space-y-4">
+                  {plant.commonDiseases.map((disease: any, index: number) => (
+                    <div key={index} className="p-3 bg-red-50/30 border border-red-100 rounded-md">
+                      <div className="flex items-start mb-2">
+                        <span className="material-icons text-red-500 mr-2">pest_control</span>
+                        <h4 className="font-medium text-red-800">{disease.name}</h4>
+                      </div>
+                      <p className="text-sm text-gray-700 mb-2">{disease.description}</p>
+                      <div className="flex items-start">
+                        <span className="text-xs font-medium bg-white px-2 py-1 rounded border border-red-100 text-red-600">
+                          <span className="material-icons text-xs mr-1 align-text-top">healing</span>
+                          Traitement
+                        </span>
+                        <p className="text-xs text-gray-600 ml-2">{disease.treatment}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-6 text-center">
+                  <span className="material-icons text-gray-300 text-4xl mb-2">verified</span>
+                  <p className="text-sm text-gray-500">Cette plante ne présente pas de maladies fréquentes connues.</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+          
+          {/* Section pour la taille de pot recommandée */}
+          {plant.potSize && (
+            <Card className="bg-white rounded-lg shadow-md p-4 mb-6">
+              <CardContent className="p-0">
+                <h3 className="font-raleway font-semibold mb-3">Taille de pot recommandée</h3>
+                <div className="flex items-center bg-blue-50/30 p-3 rounded-md border border-blue-100">
+                  <span className="material-icons text-blue-500 mr-3">format_size</span>
+                  <div>
+                    <p className="text-sm font-medium text-blue-800">{plant.potSize}</p>
+                    <p className="text-xs text-gray-600">Assurez-vous que le pot dispose de trous de drainage adéquats.</p>
                   </div>
-                ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          
+          {/* Section pour la galerie d'images */}
+          <Card className="bg-white rounded-lg shadow-md p-4 mb-6">
+            <CardContent className="p-0">
+              <div className="flex justify-between items-center mb-3">
+                <h3 className="font-raleway font-semibold">Galerie</h3>
+                <button className="text-primary text-sm font-medium flex items-center">
+                  <span className="material-icons text-sm mr-1">add_photo_alternate</span>
+                  Ajouter
+                </button>
               </div>
-            ) : (
-              <p className="text-sm text-gray-500">Aucun conseil d'entretien disponible.</p>
-            )}
-          </CardContent>
-        </Card>
+              
+              {plant.gallery && Array.isArray(plant.gallery) && plant.gallery.length > 0 ? (
+                <div className="grid grid-cols-3 gap-2">
+                  {plant.gallery.map((image: string, index: number) => (
+                    <div key={index} className="aspect-square bg-gray-100 rounded-md overflow-hidden">
+                      <img 
+                        src={image} 
+                        alt={`${plant.name} - image ${index + 1}`}
+                        className="w-full h-full object-cover hover:scale-110 transition-transform duration-300"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none';
+                          const parent = e.currentTarget.parentElement;
+                          if (parent) {
+                            parent.innerHTML = '<div class="flex items-center justify-center h-full"><span class="material-icons text-gray-400">image_not_supported</span></div>';
+                          }
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-8 text-center bg-gray-50 rounded-md">
+                  <span className="material-icons text-gray-300 text-4xl mb-2">photo_library</span>
+                  <p className="text-sm text-gray-500 mb-2">Aucune photo dans la galerie</p>
+                  <p className="text-xs text-gray-400">Ajoutez des photos pour suivre l'évolution de votre plante</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </>
       )}
 
       {displayTab === "history" && (

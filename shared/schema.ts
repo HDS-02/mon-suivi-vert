@@ -20,11 +20,14 @@ export const plants = pgTable("plants", {
   species: text("species"),
   status: text("status").notNull().default("healthy"), // healthy, warning, danger
   image: text("image"),
+  gallery: json("gallery").default('[]'), // Array of image URLs
   dateAdded: timestamp("date_added").defaultNow(),
   wateringFrequency: integer("watering_frequency"), // days
   light: text("light"), // indirect, direct, shade
   temperature: text("temperature"), // optimal temperature range
   careNotes: text("care_notes"),
+  potSize: text("pot_size"), // Taille du pot recommandée
+  commonDiseases: json("common_diseases").default('[]'), // Maladies fréquentes (tableau)
   userId: integer("user_id").notNull().default(1), // Foreign key to users table
 });
 

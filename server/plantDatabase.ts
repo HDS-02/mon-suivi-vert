@@ -12,6 +12,8 @@ export interface PlantEntry {
   light: string;
   temperature: string;
   careNotes: string;
+  potSize?: string;
+  commonDiseases?: Array<{name: string, description: string, treatment: string}>;
 }
 
 export interface PlantCategoryInfo {

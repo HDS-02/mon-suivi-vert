@@ -57,6 +57,10 @@ export default function EditPlantDialog({ open, onOpenChange, plant, onDelete }:
       wateringFrequency: plant?.wateringFrequency || 7,
       careNotes: plant?.careNotes || "",
       image: plant?.image || "",
+      potSize: plant?.potSize || "",
+      // Ces champs d'objets JSON sont convertis en chaînes pour le formulaire
+      gallery: plant?.gallery ? JSON.stringify(plant.gallery) : "[]",
+      commonDiseases: plant?.commonDiseases ? JSON.stringify(plant.commonDiseases) : "[]",
     },
   });
   
@@ -72,15 +76,43 @@ export default function EditPlantDialog({ open, onOpenChange, plant, onDelete }:
         wateringFrequency: plant.wateringFrequency || 7,
         careNotes: plant.careNotes || "",
         image: plant.image || "",
+        potSize: plant?.potSize || "",
+        gallery: plant?.gallery ? JSON.stringify(plant.gallery) : "[]",
+        commonDiseases: plant?.commonDiseases ? JSON.stringify(plant.commonDiseases) : "[]",
       });
     }
   }, [plant, form.reset]);
 
   const onSubmit = async (data: EditPlantFormValues) => {
     try {
+      // Traitement des données JSON avant envoi
+      const formattedData = {
+        ...data,
+        // Traiter la galerie : convertir la chaîne en tableau
+        gallery: data.gallery ? 
+          (typeof data.gallery === 'string' ? 
+            data.gallery.split(',').map(url => url.trim()).filter(url => url) : 
+            data.gallery) : 
+          [],
+        
+        // Traiter les maladies courantes : s'assurer que c'est un JSON valide
+        commonDiseases: data.commonDiseases ? 
+          (typeof data.commonDiseases === 'string' ? 
+            (() => {
+              try {
+                return JSON.parse(data.commonDiseases as string);
+              } catch (e) {
+                console.error("Format JSON invalide:", e);
+                return [];
+              }
+            })() : 
+            data.commonDiseases) : 
+          []
+      };
+
       if (plant?.id) {
         // Update existing plant
-        await apiRequest("PATCH", `/api/plants/${plant.id}`, data);
+        await apiRequest("PATCH", `/api/plants/${plant.id}`, formattedData);
         toast({
           title: "Plante mise à jour",
           description: "Les informations de la plante ont été mises à jour avec succès.",
@@ -91,7 +123,7 @@ export default function EditPlantDialog({ open, onOpenChange, plant, onDelete }:
         queryClient.invalidateQueries({ queryKey: [`/api/plants/${plant.id}`] });
       } else {
         // Create new plant
-        await apiRequest("POST", "/api/plants", data);
+        await apiRequest("POST", "/api/plants", formattedData);
         toast({
           title: "Plante créée",
           description: "La nouvelle plante a été ajoutée à votre collection.",
@@ -103,6 +135,7 @@ export default function EditPlantDialog({ open, onOpenChange, plant, onDelete }:
       
       onOpenChange(false);
     } catch (error) {
+      console.error("Erreur lors de la sauvegarde:", error);
       toast({
         title: "Erreur",
         description: "Une erreur est survenue lors de l'enregistrement de la plante.",
@@ -271,6 +304,85 @@ export default function EditPlantDialog({ open, onOpenChange, plant, onDelete }:
                         {...field}
                       />
                     </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="potSize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Taille de pot recommandée</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Ex: Pot de 20-25 cm de diamètre" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="gallery"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Galerie d'images (URLs séparées par des virgules)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Entrez une liste d'URLs d'images séparées par des virgules"
+                        className="h-20"
+                        {...field}
+                        onChange={(e) => {
+                          // Stocke les URLs sous forme de chaîne pour le formulaire
+                          field.onChange(e.target.value);
+                          
+                          try {
+                            // Validation simple pour s'assurer que c'est un tableau JSON valide
+                            const urls = e.target.value.split(',').map(url => url.trim());
+                            const jsonUrls = JSON.stringify(urls.filter(url => url));
+                            // Cette ligne ne s'exécute que pour validation
+                            JSON.parse(jsonUrls);
+                          } catch (err) {
+                            // En cas d'erreur de parsing, on garde la valeur telle quelle
+                            console.error("Format de galerie invalide:", err);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              
+              <FormField
+                control={form.control}
+                name="commonDiseases"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Maladies courantes (format JSON)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder='[{"name": "Oïdium", "description": "Champignon qui forme un duvet blanc sur les feuilles", "treatment": "Traitement fongicide ou solution de bicarbonate de soude"}]'
+                        className="h-24 font-mono text-xs"
+                        {...field}
+                        onChange={(e) => {
+                          field.onChange(e.target.value);
+                          
+                          try {
+                            // Validation simple pour s'assurer que c'est un JSON valide
+                            JSON.parse(e.target.value);
+                          } catch (err) {
+                            // En cas d'erreur de parsing, on garde la valeur telle quelle
+                            console.error("Format JSON invalide:", err);
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-gray-500 mt-1">
+                      Format: Tableau d'objets avec les propriétés name, description et treatment
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
