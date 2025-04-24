@@ -12,10 +12,65 @@ export interface Notification {
   taskId?: number;
 }
 
+// Données d'exemple pour les notifications
+const EXAMPLE_NOTIFICATIONS: Array<{
+  title: string;
+  message: string;
+  type: 'info' | 'warning' | 'success';
+}> = [
+  {
+    title: 'Rappel d\'arrosage',
+    message: 'Il est temps d\'arroser votre Chou-fleur aujourd\'hui',
+    type: 'info',
+  },
+  {
+    title: 'Bienvenue sur Mon Suivi Vert !',
+    message: 'Découvrez comment prendre soin de vos plantes facilement',
+    type: 'success',
+  },
+  {
+    title: 'Conseils de jardinage',
+    message: 'Saviez-vous que les légumes-feuilles préfèrent l\'ombre partielle ?',
+    type: 'info',
+  },
+  {
+    title: 'Nouveau badge débloqué !',
+    message: 'Félicitations ! Vous avez débloqué le badge "Premier Pas"',
+    type: 'success',
+  },
+  {
+    title: 'Alerte météo',
+    message: 'Température en baisse prévue cette nuit. Protégez vos plantes sensibles !',
+    type: 'warning',
+  }
+];
+
 export default function useNotifications() {
   const { toast } = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [permission, setPermission] = useState<'default' | 'granted' | 'denied'>('default');
+  const [exampleNotificationsAdded, setExampleNotificationsAdded] = useState(false);
+  
+  // Ajouter des notifications d'exemple
+  useEffect(() => {
+    if (!exampleNotificationsAdded) {
+      // Ajouter des notifications d'exemple avec délai pour simulation
+      setTimeout(() => {
+        const now = new Date();
+        
+        // Ajouter les notifications avec des dates différentes
+        const exampleWithDates = EXAMPLE_NOTIFICATIONS.map((notif, index) => ({
+          ...notif,
+          id: Math.random().toString(36).substring(2),
+          date: new Date(now.getTime() - index * 1000 * 60 * 60 * (index + 1)), // Espacer les dates
+          read: index > 1 // Les 2 premières ne sont pas lues
+        }));
+        
+        setNotifications(exampleWithDates);
+        setExampleNotificationsAdded(true);
+      }, 500);
+    }
+  }, [exampleNotificationsAdded]);
 
   // Vérification simplifiée pour les notifications du navigateur
   useEffect(() => {
