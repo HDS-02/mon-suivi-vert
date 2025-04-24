@@ -111,21 +111,21 @@ export default function Home() {
     <div>
       {/* WELCOME SECTION */}
       <section className="mb-8">
-        <div className="bg-white rounded-lg shadow-md p-6 flex items-center">
-          <div className="mr-4">
-            <span className="material-icons text-primary text-4xl">eco</span>
+        <div className="bg-gradient-to-br from-primary/80 to-primary-light/80 backdrop-blur-md rounded-xl shadow-lg p-6 flex items-center">
+          <div className="mr-4 bg-white/20 p-3 rounded-full">
+            <span className="material-icons text-white text-4xl">eco</span>
           </div>
           <div>
-            <h2 className="text-xl font-raleway font-semibold mb-1">
+            <h2 className="text-xl font-raleway font-semibold mb-1 text-white">
               Bonjour {user?.firstName || "Jardinier"} !
             </h2>
-            <p className="text-gray-600">
+            <p className="text-white/90">
               Votre collection contient{" "}
-              <span className="font-semibold text-primary">
+              <span className="font-semibold text-white">
                 {!plantsLoading ? plants?.length || 0 : "..."} plantes
               </span>{" "}
               {!tasksLoading && tasks && tasks.filter(t => !t.completed).length > 0 && (
-                <>dont <span className="font-semibold text-primary">{tasks.filter(t => !t.completed).length}</span> à entretenir aujourd'hui</>
+                <>dont <span className="font-semibold text-white">{tasks.filter(t => !t.completed).length}</span> à entretenir aujourd'hui</>
               )}
               .
             </p>
@@ -139,26 +139,34 @@ export default function Home() {
           <h2 className="text-lg font-raleway font-semibold mb-4">Actions rapides</h2>
           <div className="grid grid-cols-2 gap-4">
             <Link href="/analyze">
-              <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-                <span className="material-icons text-primary mb-2">add_a_photo</span>
+              <Button variant="ghost" className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-4 h-auto hover:shadow-lg hover:bg-white/90 transition-all duration-200 flex flex-col items-center w-full border border-gray-100">
+                <div className="bg-gradient-to-br from-primary/90 to-primary-light/90 rounded-full p-3 mb-2 text-white">
+                  <span className="material-icons">add_a_photo</span>
+                </div>
                 <span className="text-sm font-medium">Analyser une plante</span>
               </Button>
             </Link>
             <Link href="/plants">
-              <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-                <span className="material-icons text-primary mb-2">format_list_bulleted</span>
+              <Button variant="ghost" className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-4 h-auto hover:shadow-lg hover:bg-white/90 transition-all duration-200 flex flex-col items-center w-full border border-gray-100">
+                <div className="bg-gradient-to-br from-green-500/90 to-green-400/90 rounded-full p-3 mb-2 text-white">
+                  <span className="material-icons">format_list_bulleted</span>
+                </div>
                 <span className="text-sm font-medium">Mes plantes</span>
               </Button>
             </Link>
             <Link href="/calendar">
-              <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-                <span className="material-icons text-primary mb-2">calendar_today</span>
+              <Button variant="ghost" className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-4 h-auto hover:shadow-lg hover:bg-white/90 transition-all duration-200 flex flex-col items-center w-full border border-gray-100">
+                <div className="bg-gradient-to-br from-blue-500/90 to-blue-400/90 rounded-full p-3 mb-2 text-white">
+                  <span className="material-icons">calendar_today</span>
+                </div>
                 <span className="text-sm font-medium">Calendrier</span>
               </Button>
             </Link>
             <Link href="/tips">
-              <Button variant="ghost" className="bg-white rounded-lg shadow-sm p-4 h-auto hover:shadow-md transition-shadow flex flex-col items-center w-full">
-                <span className="material-icons text-primary mb-2">tips_and_updates</span>
+              <Button variant="ghost" className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-4 h-auto hover:shadow-lg hover:bg-white/90 transition-all duration-200 flex flex-col items-center w-full border border-gray-100">
+                <div className="bg-gradient-to-br from-amber-500/90 to-amber-400/90 rounded-full p-3 mb-2 text-white">
+                  <span className="material-icons">tips_and_updates</span>
+                </div>
                 <span className="text-sm font-medium">Conseils</span>
               </Button>
             </Link>
@@ -180,34 +188,50 @@ export default function Home() {
             </a>
           </Link>
         </div>
-        <Card className="bg-white rounded-lg shadow-md divide-y divide-gray-100">
+        <Card className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md overflow-hidden border border-gray-100">
           {tasksLoading ? (
-            <div className="p-6 text-center">Chargement des tâches...</div>
+            <div className="p-6 text-center">
+              <div className="animate-pulse flex justify-center">
+                <div className="h-6 w-6 bg-gray-200 rounded-full"></div>
+              </div>
+              <p className="mt-2 text-gray-400">Chargement des tâches...</p>
+            </div>
           ) : tasks && tasks.filter(t => !t.completed).length > 0 ? (
-            tasks
-              .filter((task: Task) => !task.completed)
-              .map((task: Task) => (
-                <div key={task.id} className="p-4 flex items-center">
-                  <div className={`w-10 h-10 ${getTaskTypeBackground(task.type)} rounded-full flex items-center justify-center mr-4`}>
-                    {getTaskIcon(task.type)}
+            <div className="divide-y divide-gray-100">
+              {tasks
+                .filter((task: Task) => !task.completed)
+                .map((task: Task) => (
+                  <div key={task.id} className="p-4 flex items-center hover:bg-gray-50/50 transition-colors">
+                    <div className={`w-12 h-12 bg-gradient-to-br ${
+                      task.type === 'water' ? 'from-blue-500/80 to-blue-400/80' :
+                      task.type === 'light' ? 'from-amber-500/80 to-amber-400/80' :
+                      task.type === 'fertilize' ? 'from-green-500/80 to-green-400/80' :
+                      task.type === 'repot' ? 'from-amber-700/80 to-amber-600/80' :
+                      'from-gray-500/80 to-gray-400/80'
+                    } rounded-full flex items-center justify-center mr-4 shadow-sm text-white`}>
+                      {getTaskIcon(task.type)}
+                    </div>
+                    <div className="flex-grow">
+                      <h3 className="font-medium">{task.description}</h3>
+                      <p className="text-sm text-gray-500">
+                        {new Date(task.dueDate || Date.now()).toLocaleDateString("fr-FR")}
+                      </p>
+                    </div>
+                    <button 
+                      className="ml-2 p-2 rounded-full hover:bg-white/80 active:bg-white/90 transition-all"
+                      onClick={() => completeTask(task.id)}
+                    >
+                      <span className="material-icons text-gray-400 hover:text-green-500 transition-colors">check_circle_outline</span>
+                    </button>
                   </div>
-                  <div className="flex-grow">
-                    <h3 className="font-medium">{task.description}</h3>
-                    <p className="text-sm text-gray-500">
-                      {new Date(task.dueDate || Date.now()).toLocaleDateString("fr-FR")}
-                    </p>
-                  </div>
-                  <button 
-                    className="ml-2 p-2 rounded-full hover:bg-gray-100"
-                    onClick={() => completeTask(task.id)}
-                  >
-                    <span className="material-icons text-gray-400">check_circle_outline</span>
-                  </button>
-                </div>
-              ))
+                ))}
+            </div>
           ) : (
-            <div className="p-6 text-center text-gray-500">
-              Aucune tâche pour aujourd'hui
+            <div className="p-8 text-center bg-gradient-to-br from-gray-50/50 to-white/80">
+              <div className="mb-3 rounded-full bg-gray-100/80 p-3 inline-block">
+                <span className="material-icons text-gray-400 text-xl">check_circle</span>
+              </div>
+              <p className="text-gray-500">Aucune tâche pour aujourd'hui</p>
             </div>
           )}
         </Card>

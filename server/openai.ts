@@ -160,7 +160,11 @@ async function useClaude(plantName: string): Promise<PlantAnalysisResponse> {
     ],
   });
 
-  const content = response.content[0].text;
+  // Extraire le contenu de la réponse
+  let content = '';
+  if (response.content && response.content.length > 0 && 'text' in response.content[0]) {
+    content = response.content[0].text;
+  }
   if (!content) {
     throw new Error("Aucune réponse reçue de Claude");
   }
