@@ -154,11 +154,15 @@ export default function WeatherWidget() {
             longitude: position.coords.longitude
           };
           
-          location = getNearestCity(coords.latitude, coords.longitude);
+          // Utiliser directement les coordonnées géographiques (format arrondi pour lisibilité)
+          const lat = parseFloat(coords.latitude.toFixed(4));
+          const lon = parseFloat(coords.longitude.toFixed(4));
+          location = `${lat}°N, ${lon}°E`;
           console.log("Localisation mise à jour:", location);
         } catch (locError) {
           console.log("Impossible d'obtenir la position, utilisation de Paris par défaut");
           // On continue avec la localisation par défaut de Paris
+          location = "48.8566°N, 2.3522°E"; // Coordonnées exactes de Paris
         }
         
         // Simulation de données météo pour une expérience utilisateur fiable
