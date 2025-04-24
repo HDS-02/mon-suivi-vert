@@ -10,6 +10,7 @@ import path from "path";
 import { nanoid } from "nanoid";
 import { setupAuth } from "./auth";
 import { badgeService } from "./badgeService";
+import { plantDatabase, searchPlants, getPlantByName } from "./plantDatabase";
 
 // Configure multer for in-memory file storage
 const upload = multer({
@@ -375,6 +376,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Données invalides", errors: error.errors });
       }
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // RÉCUPÉRATION DE LA BASE DE DONNÉES DES PLANTES (pour l'ajout manuel)
+  app.get("/api/plant-database", async (req: Request, res: Response) => {
+    try {
+      const query = req.query.q as string;
+      
+      if (query) {
+        // Recherche de plantes selon le critère de recherche
+        const results = searchPlants(query);
+        return res.json(results);
+      }
+      
+      // Sans critère de recherche, retourne toute la base de données
+      res.json(plantDatabase);
+    } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Récupération d'une plante spécifique de la base de données par nom
+  app.get("/api/plant-database/:name", async (req: Request, res: Response) => {
+    try {
+      const name = req.params.name;
+      const plant = getPlantByName(name);
+      
+      if (!plant) {
+        return res.status(404).json({ message: "Plante non trouvée dans la base de données" });
+      }
+      
+      res.json(plant);
+    } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
   });
