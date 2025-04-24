@@ -286,6 +286,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Aucune image fournie" });
       }
 
+      // Récupérer la description textuelle si fournie
+      const description = req.body.description || '';
+
       // Save the uploaded file
       const fileExtension = file.originalname.split('.').pop() || 'jpg';
       const fileName = `${nanoid()}.${fileExtension}`;
@@ -301,7 +304,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const base64Image = file.buffer.toString('base64');
       
       // Analyze image using OpenAI or fallback to local analyzer
-      const analysisResult = await analyzePlantImage(base64Image, file.originalname);
+      // Passer la description à l'analyseur pour améliorer la précision
+      const analysisResult = await analyzePlantImage(base64Image, file.originalname, description);
       
       // Public URL path for the saved image
       const imagePath = `/uploads/${fileName}`;

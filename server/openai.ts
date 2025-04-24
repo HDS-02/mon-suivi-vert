@@ -12,16 +12,20 @@ const openai = new OpenAI({
 // Nouvel analyseur de plantes basé sur des règles (ne nécessite pas d'API)
 const plantAnalyzer = new PlantAnalyzer();
 
-export async function analyzePlantImage(base64Image: string, fileName?: string): Promise<any> {
+export async function analyzePlantImage(base64Image: string, fileName?: string, description?: string): Promise<any> {
   // Si aucune clé API OpenAI n'est définie, utiliser l'analyseur local
   if (!process.env.OPENAI_API_KEY) {
     console.log("Clé API OpenAI non trouvée, utilisation de l'analyseur local");
     
-    // Si un nom de fichier est fourni, analyser l'image en fonction du nom de fichier
+    // Si un nom de fichier est fourni, analyser l'image en fonction du nom de fichier et de la description
     if (fileName) {
-      return plantAnalyzer.analyzeImage(fileName);
+      return plantAnalyzer.analyzeImage(fileName, description);
     }
-    // Sinon, retourner une analyse générique
+    // Sinon, tenter d'utiliser la description si disponible
+    if (description) {
+      return plantAnalyzer.analyzeByDescription(description);
+    }
+    // Si aucune information n'est disponible, retourner une analyse générique
     return plantAnalyzer.analyzeByDescription("plante d'intérieur générique");
   }
 
@@ -100,13 +104,20 @@ export async function analyzePlantImage(base64Image: string, fileName?: string):
     
     // Tenter d'utiliser l'analyseur local
     try {
-      // Si nous avons un nom de fichier, utilisons-le pour l'analyse
+      // Si nous avons un nom de fichier, utilisons-le pour l'analyse avec la description si disponible
       if (fileName) {
-        const localAnalysis = plantAnalyzer.analyzeImage(fileName);
+        const localAnalysis = plantAnalyzer.analyzeImage(fileName, description);
         console.log("Analyse locale réussie !");
         return localAnalysis;
-      } else {
-        // Sinon, utilisons des termes génériques pour l'analyse
+      } 
+      // Si nous avons une description, utilisons-la
+      else if (description) {
+        const localAnalysis = plantAnalyzer.analyzeByDescription(description);
+        console.log("Analyse basée sur la description réussie !");
+        return localAnalysis;
+      }
+      // Sinon, utilisons des termes génériques pour l'analyse
+      else {
         const terms = ["plante d'intérieur", "plante verte", "plante ornementale", "plante domestique"];
         const randomTerm = terms[Math.floor(Math.random() * terms.length)];
         const localAnalysis = plantAnalyzer.analyzeByDescription(randomTerm);

@@ -81,6 +81,12 @@ export default function AddPlantManually() {
         const formData = new FormData();
         formData.append("image", selectedImage);
         
+        // Ajouter la description de la plante pour améliorer l'analyse
+        const description = `${name} ${species}`.trim();
+        if (description) {
+          formData.append("description", description);
+        }
+        
         const analyzeResponse = await fetch("/api/analyze", {
           method: "POST",
           body: formData,
