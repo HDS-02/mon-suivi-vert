@@ -165,20 +165,31 @@ export default function PlantDetail() {
         </div>
       </div>
 
-      <div className="flex space-x-2 mb-4">
-        <Button
-          variant={displayTab === "overview" ? "default" : "outline"}
-          className={displayTab === "overview" ? "bg-primary text-white" : ""}
-          onClick={() => setDisplayTab("overview")}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex space-x-2">
+          <Button
+            variant={displayTab === "overview" ? "default" : "outline"}
+            className={displayTab === "overview" ? "bg-primary text-white" : ""}
+            onClick={() => setDisplayTab("overview")}
+          >
+            Aperçu
+          </Button>
+          <Button
+            variant={displayTab === "history" ? "default" : "outline"}
+            className={displayTab === "history" ? "bg-primary text-white" : ""}
+            onClick={() => setDisplayTab("history")}
+          >
+            Historique de santé
+          </Button>
+        </div>
+        
+        <Button 
+          variant="destructive"
+          className="flex items-center" 
+          onClick={() => setSosDialogOpen(true)}
         >
-          Aperçu
-        </Button>
-        <Button
-          variant={displayTab === "history" ? "default" : "outline"}
-          className={displayTab === "history" ? "bg-primary text-white" : ""}
-          onClick={() => setDisplayTab("history")}
-        >
-          Historique de santé
+          <span className="material-icons mr-1.5">healing</span>
+          SOS Assistance
         </Button>
       </div>
 
@@ -321,6 +332,13 @@ export default function PlantDetail() {
         onOpenChange={setEditDialogOpen} 
         plant={plant}
         onDelete={() => navigate("/plants")}
+      />
+
+      {/* SOS Assistance Plante Dialog */}
+      <SOSPlantDialog
+        open={sosDialogOpen}
+        onOpenChange={setSosDialogOpen}
+        plant={plant}
       />
     </div>
   );
