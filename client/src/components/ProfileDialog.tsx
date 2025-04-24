@@ -1,11 +1,4 @@
 import { useEffect } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Input } from "@/components/ui/input";
@@ -22,6 +15,7 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import { StableDialog } from "./StableDialog";
 
 // Schéma de validation pour le formulaire de profil
 const profileFormSchema = z.object({
@@ -61,13 +55,6 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
       });
     }
   }, [user, profileForm]);
-  
-  // Pour afficher les infos du formulaire dans la console (débogage)
-  useEffect(() => {
-    if (user) {
-      console.log("Données utilisateur chargées:", user);
-    }
-  }, [user]);
 
   // Gestionnaire de soumission du formulaire de profil
   const onSubmitProfileForm = async (data: ProfileFormValues) => {
@@ -96,88 +83,83 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
-      <DialogContent 
-        className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg"
-      >
-        <DialogHeader className="pb-4 border-b border-gray-100/50">
-          <DialogTitle className="text-primary-dark font-raleway text-xl">
-            <span className="flex items-center gap-2">
-              <span className="material-icons">account_circle</span>
-              Mon Profil
-            </span>
-          </DialogTitle>
-          <DialogDescription className="text-gray-600">
-            Gérez vos informations personnelles
-          </DialogDescription>
-        </DialogHeader>
+    <StableDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={
+        <span className="flex items-center gap-2 text-primary-dark font-raleway text-xl">
+          <span className="material-icons">account_circle</span>
+          Mon Profil
+        </span>
+      }
+      description="Gérez vos informations personnelles"
+      className="glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg"
+    >
+      <Form {...profileForm}>
+        <form onSubmit={profileForm.handleSubmit(onSubmitProfileForm)} className="space-y-4 py-2">
+          <FormField
+            control={profileForm.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Nom d'utilisateur</FormLabel>
+                <FormControl>
+                  <Input placeholder="Votre nom d'utilisateur" {...field} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-        <Form {...profileForm}>
-          <form onSubmit={profileForm.handleSubmit(onSubmitProfileForm)} className="space-y-4 py-2">
-            <FormField
-              control={profileForm.control}
-              name="username"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Nom d'utilisateur</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Votre nom d'utilisateur" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={profileForm.control}
+            name="firstName"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Prénom</FormLabel>
+                <FormControl>
+                  <Input placeholder="Votre prénom" {...field} value={field.value || ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={profileForm.control}
-              name="firstName"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Prénom</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Votre prénom" {...field} value={field.value || ''} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <FormField
+            control={profileForm.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email (optionnel)</FormLabel>
+                <FormControl>
+                  <Input type="email" placeholder="Votre email" {...field} value={field.value || ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
 
-            <FormField
-              control={profileForm.control}
-              name="email"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Email (optionnel)</FormLabel>
-                  <FormControl>
-                    <Input type="email" placeholder="Votre email" {...field} value={field.value || ''} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <div className="flex justify-between mt-6">
-              <Button
-                variant="outline"
-                type="button"
-                onClick={() => onOpenChange(false)}
-                className="border-primary/20 text-primary hover:bg-primary/5"
-              >
-                <span className="material-icons mr-2 text-sm">close</span>
-                Annuler
-              </Button>
-              <Button
-                type="submit"
-                className="bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
-                disabled={profileForm.formState.isSubmitting}
-              >
-                <span className="material-icons mr-2 text-sm">{profileForm.formState.isSubmitting ? "pending" : "save"}</span>
-                {profileForm.formState.isSubmitting ? "Enregistrement..." : "Enregistrer"}
-              </Button>
-            </div>
-          </form>
-        </Form>
-      </DialogContent>
-    </Dialog>
+          <div className="flex justify-between mt-6">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => onOpenChange(false)}
+              className="border-primary/20 text-primary hover:bg-primary/5"
+            >
+              <span className="material-icons mr-2 text-sm">close</span>
+              Annuler
+            </Button>
+            <Button
+              type="submit"
+              className="bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+              disabled={profileForm.formState.isSubmitting}
+            >
+              <span className="material-icons mr-2 text-sm">{profileForm.formState.isSubmitting ? "pending" : "save"}</span>
+              {profileForm.formState.isSubmitting ? "Enregistrement..." : "Enregistrer"}
+            </Button>
+          </div>
+        </form>
+      </Form>
+    </StableDialog>
   );
 }
