@@ -38,81 +38,103 @@ export default function Badges() {
   };
 
   return (
-    <div>
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h1 className="text-2xl font-bold tracking-tight">Mes Réalisations</h1>
-          
-          {/* Bouton de simulation - ne serait pas présent en production */}
-          <Button
-            variant="outline"
-            onClick={simulateUnlockBadge}
-            className="hidden" // Caché pour l'instant
-          >
-            <span className="material-icons mr-2">emoji_events</span>
-            Simuler badge
-          </Button>
-        </div>
-        
-        <p className="text-muted-foreground">
-          Suivez votre progression et déverrouillez des badges en prenant soin de vos plantes.
+    <div className="organic-bg min-h-screen pb-24">
+      <div className="gradient-header bg-gradient-to-br from-primary/90 to-primary-light/90 text-white px-4 pt-6 pb-8 mb-6 shadow-md">
+        <h1 className="text-2xl font-raleway font-semibold">Mes Réalisations</h1>
+        <p className="text-white/80 mt-1">
+          Suivez votre progression et déverrouillez des badges en prenant soin de vos plantes
         </p>
-      </section>
+      </div>
 
-      <Separator className="my-6" />
+      <div className="px-4">
+        {/* Bouton de simulation - ne serait pas présent en production */}
+        <Button
+          variant="outline"
+          onClick={simulateUnlockBadge}
+          className="hidden" // Caché pour l'instant
+        >
+          <span className="material-icons mr-2">emoji_events</span>
+          Simuler badge
+        </Button>
 
-      <BadgeCollection />
-
-      <Separator className="my-6" />
-
-      <section className="space-y-4">
-        <h2 className="text-lg font-medium">Comment obtenir des badges</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <div className="flex items-center mb-3">
-              <span className="material-icons text-primary mr-2">format_list_bulleted</span>
-              <h3 className="font-medium">Collection de plantes</h3>
-            </div>
-            <p className="text-sm text-gray-600">
-              Ajoutez des plantes à votre collection pour débloquer des badges.
-              Plus votre jardin virtuel s'agrandit, plus vous progressez !
-            </p>
-          </div>
-          
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <div className="flex items-center mb-3">
-              <span className="material-icons text-primary mr-2">task_alt</span>
-              <h3 className="font-medium">Entretien régulier</h3>
-            </div>
-            <p className="text-sm text-gray-600">
-              Complétez les tâches d'entretien pour débloquer des badges.
-              Un bon jardinier prend soin de ses plantes !
-            </p>
-          </div>
-          
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <div className="flex items-center mb-3">
-              <span className="material-icons text-primary mr-2">analytics</span>
-              <h3 className="font-medium">Analyses</h3>
-            </div>
-            <p className="text-sm text-gray-600">
-              Analysez vos plantes pour mieux comprendre leurs besoins.
-              Chaque analyse vous rapproche d'un nouveau badge !
-            </p>
-          </div>
-          
-          <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-            <div className="flex items-center mb-3">
-              <span className="material-icons text-primary mr-2">calendar_month</span>
-              <h3 className="font-medium">Fidélité</h3>
-            </div>
-            <p className="text-sm text-gray-600">
-              Connectez-vous régulièrement à l'application pour suivre vos plantes.
-              La constance est récompensée !
-            </p>
-          </div>
+        <div className="glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg rounded-xl p-6 mb-8">
+          <BadgeCollection />
         </div>
-      </section>
+
+        <section className="mb-8">
+          <h2 className="text-xl font-raleway font-medium text-primary-dark mb-4">Comment obtenir des badges</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="glass-card backdrop-blur-sm p-5 rounded-xl shadow-md border border-gray-100/80 transition-all hover:shadow-lg hover:bg-primary/5">
+              <div className="flex items-center mb-3">
+                <div className="bg-gradient-to-br from-primary to-primary-light text-white rounded-full p-2 shadow-sm mr-3">
+                  <span className="material-icons">spa</span>
+                </div>
+                <h3 className="font-medium text-primary-dark">Collection de plantes</h3>
+              </div>
+              <p className="text-sm text-gray-600">
+                Ajoutez des plantes à votre collection pour débloquer des badges.
+                Plus votre jardin virtuel s'agrandit, plus vous progressez !
+              </p>
+            </div>
+            
+            <div className="glass-card backdrop-blur-sm p-5 rounded-xl shadow-md border border-gray-100/80 transition-all hover:shadow-lg hover:bg-primary/5">
+              <div className="flex items-center mb-3">
+                <div className="bg-gradient-to-br from-primary to-primary-light text-white rounded-full p-2 shadow-sm mr-3">
+                  <span className="material-icons">task_alt</span>
+                </div>
+                <h3 className="font-medium text-primary-dark">Entretien régulier</h3>
+              </div>
+              <p className="text-sm text-gray-600">
+                Complétez les tâches d'entretien pour débloquer des badges.
+                Un bon jardinier prend soin de ses plantes !
+              </p>
+            </div>
+            
+            <div className="glass-card backdrop-blur-sm p-5 rounded-xl shadow-md border border-gray-100/80 transition-all hover:shadow-lg hover:bg-primary/5">
+              <div className="flex items-center mb-3">
+                <div className="bg-gradient-to-br from-primary to-primary-light text-white rounded-full p-2 shadow-sm mr-3">
+                  <span className="material-icons">auto_awesome</span>
+                </div>
+                <h3 className="font-medium text-primary-dark">Identification de plantes</h3>
+              </div>
+              <p className="text-sm text-gray-600">
+                Identifiez et ajoutez différentes variétés de plantes.
+                Chaque nouvelle espèce vous rapproche d'un nouveau badge !
+              </p>
+            </div>
+            
+            <div className="glass-card backdrop-blur-sm p-5 rounded-xl shadow-md border border-gray-100/80 transition-all hover:shadow-lg hover:bg-primary/5">
+              <div className="flex items-center mb-3">
+                <div className="bg-gradient-to-br from-primary to-primary-light text-white rounded-full p-2 shadow-sm mr-3">
+                  <span className="material-icons">calendar_month</span>
+                </div>
+                <h3 className="font-medium text-primary-dark">Fidélité</h3>
+              </div>
+              <p className="text-sm text-gray-600">
+                Connectez-vous régulièrement à l'application pour suivre vos plantes.
+                La constance est récompensée !
+              </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Badges à venir */}
+        <section>
+          <h2 className="text-xl font-raleway font-medium text-primary-dark mb-4">Badges à venir</h2>
+          <div className="glass-card backdrop-blur-sm p-5 rounded-xl shadow-md border border-gray-100/80">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="bg-gradient-to-br from-primary/20 to-primary-light/20 text-primary rounded-full p-2 shadow-sm">
+                <span className="material-icons">update</span>
+              </div>
+              <h3 className="font-medium text-primary-dark">Nouvelles catégories en développement</h3>
+            </div>
+            <p className="text-sm text-gray-600">
+              Restez à l'affût ! De nouvelles catégories de badges seront bientôt disponibles pour 
+              récompenser votre expertise en jardinage et votre engagement écologique.
+            </p>
+          </div>
+        </section>
+      </div>
     </div>
   );
 }

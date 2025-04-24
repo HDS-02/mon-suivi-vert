@@ -524,6 +524,168 @@ export class PlantAnalyzer {
         { symptom: "croissance faible", cause: "manque d'eau ou de nutriments", severity: "warning" },
         { symptom: "tiges couchées", cause: "environnement trop chaud et sec", severity: "warning" }
       ]
+    },
+    {
+      id: "poivron",
+      name: "Poivron",
+      commonTypes: ["Capsicum annuum", "Poivron rouge", "Poivron jaune", "Poivron vert"],
+      keywords: ["poivron", "piment doux", "légume", "potager", "solanacée"],
+      careInstructions: {
+        watering: "Arrosage régulier et constant. Éviter les à-coups d'arrosage.",
+        light: "Plein soleil, 6-8 heures par jour minimum.",
+        temperature: "20-30°C. Ne supporte pas le gel.",
+        additional: ["Tuteurage recommandé", "Sol riche en matière organique", "Fertilisation régulière"]
+      },
+      commonIssues: [
+        { symptom: "fruits déformés", cause: "pollinisation insuffisante", severity: "warning" },
+        { symptom: "chute des fleurs", cause: "chaleur excessive ou stress hydrique", severity: "warning" },
+        { symptom: "feuilles jaunes", cause: "carence en nutriments", severity: "warning" },
+        { symptom: "taches noires", cause: "maladie fongique", severity: "danger" }
+      ]
+    },
+    {
+      id: "romarin",
+      name: "Romarin",
+      commonTypes: ["Rosmarinus officinalis", "Romarin rampant", "Romarin bleu"],
+      keywords: ["romarin", "herbe aromatique", "méditerranéen", "condiment", "persistant"],
+      careInstructions: {
+        watering: "Arrosage modéré, laissez sécher entre les arrosages. Tolère la sécheresse.",
+        light: "Plein soleil.",
+        temperature: "-10°C à 35°C. Résistant au froid mais préfère la chaleur.",
+        additional: ["Sol bien drainé indispensable", "Taille annuelle recommandée", "Peu d'exigences en fertilisation"]
+      },
+      commonIssues: [
+        { symptom: "feuilles desséchées", cause: "air trop sec", severity: "warning" },
+        { symptom: "jaunissement du feuillage", cause: "excès d'eau", severity: "warning" },
+        { symptom: "tiges ligneuses peu feuillues", cause: "manque de taille", severity: "warning" },
+        { symptom: "tiges noircies", cause: "gel", severity: "danger" }
+      ]
+    },
+    {
+      id: "aubergine",
+      name: "Aubergine",
+      commonTypes: ["Solanum melongena", "Aubergine violette", "Aubergine blanche", "Aubergine striée"],
+      keywords: ["aubergine", "légume", "potager", "solanacée", "méditerranéen"],
+      careInstructions: {
+        watering: "Arrosage régulier, éviter de mouiller le feuillage. Plus important en période chaude.",
+        light: "Plein soleil.",
+        temperature: "20-30°C. Sensible au froid et au gel.",
+        additional: ["Tuteurage nécessaire", "Sol riche", "Fertilisation régulière", "Taille des fleurs en excès"]
+      },
+      commonIssues: [
+        { symptom: "petits fruits", cause: "pollinisation insuffisante", severity: "warning" },
+        { symptom: "taches sur les feuilles", cause: "mildiou", severity: "danger" },
+        { symptom: "feuilles jaunissantes", cause: "carence en nutriments", severity: "warning" },
+        { symptom: "insectes sur les feuilles", cause: "pucerons ou doryphores", severity: "warning" }
+      ]
+    },
+    {
+      id: "dahlia",
+      name: "Dahlia",
+      commonTypes: ["Dahlia pinnata", "Dahlia cactus", "Dahlia pompon", "Dahlia décoratif"],
+      keywords: ["dahlia", "fleur", "bulbe", "tubercule", "fleur d'été", "fleur coupée"],
+      careInstructions: {
+        watering: "Arrosage régulier, éviter de mouiller les fleurs. Plus important en période chaude.",
+        light: "Plein soleil à mi-ombre légère.",
+        temperature: "15-30°C. Ne supporte pas le gel.",
+        additional: ["Tuteurage nécessaire pour les grandes variétés", "Fertilisation périodique", "Déterrage des tubercules en hiver dans les régions froides"]
+      },
+      commonIssues: [
+        { symptom: "feuilles tachées", cause: "oïdium", severity: "warning" },
+        { symptom: "floraison médiocre", cause: "manque de nutriments", severity: "warning" },
+        { symptom: "tiges cassées", cause: "vent ou pluie violente", severity: "warning" },
+        { symptom: "tubercules pourris", cause: "stockage hivernal inadapté", severity: "danger" }
+      ]
+    },
+    {
+      id: "bougainvillier",
+      name: "Bougainvillier",
+      commonTypes: ["Bougainvillea glabra", "Bougainvillea spectabilis"],
+      keywords: ["bougainvillier", "grimpante", "fleur", "méditerranéen", "tropical", "bractées colorées"],
+      careInstructions: {
+        watering: "Arrosage modéré, laisser sécher entre les arrosages. Tolérant à la sécheresse une fois établi.",
+        light: "Plein soleil.",
+        temperature: "5-35°C. Sensible au gel.",
+        additional: ["Taille régulière pour contrôler la croissance", "Protection hivernale dans les régions froides", "Support solide nécessaire pour les plantes grimpantes"]
+      },
+      commonIssues: [
+        { symptom: "chute des bractées", cause: "changement d'environnement ou stress", severity: "warning" },
+        { symptom: "peu de floraison", cause: "manque de lumière ou taille excessive", severity: "warning" },
+        { symptom: "feuilles jaunissantes", cause: "arrosage excessif ou carence", severity: "warning" },
+        { symptom: "tiges gelées", cause: "exposition au froid", severity: "danger" }
+      ]
+    },
+    {
+      id: "concombre",
+      name: "Concombre",
+      commonTypes: ["Cucumis sativus", "Concombre noa", "Concombre libanais", "Cornichon"],
+      keywords: ["concombre", "légume", "potager", "cucurbitacée", "grimpante"],
+      careInstructions: {
+        watering: "Arrosage régulier et abondant, surtout en période de fructification.",
+        light: "Plein soleil à mi-ombre légère.",
+        temperature: "20-30°C. Sensible au froid et au gel.",
+        additional: ["Tuteurage ou treillis recommandé", "Sol riche en matière organique", "Pincement des tiges latérales selon la variété"]
+      },
+      commonIssues: [
+        { symptom: "fruits amers", cause: "stress hydrique ou températures fluctuantes", severity: "warning" },
+        { symptom: "feuilles jaunissantes", cause: "oïdium", severity: "warning" },
+        { symptom: "feuilles rongées", cause: "insectes", severity: "warning" },
+        { symptom: "pourriture des fruits", cause: "contact avec le sol humide", severity: "danger" }
+      ]
+    },
+    {
+      id: "figuier",
+      name: "Figuier",
+      commonTypes: ["Ficus carica", "Figuier commun", "Figuier bifère"],
+      keywords: ["figuier", "arbre fruitier", "figue", "méditerranéen", "rustique"],
+      careInstructions: {
+        watering: "Arrosage modéré, augmenter en période de fructification. Supporte bien la sécheresse une fois établi.",
+        light: "Plein soleil.",
+        temperature: "-10°C à 35°C selon les variétés. Certaines variétés sont plus rustiques que d'autres.",
+        additional: ["Taille légère en fin d'hiver", "Protection hivernale pour les jeunes arbres", "Sol bien drainé indispensable"]
+      },
+      commonIssues: [
+        { symptom: "feuilles jaunissantes", cause: "stress hydrique", severity: "warning" },
+        { symptom: "figues qui tombent avant maturité", cause: "manque d'eau ou stress", severity: "warning" },
+        { symptom: "taches sur les feuilles", cause: "maladie fongique", severity: "warning" },
+        { symptom: "branches gelées", cause: "hiver rigoureux", severity: "danger" }
+      ]
+    },
+    {
+      id: "jasmin",
+      name: "Jasmin",
+      commonTypes: ["Jasminum officinale", "Jasmin d'hiver", "Jasmin étoilé"],
+      keywords: ["jasmin", "grimpante", "fleur parfumée", "blanc", "arbuste", "méditerranéen"],
+      careInstructions: {
+        watering: "Arrosage régulier, plus abondant en période de croissance et de floraison.",
+        light: "Plein soleil à mi-ombre. Le jasmin d'hiver tolère plus d'ombre.",
+        temperature: "-5°C à 30°C selon les variétés. Le jasmin d'hiver est plus rustique.",
+        additional: ["Taille après la floraison", "Support ou treillis pour les variétés grimpantes", "Sol bien drainé"]
+      },
+      commonIssues: [
+        { symptom: "peu de fleurs", cause: "manque de lumière ou taille inadaptée", severity: "warning" },
+        { symptom: "feuilles jaunissantes", cause: "carence ou arrosage excessif", severity: "warning" },
+        { symptom: "feuilles collantes", cause: "cochenilles", severity: "warning" },
+        { symptom: "tiges desséchées", cause: "gel", severity: "danger" }
+      ]
+    },
+    {
+      id: "courgette",
+      name: "Courgette",
+      commonTypes: ["Cucurbita pepo", "Courgette verte", "Courgette jaune", "Courgette ronde"],
+      keywords: ["courgette", "légume", "potager", "cucurbitacée", "zucchini"],
+      careInstructions: {
+        watering: "Arrosage régulier et généreux, éviter de mouiller les feuilles.",
+        light: "Plein soleil.",
+        temperature: "18-30°C. Sensible au gel.",
+        additional: ["Espace important nécessaire", "Sol riche en matière organique", "Paillage recommandé"]
+      },
+      commonIssues: [
+        { symptom: "fleurs qui tombent sans former de fruits", cause: "pollinisation insuffisante", severity: "warning" },
+        { symptom: "feuilles poudreuses blanches", cause: "oïdium", severity: "warning" },
+        { symptom: "fruits pourris à l'extrémité", cause: "pourriture apicale, carence en calcium", severity: "danger" },
+        { symptom: "croissance ralentie", cause: "températures trop basses", severity: "warning" }
+      ]
     }
   ];
 

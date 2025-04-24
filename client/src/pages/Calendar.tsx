@@ -105,123 +105,148 @@ export default function Calendar() {
   }
 
   return (
-    <div>
-      <div className="mb-6">
+    <div className="organic-bg min-h-screen pb-24">
+      <div className="gradient-header bg-gradient-to-br from-primary/90 to-primary-light/90 text-white px-4 pt-6 pb-8 mb-6 shadow-md">
         <Link href="/">
-          <a className="flex items-center text-primary mb-4">
+          <a className="flex items-center text-white/90 mb-4 hover:text-white transition-colors">
             <span className="material-icons mr-1">arrow_back</span>
             Retour
           </a>
         </Link>
-        <h2 className="text-xl font-raleway font-semibold">Calendrier d'entretien</h2>
-        <p className="text-gray-600">Suivez les tâches d'entretien de vos plantes</p>
+        <h2 className="text-2xl font-raleway font-semibold">Calendrier d'entretien</h2>
+        <p className="text-white/80 mt-1">Suivez les tâches d'entretien de vos plantes</p>
       </div>
 
-      <Card className="bg-white rounded-lg shadow-md mb-6">
-        <CardContent className="p-4">
-          <CalendarUI
-            mode="single"
-            selected={date}
-            onSelect={setDate}
-            locale={fr}
-            modifiers={{
-              booked: (date) => {
-                return getTasksForDate(date).length > 0;
-              },
-            }}
-            modifiersStyles={{
-              booked: {
-                fontWeight: "bold"
-              }
-            }}
-            classNames={{
-              day_today: "bg-primary-light/20"
-            }}
-            components={{
-              Day: ({ date, displayMonth }) => {
-                // Ne pas afficher les points pour les jours qui ne sont pas du mois affiché
-                const isCurrentMonth = date.getMonth() === displayMonth.getMonth();
-                const color = isCurrentMonth ? getDotColorForDate(date) : null;
-                const day = date.getDate();
-                
-                return (
-                  <div className="relative w-full h-full flex items-center justify-center">
-                    <div>{day}</div>
-                    {color && (
-                      <div className="absolute bottom-1">
-                        <div className={`h-1 w-1 rounded-full ${color}`} />
-                      </div>
-                    )}
-                  </div>
-                );
-              }
-            }}
-          />
-        </CardContent>
-      </Card>
-
-      <div className="mb-4 flex justify-between items-center">
-        <h3 className="text-lg font-semibold font-raleway">
-          Tâches du {date ? formatDate(date) : ""}
-        </h3>
-        <Button 
-          className="bg-primary text-white text-sm"
-          onClick={() => setIsNewTaskDialogOpen(true)}
-        >
-          <span className="material-icons mr-2 text-sm">add</span>
-          Nouvelle tâche
-        </Button>
-      </div>
-
-      <Card className="bg-white rounded-lg shadow-md">
-        <CardContent className="p-4">
-          {isLoading ? (
-            <div className="py-8 text-center text-gray-500">
-              Chargement des tâches...
-            </div>
-          ) : tasksForSelectedDate.length > 0 ? (
-            <div className="divide-y divide-gray-100">
-              {tasksForSelectedDate.map((task: Task) => (
-                <div key={task.id} className="py-3 flex items-center">
-                  <div className={`w-10 h-10 ${getTaskTypeBackground(task.type)} rounded-full flex items-center justify-center mr-4`}>
-                    {getTaskIcon(task.type)}
-                  </div>
-                  <div className="flex-grow">
-                    <div className="flex items-center">
-                      <h4 className="font-medium">{task.description}</h4>
-                      {task.completed && (
-                        <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded text-xs">
-                          Terminé
-                        </span>
+      <div className="px-4">
+        <Card className="glass-card backdrop-blur-sm shadow-lg border border-gray-100/80 rounded-xl mb-6">
+          <CardContent className="p-4">
+            <CalendarUI
+              mode="single"
+              selected={date}
+              onSelect={setDate}
+              locale={fr}
+              modifiers={{
+                booked: (date) => {
+                  return getTasksForDate(date).length > 0;
+                },
+              }}
+              modifiersStyles={{
+                booked: {
+                  fontWeight: "bold"
+                }
+              }}
+              classNames={{
+                head_cell: "text-primary-dark font-medium",
+                day_today: "bg-primary/10",
+                day_selected: "bg-gradient-to-r from-primary to-primary-light text-white",
+                nav_button: "hover:bg-primary/10",
+                nav_button_previous: "text-primary",
+                nav_button_next: "text-primary"
+              }}
+              components={{
+                Day: ({ date, displayMonth }) => {
+                  // Ne pas afficher les points pour les jours qui ne sont pas du mois affiché
+                  const isCurrentMonth = date.getMonth() === displayMonth.getMonth();
+                  const color = isCurrentMonth ? getDotColorForDate(date) : null;
+                  const day = date.getDate();
+                  
+                  return (
+                    <div className="relative w-full h-full flex items-center justify-center">
+                      <div>{day}</div>
+                      {color && (
+                        <div className="absolute bottom-1">
+                          <div className={`h-1.5 w-1.5 rounded-full ${color}`} />
+                        </div>
                       )}
                     </div>
-                    <Link href={`/plants/${task.plantId}`}>
-                      <a className="text-sm text-primary">
-                        Voir la plante
-                      </a>
-                    </Link>
+                  );
+                }
+              }}
+            />
+          </CardContent>
+        </Card>
+
+        <div className="mb-4 flex justify-between items-center">
+          <h3 className="text-lg font-raleway font-medium text-primary-dark">
+            Tâches du {date ? formatDate(date) : ""}
+          </h3>
+          <Button 
+            className="bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+            onClick={() => setIsNewTaskDialogOpen(true)}
+          >
+            <span className="material-icons mr-2">add_circle</span>
+            Nouvelle tâche
+          </Button>
+        </div>
+
+        <Card className="glass-card backdrop-blur-sm shadow-lg border border-gray-100/80 rounded-xl">
+          <CardContent className="p-5">
+            {isLoading ? (
+              <div className="py-8 text-center">
+                <div className="animate-pulse flex flex-col items-center">
+                  <div className="rounded-full bg-primary/20 h-14 w-14 flex items-center justify-center mb-4">
+                    <span className="material-icons text-primary/40 text-3xl">event</span>
                   </div>
-                  {!task.completed && (
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="ml-2 p-2 rounded-full hover:bg-gray-100"
-                      onClick={() => completeTask(task.id)}
-                    >
-                      <span className="material-icons text-gray-400">check_circle_outline</span>
-                    </Button>
-                  )}
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2.5"></div>
+                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
                 </div>
-              ))}
-            </div>
-          ) : (
-            <div className="py-8 text-center text-gray-500">
-              <p className="mb-2">Aucune tâche pour cette date</p>
-              <p className="text-sm">Sélectionnez une autre date ou ajoutez une nouvelle tâche</p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+              </div>
+            ) : tasksForSelectedDate.length > 0 ? (
+              <div className="divide-y divide-gray-100/50">
+                {tasksForSelectedDate.map((task: Task) => (
+                  <div key={task.id} className="py-4 flex items-center">
+                    <div className={`w-12 h-12 ${getTaskTypeBackground(task.type)} rounded-full flex items-center justify-center mr-4 shadow-sm`}>
+                      {getTaskIcon(task.type)}
+                    </div>
+                    <div className="flex-grow">
+                      <div className="flex items-center">
+                        <h4 className="font-medium text-primary-dark">{task.description}</h4>
+                        {task.completed && (
+                          <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs flex items-center">
+                            <span className="material-icons text-xs mr-1">check_circle</span>
+                            Terminé
+                          </span>
+                        )}
+                      </div>
+                      <Link href={`/plants/${task.plantId}`}>
+                        <a className="text-sm text-primary flex items-center mt-1 hover:underline">
+                          <span className="material-icons text-xs mr-1">visibility</span>
+                          Voir la plante
+                        </a>
+                      </Link>
+                    </div>
+                    {!task.completed && (
+                      <Button
+                        variant="outline"
+                        className="ml-2 p-2.5 rounded-full bg-primary/5 border border-primary/20 hover:bg-primary/10 transition-colors"
+                        onClick={() => completeTask(task.id)}
+                      >
+                        <span className="material-icons text-primary">check_circle</span>
+                      </Button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="py-10 text-center">
+                <div className="mb-4 bg-gradient-to-br from-primary/10 to-primary-light/10 rounded-full p-4 inline-block">
+                  <span className="material-icons text-primary text-4xl">event_available</span>
+                </div>
+                <p className="text-lg font-medium text-primary-dark mb-2">Aucune tâche pour cette date</p>
+                <p className="text-sm text-gray-600 mb-4">Sélectionnez une autre date ou planifiez un nouvel entretien</p>
+                <Button 
+                  variant="outline" 
+                  className="border-primary/20 text-primary hover:bg-primary/5"
+                  onClick={() => setIsNewTaskDialogOpen(true)}
+                >
+                  <span className="material-icons mr-2">add</span>
+                  Ajouter une tâche
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
 
       {/* Dialogue pour créer une nouvelle tâche */}
       <NewTaskDialog 
