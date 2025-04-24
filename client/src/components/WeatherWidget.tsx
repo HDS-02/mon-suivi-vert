@@ -78,19 +78,99 @@ export default function WeatherWidget() {
       try {
         setLoading(true);
         
-        // Mode hors ligne pour développement - utiliser des données simulées
-        // Dans une version réelle, nous utiliserions une API météo
-        // comme OpenWeatherMap ou WeatherAPI
-        setTimeout(() => {
-          // Simulation d'une requête API
+        // Obtenir d'abord les coordonnées de l'utilisateur
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            async (position) => {
+              const { latitude, longitude } = position.coords;
+              
+              try {
+                // Dans une version de production, nous utiliserions une vraie API météo
+                // Pour le moment, nous simulons une requête mais avec des données plus réalistes
+                
+                // Date actuelle en France
+                const now = new Date();
+                const month = now.getMonth(); // 0-11
+                
+                // Températures plus réalistes selon la saison en France
+                let baseTemp;
+                let tempVariation;
+                
+                // Estimation saisonnière
+                if (month >= 11 || month <= 1) {         // Hiver (Dec-Fév)
+                  baseTemp = 5;
+                  tempVariation = 7;
+                } else if (month >= 2 && month <= 4) {   // Printemps (Mar-Mai)
+                  baseTemp = 15;
+                  tempVariation = 8;
+                } else if (month >= 5 && month <= 8) {   // Été (Juin-Sep)
+                  baseTemp = 23;
+                  tempVariation = 7;
+                } else {                                 // Automne (Oct-Nov)
+                  baseTemp = 12;
+                  tempVariation = 6;
+                }
+                
+                // Calcul température et humidité
+                const temperature = Math.floor(baseTemp + (Math.random() * tempVariation));
+                const humidity = Math.floor(Math.random() * 30) + 50;    // 50-80%
+                
+                // Détermination de l'icône et la description
+                let icon = "partly_cloudy";
+                let description = "Partiellement nuageux";
+                
+                if (temperature > 25) {
+                  icon = "clear_day";
+                  description = "Ensoleillé";
+                } else if (temperature < 10) {
+                  if (Math.random() > 0.5) {
+                    icon = "cloudy";
+                    description = "Nuageux";
+                  } else {
+                    icon = "rainy";
+                    description = "Pluvieux";
+                  }
+                }
+                
+                setWeatherData({
+                  temperature,
+                  humidity,
+                  icon,
+                  description,
+                  recommendations: []
+                });
+                setLoading(false);
+              } catch (error) {
+                console.error("Erreur lors de la récupération des données météo:", error);
+                // Fallback aux données simulées en cas d'erreur
+                setWeatherData({
+                  ...mockWeatherData,
+                  temperature: Math.floor(Math.random() * 10) + 18, // 18-28°C
+                  humidity: Math.floor(Math.random() * 30) + 50,    // 50-80%
+                });
+                setLoading(false);
+              }
+            },
+            (error) => {
+              console.error("Erreur de géolocalisation:", error);
+              // Fallback aux données simulées si la géolocalisation échoue
+              setWeatherData({
+                ...mockWeatherData,
+                temperature: Math.floor(Math.random() * 10) + 18, // 18-28°C
+                humidity: Math.floor(Math.random() * 30) + 50,    // 50-80%
+              });
+              setLoading(false);
+            }
+          );
+        } else {
+          // Le navigateur ne supporte pas la géolocalisation
           setWeatherData({
             ...mockWeatherData,
             temperature: Math.floor(Math.random() * 10) + 18, // 18-28°C
             humidity: Math.floor(Math.random() * 30) + 50,    // 50-80%
           });
           setLoading(false);
-        }, 1500);
-        
+        }
       } catch (err) {
         console.error("Erreur lors de la récupération des données météo:", err);
         setError("Impossible de récupérer les données météo");

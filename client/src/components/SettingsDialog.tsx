@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Dialog,
   DialogContent,
@@ -63,6 +63,17 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
       email: user?.email || "",
     },
   });
+  
+  // Effet pour mettre à jour les valeurs du formulaire quand l'utilisateur est chargé
+  useEffect(() => {
+    if (user) {
+      profileForm.reset({
+        username: user.username || "",
+        firstName: user.firstName || "",
+        email: user.email || "",
+      });
+    }
+  }, [user, profileForm]);
 
   // Gestionnaire de soumission du formulaire de profil
   const onSubmitProfileForm = async (data: ProfileFormValues) => {
@@ -99,21 +110,21 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
-          <DialogTitle>Paramètres</DialogTitle>
-          <DialogDescription>
+      <DialogContent className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg">
+        <DialogHeader className="pb-4 border-b border-gray-100/50">
+          <DialogTitle className="text-primary-dark font-raleway text-xl">Paramètres</DialogTitle>
+          <DialogDescription className="text-gray-600">
             Personnalisez votre expérience avec Mon Suivi Vert
           </DialogDescription>
         </DialogHeader>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-4">
-            <TabsTrigger value="preferences" className="flex items-center gap-1">
+          <TabsList className="grid w-full grid-cols-2 mb-4 bg-primary/5 p-1 rounded-lg">
+            <TabsTrigger value="preferences" className="flex items-center gap-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-light data-[state=active]:text-white">
               <span className="material-icons text-sm">settings</span>
               Préférences
             </TabsTrigger>
-            <TabsTrigger value="profile" className="flex items-center gap-1">
+            <TabsTrigger value="profile" className="flex items-center gap-1 data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-light data-[state=active]:text-white">
               <span className="material-icons text-sm">person</span>
               Profil
             </TabsTrigger>
@@ -172,17 +183,20 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
               </div>
             </div>
 
-            <div className="flex justify-between mt-4">
+            <div className="flex justify-between mt-6">
               <Button
                 variant="outline"
                 onClick={() => onOpenChange(false)}
+                className="border-primary/20 text-primary hover:bg-primary/5"
               >
+                <span className="material-icons mr-2 text-sm">close</span>
                 Annuler
               </Button>
               <Button
-                className="bg-primary text-white"
+                className="bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
                 onClick={handleSave}
               >
+                <span className="material-icons mr-2 text-sm">save</span>
                 Enregistrer
               </Button>
             </div>
@@ -234,18 +248,21 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
                   )}
                 />
 
-                <div className="flex justify-between mt-4">
+                <div className="flex justify-between mt-6">
                   <Button
                     variant="outline"
                     onClick={() => onOpenChange(false)}
+                    className="border-primary/20 text-primary hover:bg-primary/5"
                   >
+                    <span className="material-icons mr-2 text-sm">close</span>
                     Annuler
                   </Button>
                   <Button
                     type="submit"
-                    className="bg-primary text-white"
+                    className="bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
                     disabled={profileForm.formState.isSubmitting}
                   >
+                    <span className="material-icons mr-2 text-sm">{profileForm.formState.isSubmitting ? "pending" : "save"}</span>
                     {profileForm.formState.isSubmitting ? "Enregistrement..." : "Enregistrer"}
                   </Button>
                 </div>
