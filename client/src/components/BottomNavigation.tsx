@@ -24,6 +24,12 @@ export default function BottomNavigation() {
             <span className="text-xs mt-1">Mes plantes</span>
           </a>
         </Link>
+        <Link href="/badges">
+          <a className={`py-3 px-4 flex flex-col items-center ${location === "/badges" ? "text-primary" : "text-gray-500"}`}>
+            <span className="material-icons text-current">emoji_events</span>
+            <span className="text-xs mt-1">Badges</span>
+          </a>
+        </Link>
         <Link href="/calendar">
           <a className={`py-3 px-4 flex flex-col items-center ${location === "/calendar" ? "text-primary" : "text-gray-500"}`}>
             <span className="material-icons text-current">calendar_today</span>
