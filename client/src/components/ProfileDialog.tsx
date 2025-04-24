@@ -98,19 +98,7 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
       <DialogContent 
-        className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg" 
-        onPointerDownOutside={(e) => {
-          // Empêcher la fermeture lors d'un clic à l'extérieur
-          e.preventDefault();
-        }}
-        onEscapeKeyDown={(e) => {
-          // Empêcher la fermeture lors de l'appui sur Echap
-          e.preventDefault();
-        }}
-        onInteractOutside={(e) => {
-          // Empêcher toute interaction extérieure qui pourrait fermer la modale
-          e.preventDefault();
-        }}
+        className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg"
       >
         <DialogHeader className="pb-4 border-b border-gray-100/50">
           <DialogTitle className="text-primary-dark font-raleway text-xl">

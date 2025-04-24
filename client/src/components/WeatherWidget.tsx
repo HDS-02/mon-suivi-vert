@@ -75,7 +75,10 @@ export default function WeatherWidget() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  // État pour la géolocalisation persistante
   useEffect(() => {
+    // Vérifier si nous avons déjà des coordonnées en localStorage
+    const savedLocation = localStorage.getItem('userLocation');
     const fetchWeatherData = async () => {
       try {
         setLoading(true);
@@ -92,27 +95,76 @@ export default function WeatherWidget() {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
               enableHighAccuracy: true,
               timeout: 5000,
-              maximumAge: 0
+              maximumAge: 24 * 60 * 60 * 1000 // 24 heures en millisecondes
             });
           });
         };
         
-        // On essaie d'obtenir la localisation
+        // Localisation par défaut
         let location = "Paris, France";
         
-        try {
-          const position = await getLocation();
-          const coords = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          };
-          
-          // Ici, dans une application réelle, on appellerait une API de géocodage inverse
-          // pour obtenir le nom de la ville. Pour simplifier, on affiche les coordonnées.
-          location = `Localisation: ${coords.latitude.toFixed(2)}, ${coords.longitude.toFixed(2)}`;
-        } catch (locError) {
-          console.error("Erreur de géolocalisation:", locError);
-          // On continue avec la localisation par défaut
+        // Utiliser les données sauvegardées si disponibles, sinon demander la géolocalisation
+        if (savedLocation) {
+          try {
+            const parsedLocation = JSON.parse(savedLocation);
+            location = parsedLocation.name;
+          } catch (e) {
+            console.error("Erreur de lecture de la localisation sauvegardée:", e);
+          }
+        } else {
+          try {
+            const position = await getLocation();
+            const coords = {
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude
+            };
+            
+            // Dans une application réelle, on appellerait une API de géocodage inverse
+            // Pour simuler, on utilise les coordonnées pour créer un nom de ville fictif
+            
+            // Fonction pour déterminer la ville approximative basée sur les coordonnées
+            const getNearestCity = (lat: number, lon: number): string => {
+              // Coordonnées approximatives de quelques villes françaises
+              const cities = [
+                { name: "Paris", lat: 48.86, lon: 2.35 },
+                { name: "Lyon", lat: 45.75, lon: 4.85 },
+                { name: "Marseille", lat: 43.30, lon: 5.37 },
+                { name: "Lille", lat: 50.63, lon: 3.07 },
+                { name: "Bordeaux", lat: 44.84, lon: -0.58 },
+                { name: "Toulouse", lat: 43.60, lon: 1.44 },
+                { name: "Strasbourg", lat: 48.58, lon: 7.75 },
+                { name: "Nice", lat: 43.70, lon: 7.27 },
+                { name: "Nantes", lat: 47.22, lon: -1.55 },
+              ];
+              
+              // Calculer la distance par rapport à chaque ville
+              const cityWithDistance = cities.map(city => {
+                const latDiff = city.lat - lat;
+                const lonDiff = city.lon - lon;
+                const distance = Math.sqrt(latDiff * latDiff + lonDiff * lonDiff);
+                return { ...city, distance };
+              });
+              
+              // Trouver la ville la plus proche
+              const nearestCity = cityWithDistance.reduce((prev, curr) => 
+                prev.distance < curr.distance ? prev : curr
+              );
+              
+              return `${nearestCity.name}, France`;
+            };
+            
+            location = getNearestCity(coords.latitude, coords.longitude);
+            
+            // Sauvegarder la localisation
+            localStorage.setItem('userLocation', JSON.stringify({
+              coords,
+              name: location,
+              timestamp: Date.now()
+            }));
+          } catch (locError) {
+            console.error("Erreur de géolocalisation:", locError);
+            // On continue avec la localisation par défaut
+          }
         }
         
         // Simulation de données météo pour une expérience utilisateur fiable

@@ -76,8 +76,8 @@ export default function NotificationsDialog({ open, onOpenChange }: Notification
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
+      <DialogContent className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg">
         <DialogHeader>
           <DialogTitle>Notifications</DialogTitle>
           <DialogDescription>
