@@ -184,12 +184,12 @@ export default function PlantDetail() {
         </div>
         
         <Button 
-          variant="destructive"
-          className="flex items-center" 
+          variant="outline"
+          className="flex items-center bg-white border-red-400 text-red-500 hover:bg-red-50 hover:text-red-600 shadow-sm" 
           onClick={() => setSosDialogOpen(true)}
         >
-          <span className="material-icons mr-1.5">healing</span>
-          SOS Assistance
+          <span className="material-icons mr-1.5">eco</span>
+          SOS Assistance Plante
         </Button>
       </div>
 

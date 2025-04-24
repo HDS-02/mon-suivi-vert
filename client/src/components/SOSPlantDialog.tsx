@@ -161,13 +161,34 @@ export default function SOSPlantDialog({
 
         {diagnosis ? (
           <div className="space-y-4">
-            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
-              <h3 className="font-medium text-green-800 flex items-center mb-2">
-                <span className="material-icons text-green-600 mr-2">analytics</span>
-                Diagnostic de votre plante
-              </h3>
-              <div className="prose prose-sm text-green-700 whitespace-pre-line">
-                {diagnosis}
+            <div className="flex flex-col space-y-4">
+              {/* En-tête du chat */}
+              <div className="flex items-center mb-2">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-3">
+                  <span className="material-icons text-primary">smart_toy</span>
+                </div>
+                <div>
+                  <h3 className="font-medium">Assistant Botanique</h3>
+                  <p className="text-xs text-gray-500">Diagnostic de votre {plant.name}</p>
+                </div>
+              </div>
+              
+              {/* Message de l'IA comme un chat */}
+              <div className="bg-primary/5 rounded-2xl rounded-tl-none p-4 max-w-[90%] ml-10 relative">
+                <div className="absolute w-4 h-4 bg-primary/5 -left-2 top-0 rotate-45"></div>
+                <div className="prose prose-sm max-w-none whitespace-pre-line">
+                  {diagnosis.split('\n\n').map((paragraph, index) => (
+                    <div key={index} className="mb-3">
+                      {paragraph.startsWith('**') ? (
+                        <h4 className="font-bold text-primary mt-0 mb-1">
+                          {paragraph.replace(/\*\*/g, '')}
+                        </h4>
+                      ) : (
+                        <p className="m-0">{paragraph}</p>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             
