@@ -154,15 +154,34 @@ export default function WeatherWidget() {
             longitude: position.coords.longitude
           };
           
-          // Utiliser directement les coordonnées géographiques (format arrondi pour lisibilité)
-          const lat = parseFloat(coords.latitude.toFixed(4));
-          const lon = parseFloat(coords.longitude.toFixed(4));
-          location = `${lat}°N, ${lon}°E`;
+          // Utiliser l'API de géocodage inverse pour obtenir le nom exact de la ville
+          const lat = coords.latitude;
+          const lon = coords.longitude;
+          
+          // Fonction pour obtenir le nom de la ville à partir des coordonnées
+          const getExactCity = async (lat: number, lon: number): Promise<string> => {
+            try {
+              // Utiliser l'API OpenStreetMap Nominatim pour le géocodage inversé
+              const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=10&addressdetails=1`);
+              const data = await response.json();
+              
+              // Extraire le nom de la ville ou du village
+              const city = data.address.city || data.address.town || data.address.village || data.address.hamlet || "Localité inconnue";
+              return city + ", France";
+            } catch (error) {
+              console.error("Erreur lors de la récupération du nom de la ville:", error);
+              return "Localisation inconnue";
+            }
+          };
+          
+          // Obtenir le nom exact de la ville
+          const exactCity = await getExactCity(lat, lon);
+          location = exactCity;
           console.log("Localisation mise à jour:", location);
         } catch (locError) {
           console.log("Impossible d'obtenir la position, utilisation de Paris par défaut");
           // On continue avec la localisation par défaut de Paris
-          location = "48.8566°N, 2.3522°E"; // Coordonnées exactes de Paris
+          location = "Paris, France"; // Localisation par défaut
         }
         
         // Simulation de données météo pour une expérience utilisateur fiable

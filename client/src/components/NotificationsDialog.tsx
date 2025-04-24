@@ -75,6 +75,7 @@ export default function NotificationsDialog({ open, onOpenChange }: Notification
       title="Notifications"
       description="Restez informé des besoins de vos plantes"
       className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg"
+      showCloseButton={true}
     >
       {permission !== 'granted' && (
         <div className="mb-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md text-sm">
@@ -153,6 +154,15 @@ export default function NotificationsDialog({ open, onOpenChange }: Notification
               </Button>
             </>
           )}
+          <Button 
+            variant="outline" 
+            size="sm" 
+            onClick={() => onOpenChange(false)}
+            className="border-red-200 text-red-500 hover:bg-red-50 hover:text-red-600"
+          >
+            <span className="material-icons text-sm mr-1">close</span>
+            Fermer
+          </Button>
         </div>
       </div>
     </StableDialog>
