@@ -54,18 +54,18 @@ function StableDialog({
         "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 transition-opacity duration-200",
         open ? "opacity-100" : "opacity-0"
       )}
-      style={{ alignItems: "center" }}
       aria-modal="true"
       role="dialog"
       onClick={() => onOpenChange(false)}
     >
       <div 
         className={cn(
-          "bg-white dark:bg-gray-900 rounded-xl shadow-lg w-full transition-all transform duration-200 overflow-hidden",
+          "bg-white dark:bg-gray-900 rounded-xl shadow-lg w-full transition-all transform duration-200 overflow-hidden my-auto",
           maxWidth,
           open ? "scale-100 opacity-100" : "scale-95 opacity-0",
           className
         )}
+        style={{ maxHeight: '90vh' }}
         onClick={(e) => e.stopPropagation()}
       >
         {(title || showCloseButton) && (
@@ -91,7 +91,7 @@ function StableDialog({
           </div>
         )}
         
-        <div className="max-h-[70vh] overflow-y-auto">
+        <div className="max-h-[calc(90vh-8rem)] overflow-y-auto">
           {children}
         </div>
       </div>
