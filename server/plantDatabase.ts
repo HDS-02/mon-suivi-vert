@@ -1,17 +1,90 @@
 /**
- * Base de données de plantes d'intérieur disponibles pour l'ajout manuel
+ * Base de données de plantes disponibles pour l'ajout manuel
  */
 
-interface PlantEntry {
+export type PlantCategory = 'interieur' | 'exterieur' | 'fruitier' | 'fleurs' | 'legumes';
+
+export interface PlantEntry {
   name: string;
   species: string;
+  category: PlantCategory;
   wateringFrequency: number;
   light: string;
   temperature: string;
   careNotes: string;
 }
 
-export const plantDatabase: PlantEntry[] = [
+export interface PlantCategoryInfo {
+  id: PlantCategory;
+  name: string;
+  description: string;
+  icon: string;
+}
+
+export const plantCategories: PlantCategoryInfo[] = [
+  {
+    id: "interieur",
+    name: "Plantes d'intérieur",
+    description: "Plantes cultivées en pot à l'intérieur des habitations",
+    icon: "home"
+  },
+  {
+    id: "exterieur",
+    name: "Plantes d'extérieur",
+    description: "Plantes cultivées dans le jardin ou sur la terrasse",
+    icon: "grass"
+  },
+  {
+    id: "fruitier",
+    name: "Arbres fruitiers",
+    description: "Arbres et arbustes produisant des fruits comestibles",
+    icon: "nutrition"
+  },
+  {
+    id: "fleurs",
+    name: "Fleurs",
+    description: "Plantes ornementales à fleurs",
+    icon: "local_florist"
+  },
+  {
+    id: "legumes",
+    name: "Légumes",
+    description: "Plantes potagères comestibles",
+    icon: "eco"
+  }
+];
+
+// Fonction pour assigner automatiquement des catégories
+function assignCategories(plants: Omit<PlantEntry, 'category'>[]): PlantEntry[] {
+  return plants.map(plant => {
+    let category: PlantCategory = 'interieur';
+    
+    // Par défaut, les tomates sont des légumes
+    if (plant.name.toLowerCase().includes('tomate')) {
+      category = 'legumes';
+    } 
+    // Les plantes qui préfèrent la lumière directe sont souvent d'extérieur
+    else if (plant.light.toLowerCase().includes('directe') && !plant.name.toLowerCase().includes('éléphant') && !plant.name.toLowerCase().includes('jade')) {
+      category = 'exterieur';
+    }
+    // Les plantes fleuries
+    else if (plant.name.toLowerCase().includes('fleur') || plant.name.toLowerCase().includes('orchid') || plant.name.toLowerCase().includes('rose') || plant.name.toLowerCase().includes('bégonia')) {
+      category = 'fleurs';
+    }
+    // Les arbres fruitiers
+    else if (plant.name.toLowerCase().includes('citronnier') || plant.name.toLowerCase().includes('arbre') || plant.name.toLowerCase().includes('pommier')) {
+      category = 'fruitier';
+    }
+    
+    return {
+      ...plant,
+      category
+    };
+  });
+}
+
+// Base de données originale (sans catégories)
+const plantsWithoutCategories = [
   // Variétés de tomates
   {
     name: "Tomate Coeur de Boeuf",
@@ -542,6 +615,17 @@ export const plantDatabase: PlantEntry[] = [
     careNotes: "Arrosez très peu, laissez sécher complètement entre les arrosages. Extrêmement résistante à la négligence. Tolère très bien l'ombre.",
   },
 ];
+
+// Application de la fonction pour assigner les catégories
+export const plantDatabase: PlantEntry[] = assignCategories(plantsWithoutCategories);
+
+/**
+ * Recherche des plantes par catégorie
+ */
+export function getPlantsByCategory(category: PlantCategory): PlantEntry[] {
+  return plantDatabase.filter((plant) => plant.category === category)
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
 
 export function searchPlants(query: string): PlantEntry[] {
   const normalizedQuery = query.toLowerCase().trim();

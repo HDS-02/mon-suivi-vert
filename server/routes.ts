@@ -10,7 +10,7 @@ import path from "path";
 import { nanoid } from "nanoid";
 import { setupAuth } from "./auth";
 import { badgeService } from "./badgeService";
-import { plantDatabase, searchPlants, getPlantByName } from "./plantDatabase";
+import { plantDatabase, searchPlants, getPlantByName, getPlantsByCategory, plantCategories } from "./plantDatabase";
 import { plantDiagnosticService } from "./plantDiagnosticService";
 
 // Configure multer for in-memory file storage
@@ -498,6 +498,38 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(defaultResults);
     } catch (error: any) {
       console.error("Erreur lors de la recherche:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Récupération des catégories de plantes disponibles
+  app.get("/api/plant-categories", async (_req: Request, res: Response) => {
+    try {
+      res.json(plantCategories);
+    } catch (error: any) {
+      console.error("Erreur lors de la récupération des catégories:", error);
+      res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // Récupération des plantes par catégorie
+  app.get("/api/plant-database/category/:category", async (req: Request, res: Response) => {
+    try {
+      const category = req.params.category as any;
+      
+      // Vérifier si la catégorie existe
+      const validCategory = plantCategories.find(cat => cat.id === category);
+      if (!validCategory) {
+        return res.status(400).json({ message: "Catégorie non valide" });
+      }
+      
+      // Récupérer les plantes de cette catégorie
+      const plants = getPlantsByCategory(category);
+      
+      console.log(`${plants.length} plantes trouvées dans la catégorie "${category}"`);
+      res.json(plants);
+    } catch (error: any) {
+      console.error("Erreur lors de la récupération des plantes par catégorie:", error);
       res.status(500).json({ message: error.message });
     }
   });
