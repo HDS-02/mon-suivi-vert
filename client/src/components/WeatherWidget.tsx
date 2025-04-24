@@ -9,6 +9,12 @@ interface WeatherData {
   icon: string;
   recommendations: string[];
   location: string;
+  forecast?: {
+    temperature: number;
+    humidity: number;
+    description: string;
+    icon: string;
+  };
 }
 
 // Données météo simulées pour le mode hors ligne ou quand l'API n'est pas disponible
@@ -22,7 +28,13 @@ const mockWeatherData: WeatherData = {
     "Température idéale pour la plupart des plantes d'intérieur",
     "Humidité adéquate, vos plantes devraient être confortables",
     "Aucune action spécifique nécessaire aujourd'hui"
-  ]
+  ],
+  forecast: {
+    temperature: 24,
+    humidity: 60,
+    description: "Ensoleillé",
+    icon: "clear_day"
+  }
 };
 
 // Convertir l'icône météo en icône material
@@ -219,11 +231,11 @@ export default function WeatherWidget() {
           tempVariation = 6;
         }
         
-        // Calcul température et humidité
+        // Calcul température et humidité pour aujourd'hui
         const temperature = Math.floor(baseTemp + (Math.random() * tempVariation));
         const humidity = Math.floor(Math.random() * 30) + 50;    // 50-80%
         
-        // Détermination de l'icône et la description
+        // Détermination de l'icône et la description pour aujourd'hui
         let icon = "partly_cloudy";
         let description = "Partiellement nuageux";
         
@@ -240,6 +252,37 @@ export default function WeatherWidget() {
           }
         }
         
+        // Calcul des prévisions pour demain (légèrement différent d'aujourd'hui)
+        // Variation de température de +/- 3 degrés par rapport à aujourd'hui
+        const temperatureVariation = Math.floor(Math.random() * 7) - 3; // -3 à +3 degrés
+        const forecastTemperature = temperature + temperatureVariation;
+        
+        // Variation d'humidité de +/- 10%
+        const humidityVariation = Math.floor(Math.random() * 21) - 10; // -10% à +10%
+        const forecastHumidity = Math.max(40, Math.min(90, humidity + humidityVariation));
+        
+        // Description et icône pour demain
+        let forecastIcon = icon;
+        let forecastDescription = description;
+        
+        // 30% de chances que le temps change
+        if (Math.random() < 0.3) {
+          // Changement de temps
+          const weatherTypes = [
+            { icon: "clear_day", description: "Ensoleillé" },
+            { icon: "partly_cloudy", description: "Partiellement nuageux" },
+            { icon: "cloudy", description: "Nuageux" },
+            { icon: "rainy", description: "Pluvieux" }
+          ];
+          
+          // Choisir un nouveau type de temps différent de l'actuel
+          const availableTypes = weatherTypes.filter(type => type.icon !== icon);
+          const newWeather = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+          
+          forecastIcon = newWeather.icon;
+          forecastDescription = newWeather.description;
+        }
+        
         // Court délai pour simuler une requête API et améliorer l'expérience utilisateur
         setTimeout(() => {
           setWeatherData({
@@ -248,7 +291,13 @@ export default function WeatherWidget() {
             icon,
             description,
             location,
-            recommendations: []
+            recommendations: [],
+            forecast: {
+              temperature: forecastTemperature,
+              humidity: forecastHumidity,
+              icon: forecastIcon,
+              description: forecastDescription
+            }
           });
           setLoading(false);
         }, 1000);
@@ -349,7 +398,35 @@ export default function WeatherWidget() {
               </div>
             </div>
             
-            <div className="mt-6 bg-blue-50/50 p-4 rounded-lg">
+            {/* Prévisions pour demain */}
+            {weatherData.forecast && (
+              <div className="mt-4 mb-4 border-t border-b border-blue-100 py-4">
+                <h4 className="font-medium mb-3 text-blue-700 flex items-center justify-center">
+                  <span className="material-icons mr-2 text-sm">calendar_today</span>
+                  Prévisions pour demain
+                </h4>
+                <div className="flex items-center justify-center gap-6">
+                  <div className="flex flex-col items-center">
+                    <span className="material-icons text-3xl text-blue-400">
+                      {getWeatherIcon(weatherData.forecast.icon)}
+                    </span>
+                    <span className="text-sm text-gray-600 mt-1">{weatherData.forecast.description}</span>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500">Temp.</div>
+                      <div className="text-lg font-medium">{weatherData.forecast.temperature}°C</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-xs text-gray-500">Hum.</div>
+                      <div className="text-lg font-medium">{weatherData.forecast.humidity}%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            <div className="mt-3 bg-blue-50/50 p-4 rounded-lg">
               <h4 className="font-medium mb-3 text-blue-700 flex items-center">
                 <span className="material-icons mr-2 text-sm">tips_and_updates</span>
                 Conseils d'entretien

@@ -13,6 +13,11 @@ import { queryClient } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
 import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
+interface PlantSuggestion {
+  name: string;
+  species: string;
+}
+
 export default function AddPlantManually() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
@@ -30,6 +35,11 @@ export default function AddPlantManually() {
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // États pour l'autocomplétion
+  const [suggestions, setSuggestions] = useState<PlantSuggestion[]>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isLoadingSuggestions, setIsLoadingSuggestions] = useState(false);
   
   // États pour suivre quels champs ont été remplis automatiquement
   const [autofilledFields, setAutofilledFields] = useState<{
@@ -178,6 +188,49 @@ export default function AddPlantManually() {
     } finally {
       setIsLoadingPlantInfo(false);
     }
+  };
+
+  // Fonction pour rechercher des suggestions de plantes
+  const fetchPlantSuggestions = async (query: string) => {
+    if (!query || query.trim().length < 2) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+    
+    setIsLoadingSuggestions(true);
+    
+    try {
+      const response = await fetch(`/api/plant-database?q=${encodeURIComponent(query)}`);
+      
+      if (!response.ok) {
+        throw new Error("Erreur lors de la recherche de suggestions");
+      }
+      
+      const plants = await response.json();
+      
+      // Limiter à 7 suggestions
+      setSuggestions(plants.slice(0, 7).map((plant: any) => ({
+        name: plant.name,
+        species: plant.species
+      })));
+      
+      setShowSuggestions(true);
+    } catch (error) {
+      console.error("Erreur lors de la récupération des suggestions:", error);
+      setSuggestions([]);
+    } finally {
+      setIsLoadingSuggestions(false);
+    }
+  };
+  
+  // Fonction pour sélectionner une suggestion et remplir les informations
+  const selectPlantSuggestion = async (plantName: string) => {
+    setName(plantName);
+    setShowSuggestions(false);
+    
+    // Récupérer les informations détaillées de la plante sélectionnée
+    await fetchPlantInfo(plantName);
   };
 
   // Gérer le glisser-déposer d'image
@@ -350,61 +403,100 @@ export default function AddPlantManually() {
                   Nom de la plante * 
                   <span className="text-xs ml-2 text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">Auto-complétion</span>
                 </Label>
-                <div className="flex gap-2 items-start">
-                  <div className="flex-1">
-                    <Input
-                      id="name"
-                      value={name}
-                      onChange={(e) => {
-                        const newName = e.target.value;
-                        setName(newName);
-                        
-                        // Lorsque l'utilisateur a saisi au moins 3 caractères et s'arrête de taper,
-                        // récupérer les informations sur la plante après une courte pause
-                        if (newName.trim().length >= 3) {
-                          // Utiliser un délai pour éviter de faire des requêtes à chaque frappe
-                          const timerId = setTimeout(() => {
-                            fetchPlantInfo(newName);
-                          }, 600); // 600ms de délai
+                <div className="relative">
+                  <div className="flex gap-2 items-start">
+                    <div className="flex-1 relative">
+                      <Input
+                        id="name"
+                        value={name}
+                        onChange={(e) => {
+                          const newName = e.target.value;
+                          setName(newName);
                           
-                          // Nettoyer le timer précédent si l'utilisateur continue à taper
-                          return () => clearTimeout(timerId);
-                        }
-                      }}
-                      placeholder="Ex: Rosier, Ficus, Basilic..."
-                      className="input-glass focus:ring-2 ring-primary/30 transition-all pl-10"
-                      required
-                    />
-                    <div className="relative">
-                      <span className="material-icons text-primary/70 absolute -top-9 left-3">
-                        auto_awesome
-                      </span>
+                          // Déclencher la recherche de suggestions après 300ms
+                          if (newName.trim().length >= 2) {
+                            const timerId = setTimeout(() => {
+                              fetchPlantSuggestions(newName);
+                            }, 300);
+                            
+                            return () => clearTimeout(timerId);
+                          } else {
+                            setShowSuggestions(false);
+                          }
+                        }}
+                        onFocus={() => {
+                          if (name.trim().length >= 2) {
+                            fetchPlantSuggestions(name);
+                          }
+                        }}
+                        placeholder="Ex: Rosier, Ficus, Basilic..."
+                        className="input-glass focus:ring-2 ring-primary/30 transition-all pl-10"
+                        required
+                      />
+                      <div className="relative">
+                        <span className="material-icons text-primary/70 absolute -top-9 left-3">
+                          auto_awesome
+                        </span>
+                      </div>
                     </div>
+                    <Button 
+                      type="button" 
+                      variant="outline"
+                      onClick={() => fetchPlantInfo(name)}
+                      disabled={isLoadingPlantInfo || name.trim().length < 3}
+                      className="h-10 px-3 bg-primary/10 backdrop-blur-sm hover:bg-primary/20 hover:text-primary-foreground transition-all"
+                    >
+                      {isLoadingPlantInfo ? (
+                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      ) : (
+                        <span className="material-icons text-primary">search</span>
+                      )}
+                    </Button>
                   </div>
-                  <Button 
-                    type="button" 
-                    variant="outline"
-                    onClick={() => fetchPlantInfo(name)}
-                    disabled={isLoadingPlantInfo || name.trim().length < 3}
-                    className="h-10 px-3 bg-primary/10 backdrop-blur-sm hover:bg-primary/20 hover:text-primary-foreground transition-all"
-                  >
-                    {isLoadingPlantInfo ? (
-                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
-                    ) : (
-                      <span className="material-icons text-primary">search</span>
-                    )}
-                  </Button>
+                  
+                  {/* Liste des suggestions */}
+                  {showSuggestions && suggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-1 bg-white rounded-md shadow-lg border border-gray-200 max-h-64 overflow-auto">
+                      <div className="p-2">
+                        <p className="text-xs text-gray-500 mb-2">Suggestions :</p>
+                        <ul className="space-y-1">
+                          {suggestions.map((suggestion, index) => (
+                            <li key={index}>
+                              <button
+                                type="button"
+                                className="w-full text-left px-3 py-2 hover:bg-primary/10 rounded-md flex items-center justify-between text-sm transition-colors"
+                                onClick={() => selectPlantSuggestion(suggestion.name)}
+                              >
+                                <div className="flex items-center">
+                                  <span className="material-icons text-primary mr-2 text-sm">eco</span>
+                                  <span>{suggestion.name}</span>
+                                </div>
+                                <span className="text-xs text-gray-500">{suggestion.species}</span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Message de statut */}
+                  {isLoadingSuggestions ? (
+                    <p className="text-xs text-primary mt-2 flex items-center animate-pulse">
+                      <span className="material-icons text-xs mr-1">search</span>
+                      Recherche de suggestions...
+                    </p>
+                  ) : isLoadingPlantInfo ? (
+                    <p className="text-xs text-primary mt-2 flex items-center animate-pulse">
+                      <span className="material-icons text-xs mr-1">hourglass_empty</span>
+                      Recherche des informations sur cette plante...
+                    </p>
+                  ) : name.trim().length >= 3 && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Saisissez le nom d'une plante ou choisissez parmi les suggestions pour remplir automatiquement ses informations
+                    </p>
+                  )}
                 </div>
-                {isLoadingPlantInfo ? (
-                  <p className="text-xs text-primary mt-2 flex items-center animate-pulse">
-                    <span className="material-icons text-xs mr-1">hourglass_empty</span>
-                    Recherche des informations sur cette plante...
-                  </p>
-                ) : name.trim().length >= 3 && (
-                  <p className="text-xs text-gray-500 mt-1">
-                    Saisissez le nom d'une plante et appuyez sur le bouton pour remplir automatiquement ses informations
-                  </p>
-                )}
               </div>
               
               <div>
