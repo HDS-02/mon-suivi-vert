@@ -6,13 +6,21 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import PlantGrowth from './animations/PlantGrowth';
 import BadgeAchievement from './animations/BadgeAchievement';
 import PlantDiagnostic from './animations/PlantDiagnostic';
+import { 
+  HomeScreenMockup, 
+  AddPlantScreenMockup, 
+  TasksScreenMockup, 
+  SOSScreenMockup, 
+  BadgesScreenMockup 
+} from './animations/ScreenMockups';
 
 interface OnboardingStep {
   id: number;
   title: string;
   description: string;
   icon: string;
-  animation: React.ReactNode;
+  mainAnimation: React.ReactNode;
+  screenPreview?: React.ReactNode;
   color: string;
   position?: 'center' | 'left' | 'right';
 }
@@ -23,13 +31,14 @@ const steps: OnboardingStep[] = [
     title: "Bienvenue sur Mon Suivi Vert !",
     description: "Suivez la santé de vos plantes et obtenez des conseils personnalisés pour les aider à s'épanouir.",
     icon: "eco",
-    animation: <motion.div 
+    mainAnimation: <motion.div 
       animate={{ rotate: [0, 10, -10, 0] }}
       transition={{ duration: 2, repeat: Infinity }}
       className="text-8xl"
     >
       🌱
     </motion.div>,
+    screenPreview: <HomeScreenMockup />,
     color: "from-green-400 to-emerald-600",
     position: "center"
   },
@@ -38,7 +47,7 @@ const steps: OnboardingStep[] = [
     title: "Ajoutez vos plantes",
     description: "Créez votre collection personnelle en ajoutant vos plantes avec leur nom, espèce et photo.",
     icon: "add_circle",
-    animation: <div className="relative w-32 h-32">
+    mainAnimation: <div className="relative w-32 h-32">
       <PlantGrowth />
       <motion.div 
         className="absolute -top-3 -right-3 bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center"
@@ -49,6 +58,7 @@ const steps: OnboardingStep[] = [
         <span className="material-icons text-base">add</span>
       </motion.div>
     </div>,
+    screenPreview: <AddPlantScreenMockup />,
     color: "from-blue-400 to-indigo-600",
     position: "left"
   },
@@ -57,7 +67,7 @@ const steps: OnboardingStep[] = [
     title: "Suivez leur entretien",
     description: "Recevez des rappels personnalisés pour l'arrosage et autres soins en fonction de chaque espèce.",
     icon: "water_drop",
-    animation: <div className="w-32 h-32 flex items-center justify-center">
+    mainAnimation: <div className="w-32 h-32 flex items-center justify-center">
       <motion.div 
         className="relative"
         animate={{ y: [0, -5, 0] }}
@@ -97,6 +107,7 @@ const steps: OnboardingStep[] = [
         </motion.div>
       </motion.div>
     </div>,
+    screenPreview: <TasksScreenMockup />,
     color: "from-cyan-400 to-sky-600",
     position: "right"
   },
@@ -105,9 +116,10 @@ const steps: OnboardingStep[] = [
     title: "Besoin d'aide ?",
     description: "Utilisez le bouton SOS pour diagnostiquer les problèmes de vos plantes et obtenir des conseils immédiats.",
     icon: "emergency",
-    animation: <div className="w-32 h-32 flex items-center justify-center">
+    mainAnimation: <div className="w-32 h-32 flex items-center justify-center">
       <PlantDiagnostic />
     </div>,
+    screenPreview: <SOSScreenMockup />,
     color: "from-orange-400 to-red-600",
     position: "left"
   },
@@ -116,9 +128,10 @@ const steps: OnboardingStep[] = [
     title: "Débloquez des badges",
     description: "Collectionnez des badges en prenant soin de vos plantes et en utilisant les fonctionnalités de l'application.",
     icon: "emoji_events",
-    animation: <div className="w-32 h-32 flex items-center justify-center">
+    mainAnimation: <div className="w-32 h-32 flex items-center justify-center">
       <BadgeAchievement />
     </div>,
+    screenPreview: <BadgesScreenMockup />,
     color: "from-yellow-400 to-amber-600",
     position: "right"
   }
@@ -208,9 +221,23 @@ export default function OnboardingTutorial() {
                 zIndex: 2
               }}
             >
-              {steps[currentStep].animation}
+              {steps[currentStep].mainAnimation}
             </motion.div>
           </div>
+          
+          {/* Aperçu d'écran */}
+          {steps[currentStep].screenPreview && (
+            <div className="p-4 flex justify-center">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.4, duration: 0.4 }}
+                className="w-full max-w-[300px] transform scale-[0.7] -my-20"
+              >
+                {steps[currentStep].screenPreview}
+              </motion.div>
+            </div>
+          )}
 
           {/* Navigation */}
           <div className="p-4 flex justify-between items-center">
