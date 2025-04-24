@@ -547,10 +547,15 @@ export function searchPlants(query: string): PlantEntry[] {
   const normalizedQuery = query.toLowerCase().trim();
   if (!normalizedQuery) return [];
   
-  return plantDatabase.filter(plant => 
+  console.log("Recherche de plantes avec requête:", query);
+  
+  const results = plantDatabase.filter(plant => 
     plant.name.toLowerCase().includes(normalizedQuery) ||
     plant.species.toLowerCase().includes(normalizedQuery)
   );
+  
+  console.log(`${results.length} plantes trouvées pour "${query}"`);
+  return results;
 }
 
 export function getPlantByName(name: string): PlantEntry | undefined {

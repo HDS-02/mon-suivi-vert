@@ -201,13 +201,15 @@ export default function AddPlantManually() {
     setIsLoadingSuggestions(true);
     
     try {
-      const response = await fetch(`/api/plant-database?q=${encodeURIComponent(query)}`);
+      console.log("Recherche de suggestions pour:", query);
+      const response = await fetch(`/api/plant-database?search=${encodeURIComponent(query)}`);
       
       if (!response.ok) {
         throw new Error("Erreur lors de la recherche de suggestions");
       }
       
       const plants = await response.json();
+      console.log("Suggestions trouvées:", plants.length);
       
       // Limiter à 7 suggestions
       setSuggestions(plants.slice(0, 7).map((plant: any) => ({
