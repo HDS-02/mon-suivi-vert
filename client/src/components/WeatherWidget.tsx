@@ -89,9 +89,12 @@ export default function WeatherWidget() {
 
   // État pour la géolocalisation persistante
   useEffect(() => {
-    // Vérifier si nous avons déjà des coordonnées en localStorage
+    // Forcer l'utilisation de la géolocalisation à chaque chargement
+    localStorage.removeItem('userLocation');
+    // Vérifier si nous avons déjà des coordonnées en localStorage après la suppression (devrait être null)
     const savedLocation = localStorage.getItem('userLocation');
-    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000; // Une semaine en millisecondes
+    // Définir la durée de cache à 1 jour
+    const ONE_DAY_MS = 24 * 60 * 60 * 1000; // Un jour en millisecondes
     
     const fetchWeatherData = async () => {
       try {
@@ -109,7 +112,7 @@ export default function WeatherWidget() {
             navigator.geolocation.getCurrentPosition(resolve, reject, {
               enableHighAccuracy: false, // Précision standard pour économiser la batterie
               timeout: 10000, // 10 secondes de timeout
-              maximumAge: ONE_WEEK_MS // Utiliser les données pendant une semaine
+              maximumAge: ONE_DAY_MS // Utiliser les données pendant une journée
             });
           });
         };
@@ -122,7 +125,7 @@ export default function WeatherWidget() {
           try {
             const parsedLocation = JSON.parse(savedLocation);
             const savedTime = parsedLocation.timestamp || 0;
-            const isExpired = Date.now() - savedTime > ONE_WEEK_MS;
+            const isExpired = Date.now() - savedTime > ONE_DAY_MS;
             
             if (!isExpired) {
               // Utiliser la localisation en cache
