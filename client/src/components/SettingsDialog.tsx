@@ -58,13 +58,13 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
   const profileForm = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues: {
-      username: user?.username || "",
-      firstName: user?.firstName || "",
-      email: user?.email || "",
+      username: "",
+      firstName: "",
+      email: "",
     },
   });
   
-  // Effet pour mettre à jour les valeurs du formulaire quand l'utilisateur est chargé
+  // Mise à jour du formulaire quand l'utilisateur est chargé
   useEffect(() => {
     if (user) {
       profileForm.reset({
@@ -73,7 +73,14 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
         email: user.email || "",
       });
     }
-  }, [user, profileForm]);
+  }, [user]);
+  
+  // Pour afficher les infos du formulaire dans la console (débogage)
+  useEffect(() => {
+    if (user) {
+      console.log("Données utilisateur chargées:", user);
+    }
+  }, [user]);
 
   // Gestionnaire de soumission du formulaire de profil
   const onSubmitProfileForm = async (data: ProfileFormValues) => {
