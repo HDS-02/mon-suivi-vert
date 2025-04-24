@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import Header from "./Header";
 import BottomNavigation from "./BottomNavigation";
+import OnboardingTutorial from "./OnboardingTutorial";
 
 interface LayoutProps {
   children: ReactNode;
@@ -23,6 +24,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
       
       <BottomNavigation />
+      <OnboardingTutorial />
     </div>
   );
 }
