@@ -1,11 +1,15 @@
 import { useState } from "react";
 import NotificationsDialog from "./NotificationsDialog";
 import SettingsDialog from "./SettingsDialog";
+import ProfileDialog from "./ProfileDialog";
 import logoSimple from "../assets/logo-simple.svg";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Header() {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+  const { user } = useAuth();
 
   return (
     <header className="bg-primary/80 backdrop-blur-md text-white shadow-lg sticky top-0 z-20">
@@ -18,14 +22,24 @@ export default function Header() {
           <button 
             className="p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 ease-in-out"
             onClick={() => setNotificationsOpen(true)}
+            title="Notifications"
           >
             <span className="material-icons">notifications</span>
           </button>
           <button 
             className="p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 ease-in-out"
             onClick={() => setSettingsOpen(true)}
+            title="Paramètres"
           >
             <span className="material-icons">settings</span>
+          </button>
+          <button 
+            className="p-2 rounded-full hover:bg-white/20 active:bg-white/30 transition-all duration-200 ease-in-out"
+            onClick={() => setProfileOpen(true)}
+            title="Mon profil"
+          >
+            <span className="material-icons">person</span>
+            {user?.firstName && <span className="text-xs ml-1">{user.firstName}</span>}
           </button>
         </div>
       </div>
@@ -39,6 +53,11 @@ export default function Header() {
       <SettingsDialog 
         open={settingsOpen} 
         onOpenChange={setSettingsOpen} 
+      />
+
+      <ProfileDialog
+        open={profileOpen}
+        onOpenChange={setProfileOpen}
       />
     </header>
   );

@@ -79,6 +79,41 @@ export default function WeatherWidget() {
     const fetchWeatherData = async () => {
       try {
         setLoading(true);
+        setError(null);
+        
+        // Récupération de la position géographique de l'utilisateur
+        const getLocation = () => {
+          return new Promise<GeolocationPosition>((resolve, reject) => {
+            if (!navigator.geolocation) {
+              reject(new Error("La géolocalisation n'est pas prise en charge par votre navigateur"));
+              return;
+            }
+            
+            navigator.geolocation.getCurrentPosition(resolve, reject, {
+              enableHighAccuracy: true,
+              timeout: 5000,
+              maximumAge: 0
+            });
+          });
+        };
+        
+        // On essaie d'obtenir la localisation
+        let location = "Paris, France";
+        
+        try {
+          const position = await getLocation();
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          
+          // Ici, dans une application réelle, on appellerait une API de géocodage inverse
+          // pour obtenir le nom de la ville. Pour simplifier, on affiche les coordonnées.
+          location = `Localisation: ${coords.latitude.toFixed(2)}, ${coords.longitude.toFixed(2)}`;
+        } catch (locError) {
+          console.error("Erreur de géolocalisation:", locError);
+          // On continue avec la localisation par défaut
+        }
         
         // Simulation de données météo pour une expérience utilisateur fiable
         // Dans une version de production, une API météo serait utilisée
@@ -126,9 +161,6 @@ export default function WeatherWidget() {
             description = "Pluvieux";
           }
         }
-        
-        // Localisation (fixe pour ce prototype)
-        const location = "Paris, France";
         
         // Court délai pour simuler une requête API et améliorer l'expérience utilisateur
         setTimeout(() => {
