@@ -25,6 +25,7 @@ interface PlantSuggestion {
 export default function AddPlantManually() {
   const [, navigate] = useLocation();
   const { toast } = useToast();
+  const { addNotification } = useNotifications();
   
   // État pour suivre l'étape du processus hiérarchique
   const [step, setStep] = useState<'category' | 'plant-list' | 'details'>('category');
@@ -321,6 +322,13 @@ export default function AddPlantManually() {
       
       // Invalidate queries
       queryClient.invalidateQueries({ queryKey: ["/api/plants"] });
+      
+      // Ajouter une notification pour informer l'utilisateur
+      addNotification({
+        title: "Nouvelle plante ajoutée",
+        message: `Vous avez ajouté ${name} à votre collection`,
+        type: "success"
+      });
       
       toast({
         title: "Plante ajoutée",
