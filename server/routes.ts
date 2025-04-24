@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { z } from "zod";
 import { insertPlantSchema, insertTaskSchema, insertPlantAnalysisSchema, insertUserSchema } from "@shared/schema";
 import { analyzePlantImage } from "./openai";
+import { PlantAnalyzer } from "./plantAnalyzer";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
@@ -274,6 +275,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       res.json(analysis);
     } catch (error: any) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+  // ENDPOINT POUR OBTENIR DES INFORMATIONS SUR UNE PLANTE PAR SON NOM
+  app.get("/api/plant-info", async (req: Request, res: Response) => {
+    try {
+      const plantName = req.query.name as string;
+      
+      if (!plantName) {
+        return res.status(400).json({ message: "Le nom de la plante est requis" });
+      }
+      
+      // Utiliser l'analyseur de plantes pour obtenir des informations
+      const plantAnalyzer = new PlantAnalyzer();
+      const plantInfo = plantAnalyzer.analyzeByDescription(plantName);
+      
+      // Retourner les informations de la plante
+      res.json(plantInfo);
+    } catch (error: any) {
+      console.error("Erreur lors de la recherche d'informations sur la plante:", error);
       res.status(500).json({ message: error.message });
     }
   });

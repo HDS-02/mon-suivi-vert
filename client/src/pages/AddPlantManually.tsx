@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -38,6 +38,85 @@ export default function AddPlantManually() {
         setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    }
+  };
+  
+  // Fonction pour récupérer les informations sur la plante à partir de son nom
+  const fetchPlantInfo = async (plantName: string) => {
+    if (!plantName || plantName.trim().length < 3) return;
+    
+    try {
+      const response = await fetch(`/api/plant-info?name=${encodeURIComponent(plantName)}`);
+      
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération des informations sur la plante");
+      }
+      
+      const plantInfo = await response.json();
+      
+      // Remplir automatiquement les champs avec les informations récupérées
+      if (plantInfo) {
+        // Ne pas écraser l'espèce si elle est déjà remplie
+        if (plantInfo.species && !species) {
+          setSpecies(plantInfo.species);
+        }
+        
+        // Mettre à jour l'état de santé
+        if (plantInfo.status) {
+          setStatus(plantInfo.status);
+        }
+        
+        // Mettre à jour les informations d'entretien
+        if (plantInfo.careInstructions) {
+          if (plantInfo.careInstructions.light) {
+            setLight(plantInfo.careInstructions.light);
+          }
+          
+          if (plantInfo.careInstructions.temperature) {
+            setTemperature(plantInfo.careInstructions.temperature);
+          }
+          
+          // Mettre à jour les notes d'entretien avec les recommandations
+          let notes = '';
+          
+          if (plantInfo.recommendations && plantInfo.recommendations.length > 0) {
+            notes += "Recommandations:\n" + plantInfo.recommendations.join("\n") + "\n\n";
+          }
+          
+          if (plantInfo.careInstructions.additional && plantInfo.careInstructions.additional.length > 0) {
+            notes += "Conseils supplémentaires:\n" + plantInfo.careInstructions.additional.join("\n");
+          }
+          
+          if (notes) {
+            setCareNotes(notes);
+          }
+          
+          // Tenter d'extraire une fréquence d'arrosage approximative à partir du texte
+          if (plantInfo.careInstructions.watering) {
+            const wateringText = plantInfo.careInstructions.watering.toLowerCase();
+            let frequency = 7; // Valeur par défaut (une fois par semaine)
+            
+            if (wateringText.includes("quotidien") || wateringText.includes("tous les jours")) {
+              frequency = 1;
+            } else if (wateringText.includes("2-3 jours") || wateringText.includes("tous les 2")) {
+              frequency = 2;
+            } else if (wateringText.includes("semaine") || wateringText.includes("7 jours")) {
+              frequency = 7;
+            } else if (wateringText.includes("10 jours")) {
+              frequency = 10;
+            } else if (wateringText.includes("2 semaines") || wateringText.includes("14 jours")) {
+              frequency = 14;
+            } else if (wateringText.includes("rarement") || wateringText.includes("mois")) {
+              frequency = 30;
+            }
+            
+            setWateringFrequency(frequency);
+          }
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la récupération des informations sur la plante:", error);
+      // Ne pas afficher d'erreur à l'utilisateur, simplement continuer avec les valeurs par défaut
     }
   };
 
@@ -211,7 +290,22 @@ export default function AddPlantManually() {
                 <Input
                   id="name"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    setName(newName);
+                    
+                    // Lorsque l'utilisateur a saisi au moins 3 caractères et s'arrête de taper,
+                    // récupérer les informations sur la plante après une courte pause
+                    if (newName.trim().length >= 3) {
+                      // Utiliser un délai pour éviter de faire des requêtes à chaque frappe
+                      const timerId = setTimeout(() => {
+                        fetchPlantInfo(newName);
+                      }, 600); // 600ms de délai
+                      
+                      // Nettoyer le timer précédent si l'utilisateur continue à taper
+                      return () => clearTimeout(timerId);
+                    }
+                  }}
                   placeholder="Ex: Ficus Lyrata"
                   required
                 />
