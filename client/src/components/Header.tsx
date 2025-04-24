@@ -14,8 +14,8 @@ export default function Header() {
   return (
     <header className="bg-primary/80 backdrop-blur-md text-white shadow-lg sticky top-0 z-20">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
-        <div className="flex items-center bg-white/10 rounded-lg px-4 py-1">
-          <img src={newLogo} alt="Logo Mon Suivi Vert" className="h-12 w-auto" />
+        <div className="flex items-center bg-white/30 backdrop-blur-md rounded-lg px-3 py-2">
+          <img src={newLogo} alt="Logo Mon Suivi Vert" className="h-14 w-auto drop-shadow-md" />
         </div>
         <div className="flex space-x-2">
           <button 
