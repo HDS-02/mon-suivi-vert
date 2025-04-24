@@ -185,7 +185,7 @@ export default function OnboardingTutorial() {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
       <AnimatePresence mode="wait">
         <motion.div
           key={currentStep}
@@ -193,108 +193,68 @@ export default function OnboardingTutorial() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.3 }}
-          className="relative w-full max-w-4xl mx-auto bg-white rounded-2xl overflow-hidden shadow-2xl flex flex-col md:flex-row"
-          style={{ height: 'min(85vh, 650px)' }}
+          className="relative w-full max-w-2xl mx-auto bg-white rounded-xl overflow-hidden shadow-xl"
         >
-          {/* Partie gauche - Informations */}
-          <div className="w-full md:w-[40%] flex flex-col">
-            {/* Barre de progression */}
-            <div className="w-full h-1 bg-gray-200">
-              <div 
-                className="h-full bg-primary" 
-                style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
-              />
-            </div>
+          {/* Barre de progression */}
+          <div className="w-full h-1 bg-gray-200">
+            <div 
+              className="h-full bg-primary" 
+              style={{ width: `${((currentStep + 1) / steps.length) * 100}%` }}
+            />
+          </div>
 
-            {/* En-tête coloré avec illustration */}
-            <div className={`bg-gradient-to-r ${steps[currentStep].color} p-8 text-white flex-grow flex flex-col relative overflow-hidden`}>
-              <div className="relative z-10 mt-8">
-                <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center mb-6">
-                  <span className="material-icons text-2xl">{steps[currentStep].icon}</span>
+          <div className="flex flex-col md:flex-row">
+            {/* Informations à gauche */}
+            <div className="p-6 md:w-1/2">
+              <div className="flex items-center mb-4">
+                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center mr-4">
+                  <span className="material-icons text-primary">{steps[currentStep].icon}</span>
                 </div>
-                <h2 className="text-2xl font-bold mb-3">{steps[currentStep].title}</h2>
-                <p className="text-white/90 text-lg leading-relaxed">{steps[currentStep].description}</p>
+                <h2 className="text-xl font-bold">{steps[currentStep].title}</h2>
               </div>
               
-              {/* Animation */}
-              <div className="flex-grow flex items-center justify-center mt-8 relative">
-                <motion.div>
-                  {steps[currentStep].mainAnimation}
-                </motion.div>
-              </div>
+              <p className="text-gray-600 mb-6">{steps[currentStep].description}</p>
               
-              {/* Navigation */}
-              <div className="mt-auto pt-4 flex justify-between items-center">
-                <div>
-                  {currentStep > 0 ? (
-                    <Button variant="ghost" className="text-white hover:bg-white/20 hover:text-white" onClick={prevStep}>
-                      <span className="material-icons mr-1">arrow_back</span>
-                      Précédent
-                    </Button>
-                  ) : (
-                    <Button variant="ghost" className="text-white hover:bg-white/20 hover:text-white" onClick={skipTutorial}>
-                      Passer
-                    </Button>
-                  )}
-                </div>
-                <div className="text-white/80 font-medium">
-                  {currentStep + 1} / {steps.length}
-                </div>
+              <div className="hidden md:block">
+                {steps[currentStep].mainAnimation}
+              </div>
+            </div>
+            
+            {/* Preview à droite */}
+            <div className="md:w-1/2 p-4 bg-gray-50 flex items-center justify-center">
+              <div className="w-full max-w-[220px] transform scale-75">
+                {steps[currentStep].screenPreview}
               </div>
             </div>
           </div>
           
-          {/* Partie droite - Aperçu d'écran */}
-          <div className="w-full md:w-[60%] bg-gray-50 h-full flex flex-col">
-            <div className="flex-grow p-8 flex flex-col items-center justify-center relative">
-              {steps[currentStep].screenPreview && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.2, duration: 0.5 }}
-                  className="max-w-[350px] mx-auto relative"
-                  style={{ height: '90%' }}
-                >
-                  {/* Overlay décoratif */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-b from-transparent to-gray-900/5 rounded-3xl"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.5 }}
-                  />
-                  
-                  {/* Arrière-plan décoratif circulaire */}
-                  <motion.div
-                    className={`absolute -inset-4 rounded-full opacity-20 blur-xl bg-gradient-to-r ${steps[currentStep].color}`}
-                    initial={{ scale: 0.8, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 0.15 }}
-                    transition={{ delay: 0.3 }}
-                  />
-                  
-                  {steps[currentStep].screenPreview}
-                </motion.div>
+          {/* Navigation */}
+          <div className="p-4 border-t border-gray-200 flex justify-between items-center">
+            <div>
+              {currentStep > 0 ? (
+                <Button variant="ghost" size="sm" onClick={prevStep}>
+                  <span className="material-icons mr-1 text-sm">arrow_back</span>
+                  Précédent
+                </Button>
+              ) : (
+                <Button variant="ghost" size="sm" onClick={skipTutorial}>
+                  Passer
+                </Button>
               )}
             </div>
-            
-            {/* Bouton Suivant/Terminer */}
-            <div className="p-6 border-t border-gray-200 flex justify-end">
-              <Button
-                onClick={nextStep}
-                className={`px-8 py-6 text-base rounded-xl bg-gradient-to-r shadow-lg ${steps[currentStep].color}`}
-              >
-                {currentStep < steps.length - 1 ? (
-                  <>
-                    Suivant
-                    <span className="material-icons ml-2">arrow_forward</span>
-                  </>
-                ) : (
-                  <>
-                    Terminer
-                    <span className="material-icons ml-2">check_circle</span>
-                  </>
-                )}
-              </Button>
+            <div className="text-sm text-gray-500">
+              {currentStep + 1} / {steps.length}
             </div>
+            <Button size="sm" onClick={nextStep}>
+              {currentStep < steps.length - 1 ? (
+                <>
+                  Suivant
+                  <span className="material-icons ml-1 text-sm">arrow_forward</span>
+                </>
+              ) : (
+                'Terminer'
+              )}
+            </Button>
           </div>
         </motion.div>
       </AnimatePresence>
