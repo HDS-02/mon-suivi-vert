@@ -69,51 +69,50 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="container flex items-center justify-center min-h-screen py-12">
-      <div className="flex flex-col lg:flex-row w-full gap-8 max-w-6xl mx-auto">
+    <div className="organic-bg min-h-screen flex items-center justify-center py-10 px-4">
+      <div className="flex flex-col lg:flex-row w-full gap-8 max-w-6xl mx-auto bg-white/70 backdrop-blur-md p-6 lg:p-10 rounded-xl shadow-xl border border-gray-100/80">
         {/* Section de présentation */}
-        <div className="lg:w-1/2 flex flex-col justify-center">
-          <h1 className="text-4xl font-bold text-primary mb-4">Mon Suivi Vert</h1>
-          <p className="text-xl mb-6">
-            Votre assistant personnel pour suivre et prendre soin de vos plantes
-          </p>
-          <div className="space-y-4">
-            <div className="flex items-start gap-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+        <div className="lg:w-1/2 flex flex-col justify-center pr-0 lg:pr-8">
+          <div className="mb-6">
+            <h1 className="text-4xl font-raleway font-bold bg-gradient-to-r from-primary to-primary-light bg-clip-text text-transparent">
+              Mon Suivi Vert
+            </h1>
+            <p className="text-xl mt-2 text-gray-700">
+              Votre assistant personnel pour prendre soin de vos plantes
+            </p>
+          </div>
+          
+          <div className="space-y-5 mb-8">
+            <div className="flex items-start gap-3 bg-primary/5 p-4 rounded-lg transition-all hover:bg-primary/10">
+              <div className="bg-gradient-to-br from-primary to-primary-light p-2 rounded-full text-white shadow-sm">
+                <span className="material-icons">eco</span>
               </div>
               <div>
-                <h3 className="font-medium">Analyse de santé par IA</h3>
+                <h3 className="font-medium text-primary-dark">Ajout manuel intelligent</h3>
                 <p className="text-muted-foreground text-sm">
-                  Identifiez rapidement les problèmes de santé de vos plantes grâce à l'analyse d'image
+                  Ajoutez facilement vos plantes avec auto-complétion des informations d'entretien
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+            <div className="flex items-start gap-3 bg-primary/5 p-4 rounded-lg transition-all hover:bg-primary/10">
+              <div className="bg-gradient-to-br from-primary to-primary-light p-2 rounded-full text-white shadow-sm">
+                <span className="material-icons">notifications</span>
               </div>
               <div>
-                <h3 className="font-medium">Rappels d'entretien personnalisés</h3>
+                <h3 className="font-medium text-primary-dark">Rappels d'entretien personnalisés</h3>
                 <p className="text-muted-foreground text-sm">
                   Recevez des rappels pour l'arrosage, la fertilisation et autres soins essentiels
                 </p>
               </div>
             </div>
-            <div className="flex items-start gap-2">
-              <div className="bg-primary/10 p-2 rounded-full">
-                <svg className="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                </svg>
+            <div className="flex items-start gap-3 bg-primary/5 p-4 rounded-lg transition-all hover:bg-primary/10">
+              <div className="bg-gradient-to-br from-primary to-primary-light p-2 rounded-full text-white shadow-sm">
+                <span className="material-icons">emoji_events</span>
               </div>
               <div>
-                <h3 className="font-medium">Conseils adaptés à chaque plante</h3>
+                <h3 className="font-medium text-primary-dark">Système de badges motivant</h3>
                 <p className="text-muted-foreground text-sm">
-                  Obtenez des conseils spécifiques pour chaque type de plante dans votre collection
+                  Débloquez des badges en prenant soin de vos plantes et en développant votre collection
                 </p>
               </div>
             </div>
@@ -123,18 +122,22 @@ export default function AuthPage() {
         {/* Formulaires */}
         <div className="lg:w-1/2">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-2 mb-6">
-              <TabsTrigger value="login">Connexion</TabsTrigger>
-              <TabsTrigger value="register">Inscription</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 mb-6 bg-white/50 p-1">
+              <TabsTrigger value="login" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-light data-[state=active]:text-white">
+                Connexion
+              </TabsTrigger>
+              <TabsTrigger value="register" className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-primary data-[state=active]:to-primary-light data-[state=active]:text-white">
+                Inscription
+              </TabsTrigger>
             </TabsList>
 
             {/* Formulaire de connexion */}
             <TabsContent value="login">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Connexion</CardTitle>
+              <Card className="glass-card shadow-lg border-0">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-primary-dark">Bienvenue</CardTitle>
                   <CardDescription>
-                    Connectez-vous à votre compte pour accéder à vos plantes.
+                    Connectez-vous pour retrouver vos plantes et suivre leur santé
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -145,9 +148,13 @@ export default function AuthPage() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Nom d'utilisateur</FormLabel>
+                            <FormLabel className="text-primary-dark">Nom d'utilisateur</FormLabel>
                             <FormControl>
-                              <Input placeholder="Entrez votre nom d'utilisateur" {...field} />
+                              <Input 
+                                placeholder="Entrez votre nom d'utilisateur" 
+                                className="input-glass focus:ring-2 ring-primary/30 transition-all"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -158,33 +165,45 @@ export default function AuthPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Mot de passe</FormLabel>
+                            <FormLabel className="text-primary-dark">Mot de passe</FormLabel>
                             <FormControl>
-                              <Input type="password" placeholder="Entrez votre mot de passe" {...field} />
+                              <Input 
+                                type="password" 
+                                placeholder="Entrez votre mot de passe" 
+                                className="input-glass focus:ring-2 ring-primary/30 transition-all"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
                         )}
                       />
-                      <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-gradient-to-r from-primary to-primary-light text-white mt-4 shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200" 
+                        disabled={loginMutation.isPending}
+                      >
                         {loginMutation.isPending ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Connexion en cours...
                           </>
                         ) : (
-                          "Se connecter"
+                          <div className="flex items-center justify-center">
+                            <span className="material-icons mr-2">login</span>
+                            Se connecter
+                          </div>
                         )}
                       </Button>
                     </form>
                   </Form>
                 </CardContent>
-                <CardFooter className="flex justify-center">
+                <CardFooter className="flex justify-center pt-0">
                   <p className="text-sm text-muted-foreground">
                     Pas encore de compte?{" "}
                     <Button
                       variant="link"
-                      className="p-0"
+                      className="p-0 text-primary font-medium"
                       onClick={() => setActiveTab("register")}
                     >
                       Inscrivez-vous
@@ -196,11 +215,11 @@ export default function AuthPage() {
 
             {/* Formulaire d'inscription */}
             <TabsContent value="register">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Inscription</CardTitle>
+              <Card className="glass-card shadow-lg border-0">
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-primary-dark">Créer un compte</CardTitle>
                   <CardDescription>
-                    Créez un compte pour commencer à suivre vos plantes.
+                    Rejoignez notre communauté et commencez à suivre vos plantes
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -211,9 +230,13 @@ export default function AuthPage() {
                         name="username"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Nom d'utilisateur</FormLabel>
+                            <FormLabel className="text-primary-dark">Nom d'utilisateur</FormLabel>
                             <FormControl>
-                              <Input placeholder="Choisissez un nom d'utilisateur" {...field} />
+                              <Input 
+                                placeholder="Choisissez un nom d'utilisateur" 
+                                className="input-glass focus:ring-2 ring-primary/30 transition-all"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -224,9 +247,13 @@ export default function AuthPage() {
                         name="firstName"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Prénom</FormLabel>
+                            <FormLabel className="text-primary-dark">Prénom</FormLabel>
                             <FormControl>
-                              <Input placeholder="Entrez votre prénom" {...field} />
+                              <Input 
+                                placeholder="Entrez votre prénom" 
+                                className="input-glass focus:ring-2 ring-primary/30 transition-all"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -237,9 +264,14 @@ export default function AuthPage() {
                         name="email"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Email (optionnel)</FormLabel>
+                            <FormLabel className="text-primary-dark">Email (optionnel)</FormLabel>
                             <FormControl>
-                              <Input type="email" placeholder="Entrez votre email" {...field} />
+                              <Input 
+                                type="email" 
+                                placeholder="Entrez votre email" 
+                                className="input-glass focus:ring-2 ring-primary/30 transition-all"
+                                {...field} 
+                              />
                             </FormControl>
                             <FormMessage />
                           </FormItem>
@@ -250,11 +282,12 @@ export default function AuthPage() {
                         name="password"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Mot de passe</FormLabel>
+                            <FormLabel className="text-primary-dark">Mot de passe</FormLabel>
                             <FormControl>
                               <Input
                                 type="password"
                                 placeholder="Choisissez un mot de passe"
+                                className="input-glass focus:ring-2 ring-primary/30 transition-all"
                                 {...field}
                               />
                             </FormControl>
@@ -267,11 +300,12 @@ export default function AuthPage() {
                         name="confirmPassword"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>Confirmation du mot de passe</FormLabel>
+                            <FormLabel className="text-primary-dark">Confirmation du mot de passe</FormLabel>
                             <FormControl>
                               <Input
                                 type="password"
                                 placeholder="Confirmez votre mot de passe"
+                                className="input-glass focus:ring-2 ring-primary/30 transition-all"
                                 {...field}
                               />
                             </FormControl>
@@ -279,25 +313,32 @@ export default function AuthPage() {
                           </FormItem>
                         )}
                       />
-                      <Button type="submit" className="w-full" disabled={registerMutation.isPending}>
+                      <Button 
+                        type="submit" 
+                        className="w-full bg-gradient-to-r from-primary to-primary-light text-white mt-4 shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+                        disabled={registerMutation.isPending}
+                      >
                         {registerMutation.isPending ? (
                           <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             Inscription en cours...
                           </>
                         ) : (
-                          "S'inscrire"
+                          <div className="flex items-center justify-center">
+                            <span className="material-icons mr-2">person_add</span>
+                            S'inscrire
+                          </div>
                         )}
                       </Button>
                     </form>
                   </Form>
                 </CardContent>
-                <CardFooter className="flex justify-center">
+                <CardFooter className="flex justify-center pt-0">
                   <p className="text-sm text-muted-foreground">
                     Déjà un compte?{" "}
                     <Button
                       variant="link"
-                      className="p-0"
+                      className="p-0 text-primary font-medium"
                       onClick={() => setActiveTab("login")}
                     >
                       Connectez-vous

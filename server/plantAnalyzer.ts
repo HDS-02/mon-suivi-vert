@@ -9,6 +9,60 @@ import path from "path";
 export class PlantAnalyzer {
   private plantDatabase: PlantData[] = [
     {
+      id: "rosier",
+      name: "Rosier",
+      commonTypes: ["Rosa", "Rosier buisson", "Rosier grimpant", "Rosier tige"],
+      keywords: ["rose", "rosier", "fleur", "épines", "parfumée", "floraison"],
+      careInstructions: {
+        watering: "Arrosage régulier au pied, éviter de mouiller le feuillage.",
+        light: "Plein soleil, minimum 6 heures par jour.",
+        temperature: "-15°C à 35°C selon les variétés. Généralement rustique.",
+        additional: ["Taille annuelle en fin d'hiver", "Protection hivernale dans les régions très froides", "Traitement préventif contre les maladies"]
+      },
+      commonIssues: [
+        { symptom: "taches noires sur les feuilles", cause: "maladie cryptogamique", severity: "warning" },
+        { symptom: "pucerons sur les boutons", cause: "infestation d'insectes", severity: "warning" },
+        { symptom: "oïdium (poudre blanche)", cause: "champignon", severity: "warning" },
+        { symptom: "jaunissement et chute des feuilles", cause: "stress hydrique ou maladie", severity: "danger" }
+      ]
+    },
+    {
+      id: "basilic",
+      name: "Basilic",
+      commonTypes: ["Ocimum basilicum", "Basilic grand vert", "Basilic pourpre", "Basilic citron"],
+      keywords: ["basilic", "herbe aromatique", "cuisine", "méditerranéen", "annuelle"],
+      careInstructions: {
+        watering: "Arrosage régulier sans excès, sol légèrement humide.",
+        light: "Soleil non brûlant ou mi-ombre légère.",
+        temperature: "15-30°C. Craint le froid.",
+        additional: ["Pincer régulièrement les sommités", "Protéger du vent", "Replanter chaque année"]
+      },
+      commonIssues: [
+        { symptom: "feuilles jaunissantes", cause: "excès d'eau", severity: "warning" },
+        { symptom: "taches brunes", cause: "brûlure solaire ou champignon", severity: "warning" },
+        { symptom: "floraison précoce", cause: "stress ou chaleur excessive", severity: "warning" },
+        { symptom: "feuilles percées", cause: "limaces ou escargots", severity: "warning" }
+      ]
+    },
+    {
+      id: "salade",
+      name: "Salade",
+      commonTypes: ["Lactuca sativa", "Laitue", "Batavia", "Feuille de chêne"],
+      keywords: ["salade", "laitue", "batavia", "potager", "légume feuille"],
+      careInstructions: {
+        watering: "Arrosage régulier pour maintenir le sol frais sans détremper.",
+        light: "Mi-ombre à soleil selon la saison et région.",
+        temperature: "10-25°C. Peut monter en graine en forte chaleur.",
+        additional: ["Protection contre les limaces", "Récolte avant maturité complète", "Semis échelonnés pour récolte continue"]
+      },
+      commonIssues: [
+        { symptom: "feuilles rongées", cause: "limaces ou escargots", severity: "warning" },
+        { symptom: "jaunissement des feuilles basses", cause: "vieillissement normal", severity: "healthy" },
+        { symptom: "montée en graine", cause: "chaleur excessive ou âge", severity: "warning" },
+        { symptom: "taches brunes molles", cause: "pourriture", severity: "danger" }
+      ]
+    },
+    {
       id: "ficus",
       name: "Ficus",
       commonTypes: ["Ficus lyrata", "Ficus elastica", "Ficus benjamina"],
@@ -289,6 +343,186 @@ export class PlantAnalyzer {
         { symptom: "perte de feuilles", cause: "stress ou changement d'environnement", severity: "warning" },
         { symptom: "signes de dessèchement", cause: "manque d'humidité ambiante", severity: "warning" },
         { symptom: "branches mourantes", cause: "taille excessive ou maladie", severity: "danger" }
+      ]
+    },
+    {
+      id: "tomate",
+      name: "Tomate",
+      commonTypes: ["Solanum lycopersicum", "Tomate cerise", "Tomate cœur de bœuf", "Tomate ancienne"],
+      keywords: ["tomate", "légume", "potager", "fruit rouge", "grimpante", "estival"],
+      careInstructions: {
+        watering: "Arrosage régulier en évitant de mouiller le feuillage. Plus abondant en période de production.",
+        light: "Plein soleil, minimum 6-8 heures par jour.",
+        temperature: "18-30°C. Craint le gel.",
+        additional: ["Tuteurage nécessaire", "Taille des gourmands recommandée", "Fertilisation régulière"]
+      },
+      commonIssues: [
+        { symptom: "feuilles jaunissantes", cause: "carence en nutriments", severity: "warning" },
+        { symptom: "taches noires", cause: "mildiou", severity: "danger" },
+        { symptom: "pourriture apicale", cause: "carence en calcium", severity: "warning" },
+        { symptom: "fruits fendus", cause: "arrosage irrégulier", severity: "warning" }
+      ]
+    },
+    {
+      id: "pommier",
+      name: "Pommier",
+      commonTypes: ["Malus domestica", "Golden", "Gala", "Reinette"],
+      keywords: ["pommier", "arbre fruitier", "pomme", "verger", "fruitier"],
+      careInstructions: {
+        watering: "Arrosage régulier les premières années, puis principalement en période de sécheresse.",
+        light: "Plein soleil ou mi-ombre légère.",
+        temperature: "-15°C à 35°C selon les variétés. Nécessite généralement une période de froid hivernal.",
+        additional: ["Taille de formation puis d'entretien annuelle", "Protection contre les ravageurs"]
+      },
+      commonIssues: [
+        { symptom: "taches brunes sur les feuilles", cause: "tavelure", severity: "warning" },
+        { symptom: "fruits véreux", cause: "carpocapse", severity: "warning" },
+        { symptom: "feuilles enroulées", cause: "pucerons", severity: "warning" },
+        { symptom: "branches sèches", cause: "chancre", severity: "danger" }
+      ]
+    },
+    {
+      id: "fraisier",
+      name: "Fraisier",
+      commonTypes: ["Fragaria", "Fraise des bois", "Fraise remontante", "Fraise Gariguette"],
+      keywords: ["fraisier", "fraise", "fruit rouge", "fruit de jardin", "petits fruits"],
+      careInstructions: {
+        watering: "Arrosage régulier mais modéré, en évitant de mouiller les fruits et le feuillage.",
+        light: "Soleil à mi-ombre.",
+        temperature: "10-25°C. Peut résister à des températures plus basses selon les variétés.",
+        additional: ["Paillage recommandé", "Renouvellement tous les 3-4 ans", "Protection des fruits contre l'humidité du sol"]
+      },
+      commonIssues: [
+        { symptom: "fruits petits", cause: "manque d'eau ou de nutriments", severity: "warning" },
+        { symptom: "pourriture grise", cause: "humidité excessive", severity: "danger" },
+        { symptom: "feuilles tachetées", cause: "maladies fongiques", severity: "warning" },
+        { symptom: "fruits mangés", cause: "limaces ou oiseaux", severity: "warning" }
+      ]
+    },
+    {
+      id: "tulipe",
+      name: "Tulipe",
+      commonTypes: ["Tulipa", "Tulipe Darwin", "Tulipe perroquet", "Tulipe précoce"],
+      keywords: ["tulipe", "bulbe", "fleur printanière", "fleur coupée", "floraison précoce"],
+      careInstructions: {
+        watering: "Arrosage modéré après la plantation et pendant la croissance, puis réduction après la floraison.",
+        light: "Plein soleil à mi-ombre.",
+        temperature: "Supporte le froid hivernal, préfère la fraîcheur au printemps.",
+        additional: ["Plantation en automne", "Déterrage possible en été", "Ne pas couper le feuillage avant son jaunissement"]
+      },
+      commonIssues: [
+        { symptom: "fleurs déformées", cause: "virus", severity: "warning" },
+        { symptom: "bulbes pourris", cause: "excès d'humidité", severity: "danger" },
+        { symptom: "feuilles tachetées", cause: "champignons", severity: "warning" },
+        { symptom: "non-floraison", cause: "manque de froid ou bulbes épuisés", severity: "warning" }
+      ]
+    },
+    {
+      id: "geranium",
+      name: "Géranium",
+      commonTypes: ["Pelargonium", "Géranium lierre", "Géranium zonale", "Géranium odorant"],
+      keywords: ["géranium", "pélargonium", "fleur de balcon", "fleur estivale", "plante fleurie"],
+      careInstructions: {
+        watering: "Arrosage régulier, laissez sécher entre deux arrosages. Plus fréquent en été.",
+        light: "Plein soleil à mi-ombre.",
+        temperature: "10-25°C. À protéger du gel.",
+        additional: ["Fertilisation régulière en période de floraison", "Taille pour favoriser la ramification", "Hivernage possible"]
+      },
+      commonIssues: [
+        { symptom: "feuilles jaunissantes", cause: "arrosage excessif", severity: "warning" },
+        { symptom: "taches brunes", cause: "champignons", severity: "warning" },
+        { symptom: "plante dégarnie", cause: "manque de lumière", severity: "warning" },
+        { symptom: "feuilles déformées", cause: "attaque d'insectes", severity: "warning" }
+      ]
+    },
+    {
+      id: "carotte",
+      name: "Carotte",
+      commonTypes: ["Daucus carota", "Carotte Nantaise", "Carotte de Colmar", "Carotte Touchon"],
+      keywords: ["carotte", "légume racine", "potager", "légume", "racine comestible"],
+      careInstructions: {
+        watering: "Arrosage régulier, surtout lors de la germination et croissance de la racine.",
+        light: "Plein soleil à mi-ombre légère.",
+        temperature: "15-25°C pour la croissance optimale.",
+        additional: ["Sol léger et profond", "Éclaircissage nécessaire", "Éviter les sols caillouteux ou compactés"]
+      },
+      commonIssues: [
+        { symptom: "racines fourchues", cause: "sol caillouteux ou obstacle", severity: "warning" },
+        { symptom: "feuillage jaune", cause: "mouche de la carotte", severity: "warning" },
+        { symptom: "racines craquelées", cause: "arrosage irrégulier", severity: "warning" },
+        { symptom: "racines vertes au collet", cause: "exposition à la lumière", severity: "warning" }
+      ]
+    },
+    {
+      id: "olivier",
+      name: "Olivier",
+      commonTypes: ["Olea europaea", "Olivier d'Europe", "Olivier de Provence"],
+      keywords: ["olivier", "arbre méditerranéen", "olive", "arbre fruitier", "feuillage persistant"],
+      careInstructions: {
+        watering: "Arrosage modéré, tolère la sécheresse une fois établi.",
+        light: "Plein soleil.",
+        temperature: "Supporte bien la chaleur, sensible au gel prolongé en dessous de -5°C.",
+        additional: ["Taille d'entretien en fin d'hiver", "Protection hivernale dans les régions froides", "Sol bien drainé indispensable"]
+      },
+      commonIssues: [
+        { symptom: "feuilles tachetées", cause: "œil de paon (champignon)", severity: "warning" },
+        { symptom: "branches sèches", cause: "gel ou verticilliose", severity: "danger" },
+        { symptom: "feuilles collantes", cause: "cochenille", severity: "warning" },
+        { symptom: "chute des olives", cause: "mouche de l'olive", severity: "warning" }
+      ]
+    },
+    {
+      id: "citronnier",
+      name: "Citronnier",
+      commonTypes: ["Citrus limon", "Citronnier 4 saisons", "Citronnier Meyer"],
+      keywords: ["citronnier", "agrume", "citron", "arbre fruitier", "méditerranéen"],
+      careInstructions: {
+        watering: "Arrosage régulier, laissez sécher légèrement entre deux arrosages.",
+        light: "Plein soleil, idéalement exposition sud ou ouest.",
+        temperature: "8-30°C. À protéger du gel, idéalement en intérieur en hiver dans les régions froides.",
+        additional: ["Humidité ambiante appréciée", "Fertilisation régulière", "Taille légère au printemps"]
+      },
+      commonIssues: [
+        { symptom: "feuilles jaunissantes", cause: "carence en fer (chlorose)", severity: "warning" },
+        { symptom: "feuilles collantes", cause: "cochenilles ou pucerons", severity: "warning" },
+        { symptom: "chute des feuilles", cause: "stress hydrique ou thermique", severity: "warning" },
+        { symptom: "fruits qui tombent", cause: "arrosage irrégulier", severity: "warning" }
+      ]
+    },
+    {
+      id: "lavande",
+      name: "Lavande",
+      commonTypes: ["Lavandula angustifolia", "Lavande fine", "Lavandin", "Lavande papillon"],
+      keywords: ["lavande", "aromatique", "méditerranéen", "fleurs bleues", "mellifère", "parfumée"],
+      careInstructions: {
+        watering: "Arrosage modéré à l'installation puis très limité. Résistante à la sécheresse.",
+        light: "Plein soleil.",
+        temperature: "-15°C à 35°C selon les variétés. Résistante au froid et à la chaleur.",
+        additional: ["Taille annuelle après floraison", "Sol drainant indispensable", "Peu de fertilisation nécessaire"]
+      },
+      commonIssues: [
+        { symptom: "pourriture au centre", cause: "excès d'humidité", severity: "danger" },
+        { symptom: "plante ligneuse peu fleurie", cause: "manque de taille", severity: "warning" },
+        { symptom: "jaunissement", cause: "sol trop riche ou humide", severity: "warning" },
+        { symptom: "peu de floraison", cause: "manque de soleil", severity: "warning" }
+      ]
+    },
+    {
+      id: "menthe",
+      name: "Menthe",
+      commonTypes: ["Mentha", "Menthe poivrée", "Menthe verte", "Menthe marocaine"],
+      keywords: ["menthe", "aromatique", "herbe", "plante envahissante", "infusion"],
+      careInstructions: {
+        watering: "Arrosage régulier, n'aime pas le sol sec.",
+        light: "Mi-ombre à soleil, éviter le plein soleil brûlant.",
+        temperature: "10-25°C. Résistante au froid.",
+        additional: ["Culture en pot conseillée car très envahissante", "Taille régulière pour éviter la lignification", "Renouvellement tous les 2-3 ans"]
+      },
+      commonIssues: [
+        { symptom: "feuilles tachetées", cause: "rouille (champignon)", severity: "warning" },
+        { symptom: "feuilles rongées", cause: "altises", severity: "warning" },
+        { symptom: "croissance faible", cause: "manque d'eau ou de nutriments", severity: "warning" },
+        { symptom: "tiges couchées", cause: "environnement trop chaud et sec", severity: "warning" }
       ]
     }
   ];
