@@ -46,53 +46,117 @@ export default function BadgeCollection() {
     }
   };
 
-  // Composant pour afficher un badge individuel
-  const BadgeItem = ({ badge }: { badge: BadgeType }) => (
-    <div 
-      className={`p-4 rounded-lg shadow-sm flex flex-col items-center text-center
-        ${badge.unlocked 
-          ? "bg-primary/10 border border-primary/20" 
-          : "bg-gray-100 border border-gray-200 opacity-70"
-        }`}
-    >
-      <div className="mb-2 w-12 h-12 flex items-center justify-center rounded-full bg-white shadow-sm">
-        <span className={`material-icons text-2xl ${badge.unlocked ? "text-primary" : "text-gray-400"}`}>
-          {badge.icon}
-        </span>
+  // Composant pour afficher un badge individuel avec des effets visuels améliorés
+  const BadgeItem = ({ badge }: { badge: BadgeType }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    // Calculer le pourcentage de progression
+    const progressPercent = badge.progress !== undefined && badge.maxProgress !== undefined
+      ? Math.round((badge.progress / badge.maxProgress) * 100)
+      : 0;
+    
+    // Déterminer les classes et styles en fonction de l'état du badge
+    const getBadgeStyle = () => {
+      if (badge.unlocked) {
+        return {
+          container: `relative p-5 rounded-xl shadow-md flex flex-col items-center text-center 
+                      transition-all duration-300 cursor-pointer transform
+                      ${isHovered ? "scale-[1.03] shadow-lg" : ""}
+                      bg-gradient-to-br from-primary-light/20 to-primary/30 
+                      border border-primary/30`,
+          icon: "mb-3 w-16 h-16 flex items-center justify-center rounded-full bg-white shadow-md",
+          iconColor: `text-3xl ${getBadgeIconColor()}`,
+          title: "font-raleway text-base font-semibold mb-1 text-gray-800",
+          description: "text-xs text-gray-600 mb-3"
+        };
+      } else {
+        return {
+          container: `relative p-5 rounded-xl shadow-sm flex flex-col items-center text-center 
+                      transition-all duration-300
+                      bg-gray-100/80 backdrop-blur-sm border border-gray-200`,
+          icon: "mb-3 w-16 h-16 flex items-center justify-center rounded-full bg-white/80 shadow-sm",
+          iconColor: "text-3xl text-gray-400",
+          title: "font-raleway text-base font-medium mb-1 text-gray-600",
+          description: "text-xs text-gray-500 mb-3"
+        };
+      }
+    };
+    
+    // Déterminer la couleur de l'icône en fonction de la catégorie
+    function getBadgeIconColor() {
+      switch (badge.category) {
+        case "collection": return "text-emerald-500";
+        case "entretien": return "text-blue-500";
+        case "analyse": return "text-purple-500";
+        case "progression": return "text-amber-500";
+        default: return "text-primary";
+      }
+    }
+    
+    const styles = getBadgeStyle();
+    
+    return (
+      <div 
+        className={styles.container}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+      >
+        {/* Badge bloqué/débloqué indicator */}
+        {badge.unlocked && (
+          <div className="absolute -top-1 -right-1 w-7 h-7 bg-green-500 rounded-full flex items-center justify-center shadow-md">
+            <span className="material-icons text-white text-sm">check</span>
+          </div>
+        )}
+        
+        {/* Icon container */}
+        <div className={styles.icon}>
+          <span className={`material-icons ${styles.iconColor}`}>
+            {badge.icon}
+          </span>
+        </div>
+        
+        {/* Badge title and description */}
+        <h3 className={styles.title}>{badge.name}</h3>
+        <p className={styles.description}>{badge.description}</p>
+        
+        {/* Progress bar for badges in progress */}
+        {badge.progress !== undefined && badge.maxProgress !== undefined && (
+          <div className="w-full mt-auto">
+            <div className="text-xs font-medium mb-1 flex justify-between">
+              <span className={badge.unlocked ? "text-primary" : "text-gray-500"}>
+                {badge.progress}/{badge.maxProgress}
+              </span>
+              <span className={badge.unlocked ? "text-primary" : "text-gray-500"}>
+                {progressPercent}%
+              </span>
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div 
+                className={`h-full transition-all duration-500 ${badge.unlocked ? 'bg-gradient-to-r from-primary to-primary-light' : 'bg-primary/40'}`}
+                style={{ width: `${progressPercent}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+        
+        {/* Date d'obtention pour les badges débloqués */}
+        {badge.unlocked && badge.unlockedAt && (
+          <div className="mt-3 py-1 px-2 rounded-full bg-white/60 text-xs text-gray-500">
+            Débloqué le {new Date(badge.unlockedAt).toLocaleDateString("fr-FR")}
+          </div>
+        )}
       </div>
-      <h3 className="text-sm font-medium mb-1">{badge.name}</h3>
-      <p className="text-xs text-gray-500 mb-2">{badge.description}</p>
-      
-      {badge.progress !== undefined && badge.maxProgress !== undefined && (
-        <div className="w-full mt-auto">
-          <div className="text-xs text-gray-500 mb-1 flex justify-between">
-            <span>{badge.progress}/{badge.maxProgress}</span>
-            <span>{Math.round((badge.progress / badge.maxProgress) * 100)}%</span>
-          </div>
-          <div className="h-1 bg-gray-200 rounded-full overflow-hidden">
-            <div 
-              className="h-full bg-primary"
-              style={{ width: `${(badge.progress / badge.maxProgress) * 100}%` }}
-            ></div>
-          </div>
-        </div>
-      )}
-      
-      {badge.unlocked && badge.unlockedAt && (
-        <div className="mt-2 text-xs text-gray-400">
-          Débloqué le {new Date(badge.unlockedAt).toLocaleDateString("fr-FR")}
-        </div>
-      )}
-    </div>
-  );
+    );
+  };
 
-  // Placeholder pour les badges en cours de chargement
+  // Placeholder amélioré pour les badges en cours de chargement
   const BadgeSkeleton = () => (
-    <div className="p-4 rounded-lg shadow-sm bg-gray-50 flex flex-col items-center">
-      <Skeleton className="mb-2 w-12 h-12 rounded-full" />
-      <Skeleton className="w-2/3 h-4 mb-1" />
+    <div className="p-5 rounded-xl shadow-md bg-gray-50/80 backdrop-blur-sm border border-gray-100 flex flex-col items-center">
+      <Skeleton className="mb-3 w-16 h-16 rounded-full" />
+      <Skeleton className="w-3/4 h-5 mb-1" />
       <Skeleton className="w-full h-3 mb-3" />
-      <Skeleton className="w-full h-1 mb-2" />
+      <Skeleton className="w-full h-2 mb-1" />
+      <Skeleton className="w-1/2 h-6 rounded-full mt-3" />
     </div>
   );
 
@@ -106,14 +170,59 @@ export default function BadgeCollection() {
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-raleway font-semibold">Mes Badges</h2>
-        <div className="text-sm text-gray-500">
-          {!isBadgesLoading && badges && (
-            <>{getUnlockedBadges().length} débloqué(s) sur {badges.length}</>
-          )}
+    <div className="space-y-6">
+      {/* En-tête avec résumé des badges */}
+      <div className="bg-gradient-to-br from-primary-light/20 to-primary/30 rounded-xl p-4 shadow-md backdrop-blur-sm">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-raleway font-semibold text-gray-800 mb-1">Mes Badges</h2>
+            <p className="text-gray-600 text-sm">
+              {!isBadgesLoading && badges ? (
+                <>Suivez votre progression et déverrouillez des récompenses</>
+              ) : (
+                <>Chargement des badges...</>
+              )}
+            </p>
+          </div>
+          <div className="bg-white/80 backdrop-blur-sm px-3 py-2 rounded-full shadow-sm flex items-center">
+            <span className="material-icons text-primary mr-2">emoji_events</span>
+            <span className="font-medium">
+              {!isBadgesLoading && badges ? (
+                <>{getUnlockedBadges().length} / {badges.length} débloqués</>
+              ) : (
+                <>Chargement...</>
+              )}
+            </span>
+          </div>
         </div>
+        
+        {/* Statistiques des badges par catégorie */}
+        {!isBadgesLoading && badges && badges.length > 0 && (
+          <div className="grid grid-cols-4 gap-2 mt-3">
+            {['collection', 'entretien', 'analyse', 'progression'].map((category) => {
+              const categoryBadges = getBadgesByCategory(category as any);
+              const unlockedCount = categoryBadges.filter(b => b.unlocked).length;
+              const totalCount = categoryBadges.length;
+              
+              return (
+                <div key={category} className="bg-white/40 backdrop-blur-sm rounded-lg p-2 text-center">
+                  <span className="material-icons text-sm mb-1" style={{
+                    color: category === 'collection' ? '#10b981' :
+                           category === 'entretien' ? '#3b82f6' :
+                           category === 'analyse' ? '#8b5cf6' :
+                           '#f59e0b'
+                  }}>
+                    {category === 'collection' ? 'eco' :
+                     category === 'entretien' ? 'water_drop' :
+                     category === 'analyse' ? 'search' :
+                     'trending_up'}
+                  </span>
+                  <div className="text-xs font-medium">{unlockedCount}/{totalCount}</div>
+                </div>
+              );
+            })}
+          </div>
+        )}
       </div>
       
       <Tabs defaultValue="tous" value={activeTab} onValueChange={setActiveTab}>
