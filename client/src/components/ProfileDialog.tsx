@@ -96,7 +96,7 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
         </span>
       }
       description="Gérez vos informations personnelles"
-      className="glass-card backdrop-blur-sm border border-primary/20 shadow-xl bg-white/95"
+      className="border border-primary/20 shadow-xl bg-white"
       showCloseButton={true}
     >
       <div className="py-2">

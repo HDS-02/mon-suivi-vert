@@ -81,7 +81,7 @@ export default function NotificationsDialog({ open, onOpenChange }: Notification
         </span>
       }
       description="Restez informé des besoins de vos plantes"
-      className="sm:max-w-md glass-card backdrop-blur-sm border border-primary/20 shadow-xl bg-white/95"
+      className="sm:max-w-md border border-primary/20 shadow-xl bg-white"
       showCloseButton={true}
     >
       {permission !== 'granted' && (

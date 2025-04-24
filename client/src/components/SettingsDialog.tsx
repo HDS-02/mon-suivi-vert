@@ -39,7 +39,7 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
         </span>
       }
       description="Personnalisez votre expérience avec Mon Suivi Vert"
-      className="sm:max-w-md glass-card backdrop-blur-sm border border-primary/20 shadow-xl bg-white/95"
+      className="sm:max-w-md border border-primary/20 shadow-xl bg-white"
       showCloseButton={true}
     >
       <div className="pb-2">
