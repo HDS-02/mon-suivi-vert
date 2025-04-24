@@ -5,7 +5,6 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -116,8 +115,22 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg">
+    <Dialog open={open} onOpenChange={onOpenChange} modal={true}>
+      <DialogContent 
+        className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg" 
+        onPointerDownOutside={(e) => {
+          // Empêcher la fermeture lors d'un clic à l'extérieur
+          e.preventDefault();
+        }}
+        onEscapeKeyDown={(e) => {
+          // Empêcher la fermeture lors de l'appui sur Echap
+          e.preventDefault();
+        }}
+        onInteractOutside={(e) => {
+          // Empêcher toute interaction extérieure qui pourrait fermer la modale
+          e.preventDefault();
+        }}
+      >
         <DialogHeader className="pb-4 border-b border-gray-100/50">
           <DialogTitle className="text-primary-dark font-raleway text-xl">Paramètres</DialogTitle>
           <DialogDescription className="text-gray-600">
@@ -258,6 +271,7 @@ export default function SettingsDialog({ open, onOpenChange }: SettingsDialogPro
                 <div className="flex justify-between mt-6">
                   <Button
                     variant="outline"
+                    type="button"
                     onClick={() => onOpenChange(false)}
                     className="border-primary/20 text-primary hover:bg-primary/5"
                   >

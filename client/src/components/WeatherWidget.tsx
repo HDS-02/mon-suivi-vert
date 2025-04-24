@@ -8,6 +8,7 @@ interface WeatherData {
   description: string;
   icon: string;
   recommendations: string[];
+  location: string;
 }
 
 // Données météo simulées pour le mode hors ligne ou quand l'API n'est pas disponible
@@ -16,6 +17,7 @@ const mockWeatherData: WeatherData = {
   humidity: 65,
   description: "Partiellement nuageux",
   icon: "partly_cloudy",
+  location: "Paris, France",
   recommendations: [
     "Température idéale pour la plupart des plantes d'intérieur",
     "Humidité adéquate, vos plantes devraient être confortables",
@@ -125,6 +127,9 @@ export default function WeatherWidget() {
           }
         }
         
+        // Localisation (fixe pour ce prototype)
+        const location = "Paris, France";
+        
         // Court délai pour simuler une requête API et améliorer l'expérience utilisateur
         setTimeout(() => {
           setWeatherData({
@@ -132,6 +137,7 @@ export default function WeatherWidget() {
             humidity,
             icon,
             description,
+            location,
             recommendations: []
           });
           setLoading(false);
@@ -224,7 +230,12 @@ export default function WeatherWidget() {
               </div>
             </div>
             
-            <div className="text-center text-gray-600 mb-4 font-medium">{weatherData.description}</div>
+            <div className="text-center text-gray-600 mb-2 font-medium">{weatherData.description}</div>
+            
+            <div className="flex items-center justify-center mb-4">
+              <span className="material-icons text-gray-500 text-sm mr-1">location_on</span>
+              <span className="text-sm text-gray-500">{weatherData.location}</span>
+            </div>
             
             <div className="mt-6 bg-blue-50/50 p-4 rounded-lg">
               <h4 className="font-medium mb-3 text-blue-700 flex items-center">
