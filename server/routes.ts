@@ -3,8 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
 import { insertPlantSchema, insertTaskSchema, insertPlantAnalysisSchema, insertUserSchema } from "@shared/schema";
-import { analyzePlantImage } from "./openai";
-import { PlantAnalyzer } from "./plantAnalyzer";
+import { analyzePlantImage, getPlantInfoByName } from "./openai";
 import multer from "multer";
 import fs from "fs";
 import path from "path";
@@ -288,9 +287,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Le nom de la plante est requis" });
       }
       
-      // Utiliser l'analyseur de plantes pour obtenir des informations
-      const plantAnalyzer = new PlantAnalyzer();
-      const plantInfo = plantAnalyzer.analyzeByDescription(plantName);
+      // Utiliser ChatGPT pour obtenir des informations détaillées sur la plante
+      // avec repli automatique sur l'analyseur local en cas d'échec
+      const plantInfo = await getPlantInfoByName(plantName);
       
       // Retourner les informations de la plante
       res.json(plantInfo);

@@ -1,5 +1,6 @@
 import OpenAI from "openai";
 import { PlantAnalyzer } from "./plantAnalyzer";
+import { PlantAnalysisResponse } from "@shared/schema";
 
 // The newest OpenAI model is "gpt-4o" which was released May 13, 2024.
 // Do not change this unless explicitly requested by the user
@@ -11,6 +12,96 @@ const openai = new OpenAI({
 
 // Nouvel analyseur de plantes basé sur des règles (ne nécessite pas d'API)
 const plantAnalyzer = new PlantAnalyzer();
+
+/**
+ * Utilise l'API OpenAI pour obtenir des informations détaillées sur une plante à partir de son nom
+ * @param plantName Nom de la plante
+ * @returns Informations détaillées sur la plante
+ */
+export async function getPlantInfoByName(plantName: string): Promise<PlantAnalysisResponse> {
+  // Si aucune clé API OpenAI n'est définie ou si le nom est trop court, utiliser l'analyseur local
+  if (!process.env.OPENAI_API_KEY || !plantName || plantName.trim().length < 3) {
+    console.log("Clé API OpenAI non trouvée ou nom trop court, utilisation de l'analyseur local");
+    return plantAnalyzer.analyzeByDescription(plantName);
+  }
+
+  try {
+    console.log(`Recherche d'informations sur la plante "${plantName}" avec ChatGPT...`);
+
+    const prompt = `
+    Analyse le nom de plante suivant et fournis-moi des informations détaillées en français dans un format JSON:
+    "${plantName}"
+
+    Retourne les informations suivantes:
+    - Le nom commun complet de la plante en français
+    - L'espèce scientifique exacte si identifiable
+    - Des instructions d'entretien précises:
+      - Fréquence et méthode d'arrosage
+      - Besoins en lumière (intensité et durée)
+      - Plage de température idéale
+      - Conseils supplémentaires d'entretien
+    - État de santé typique et problèmes courants (choisir parmi: "healthy", "warning", "danger")
+    - Des recommandations spécifiques pour bien entretenir cette plante
+
+    Même si le nom fourni est vague ou générique, essaie de donner des informations utiles et pertinentes.
+    Indique clairement si tu n'es pas certain de l'identification.
+    `;
+
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o",
+      messages: [
+        { role: "system", content: "Tu es un expert botaniste spécialisé dans les plantes d'intérieur et d'extérieur." },
+        { role: "user", content: prompt }
+      ],
+      response_format: { type: "json_object" },
+      max_tokens: 800,
+    });
+
+    const content = response.choices[0].message.content;
+    if (!content) {
+      throw new Error("Aucune réponse reçue de ChatGPT");
+    }
+
+    // Analyser la réponse JSON
+    try {
+      const parsedContent = JSON.parse(content);
+      
+      // Transformer la réponse au format PlantAnalysisResponse
+      const plantInfo: PlantAnalysisResponse = {
+        plantName: parsedContent.nom || plantName,
+        species: parsedContent.espece || parsedContent.espèce || parsedContent.especeScientifique || undefined,
+        status: parsedContent.etat || parsedContent.état || "healthy",
+        healthIssues: parsedContent.problemes || parsedContent.problèmes || parsedContent.problemesCommuns || [],
+        recommendations: Array.isArray(parsedContent.recommandations) ? 
+          parsedContent.recommandations : 
+          [parsedContent.recommandations].filter(Boolean),
+        careInstructions: {
+          watering: parsedContent.entretien?.arrosage || parsedContent.arrosage || "Arrosage modéré",
+          light: parsedContent.entretien?.lumiere || parsedContent.entretien?.lumière || parsedContent.lumiere || parsedContent.lumière || "Lumière indirecte",
+          temperature: parsedContent.entretien?.temperature || parsedContent.temperature || parsedContent.température || "18-24°C",
+          additional: Array.isArray(parsedContent.entretien?.conseils) ? 
+            parsedContent.entretien.conseils : 
+            parsedContent.conseils ? 
+              [parsedContent.conseils].filter(Boolean) : 
+              ["Vérifiez régulièrement l'état des feuilles"]
+        }
+      };
+
+      console.log("Recherche avec ChatGPT réussie");
+      return plantInfo;
+
+    } catch (parseError) {
+      console.error("Erreur lors du parsing de la réponse JSON:", content);
+      throw new Error("Le format de réponse reçu n'est pas un JSON valide");
+    }
+  } catch (error: any) {
+    console.error("Erreur lors de la recherche avec ChatGPT:", error.message || "Erreur inconnue");
+    
+    // Utiliser l'analyseur local comme solution de repli
+    console.log("Utilisation de l'analyseur local comme solution de remplacement");
+    return plantAnalyzer.analyzeByDescription(plantName);
+  }
+}
 
 export async function analyzePlantImage(base64Image: string, fileName?: string, description?: string): Promise<any> {
   // Si aucune clé API OpenAI n'est définie, utiliser l'analyseur local
