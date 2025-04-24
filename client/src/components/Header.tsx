@@ -2,7 +2,7 @@ import { useState } from "react";
 import NotificationsDialog from "./NotificationsDialog";
 import SettingsDialog from "./SettingsDialog";
 import ProfileDialog from "./ProfileDialog";
-import logoSimple from "../assets/logo-simple.svg";
+import newLogo from "../assets/logo.png";
 import { useAuth } from "@/hooks/use-auth";
 
 export default function Header() {
@@ -15,8 +15,7 @@ export default function Header() {
     <header className="bg-primary/80 backdrop-blur-md text-white shadow-lg sticky top-0 z-20">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center bg-white/10 rounded-lg px-4 py-1">
-          <img src={logoSimple} alt="Logo Mon Suivi Vert" className="h-10 w-10 mr-2" />
-          <h1 className="text-xl font-raleway font-bold text-white">Mon Suivi Vert</h1>
+          <img src={newLogo} alt="Logo Mon Suivi Vert" className="h-12 w-auto" />
         </div>
         <div className="flex space-x-2">
           <button 
