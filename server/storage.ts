@@ -115,12 +115,15 @@ export class MemStorage implements IStorage {
   }
 
   private initSampleData() {
+    // URL d'image pour la plante de démonstration
+    const monsteraImageUrl = "https://images.pexels.com/photos/3571563/pexels-photo-3571563.jpeg?auto=compress&cs=tinysrgb&w=400";
+    
     // Une seule plante de démonstration avec une image
     const monstera: InsertPlant = {
       name: "Monstera Deliciosa",
       species: "Monstera deliciosa",
       status: "healthy",
-      image: "https://images.unsplash.com/photo-1682086248531-77cd5fbdc3b4?q=80&w=300&auto=format",
+      image: monsteraImageUrl,
       wateringFrequency: 7,
       light: "Indirecte brillante",
       temperature: "18-27°C",
@@ -130,6 +133,7 @@ export class MemStorage implements IStorage {
     
     // Créer une seule plante de démonstration
     const plant = this.createPlant(monstera);
+    console.log("Plante de démonstration créée avec l'image:", monsteraImageUrl);
     
     // Une tâche d'exemple
     this.createTask({
@@ -144,7 +148,7 @@ export class MemStorage implements IStorage {
     this.createPlantAnalysis({
       plantId: plant.id,
       status: "healthy",
-      image: "https://images.unsplash.com/photo-1682086248531-77cd5fbdc3b4?q=80&w=300&auto=format",
+      image: monsteraImageUrl,
       healthIssues: "",
       recommendations: "La plante est en excellente santé. Continuez avec les soins actuels."
     });

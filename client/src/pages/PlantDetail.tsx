@@ -103,14 +103,23 @@ export default function PlantDetail() {
       <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
         <div className="h-48 bg-gray-200 relative">
           {plant.image ? (
-            <img
-              src={plant.image}
-              alt={plant.name}
-              className="w-full h-full object-cover"
-            />
+            <>
+              <img
+                src={plant.image}
+                alt={plant.name}
+                className="w-full h-full object-cover"
+              />
+              {/* Pour dépannage, à supprimer plus tard */}
+              <div className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-xs p-1 break-all">
+                Image URL: {plant.image}
+              </div>
+            </>
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-primary/10">
-              <span className="material-icons text-primary text-4xl">eco</span>
+            <div className="w-full h-full flex flex-col items-center justify-center bg-primary/10">
+              <span className="material-icons text-primary text-4xl mb-2">eco</span>
+              <p className="text-xs text-primary">Aucune image disponible</p>
+              {/* Pour dépannage, à supprimer plus tard */}
+              <p className="text-xs mt-2">Image dans les données: {JSON.stringify(plant.image)}</p>
             </div>
           )}
         </div>
@@ -185,11 +194,10 @@ export default function PlantDetail() {
         
         <Button 
           variant="outline"
-          className="flex items-center bg-white border-red-400 text-red-500 hover:bg-red-50 hover:text-red-600 shadow-sm" 
+          className="flex items-center justify-center rounded-full w-14 h-14 bg-white border-2 border-red-400 text-red-500 hover:bg-red-50 hover:text-red-600 shadow-md p-0" 
           onClick={() => setSosDialogOpen(true)}
         >
-          <span className="material-icons mr-1.5">eco</span>
-          SOS Assistance Plante
+          <span className="material-icons text-2xl">healing</span>
         </Button>
       </div>
 
