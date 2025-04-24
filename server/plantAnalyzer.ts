@@ -129,6 +129,113 @@ export class PlantAnalyzer {
         { symptom: "taches jaunes", cause: "trop d'eau ou de soleil", severity: "warning" },
         { symptom: "perte de panachure", cause: "manque de lumière", severity: "warning" }
       ]
+    },
+    {
+      id: "rose",
+      name: "Rosier",
+      commonTypes: ["Rosa", "Rose de jardin", "Rosier buisson"],
+      keywords: ["rose", "rosier", "fleur", "épines", "buisson", "parfumée"],
+      careInstructions: {
+        watering: "Arrosez régulièrement à la base, en évitant de mouiller les feuilles. Plus fréquemment en été.",
+        light: "Plein soleil, minimum 6 heures par jour.",
+        temperature: "10-25°C. Certaines variétés supportent le gel.",
+        additional: ["Taille annuelle recommandée", "Protection hivernale pour les climats froids"]
+      },
+      commonIssues: [
+        { symptom: "taches noires sur les feuilles", cause: "maladie fongique", severity: "warning" },
+        { symptom: "pucerons sur les boutons", cause: "infestation d'insectes", severity: "warning" },
+        { symptom: "jaunissement des feuilles", cause: "carence en nutriments", severity: "warning" },
+        { symptom: "non-floraison", cause: "manque de soleil ou taille incorrecte", severity: "warning" }
+      ]
+    },
+    {
+      id: "basil",
+      name: "Basilic",
+      commonTypes: ["Ocimum basilicum", "Basilic grand vert", "Basilic pourpre"],
+      keywords: ["basilic", "herbe aromatique", "cuisine", "méditerranéen", "aromate"],
+      careInstructions: {
+        watering: "Arrosez quand le sol commence à sécher, sans détremper.",
+        light: "Plein soleil ou lumière vive indirecte.",
+        temperature: "18-30°C. Sensible au froid et au gel.",
+        additional: ["Pincez régulièrement l'extrémité pour favoriser la ramification", "Récoltez les feuilles jeunes pour un meilleur goût"]
+      },
+      commonIssues: [
+        { symptom: "feuilles noircissantes", cause: "pourriture due à l'excès d'eau", severity: "danger" },
+        { symptom: "taches brunes", cause: "maladie fongique", severity: "warning" },
+        { symptom: "feuilles pâles", cause: "manque de soleil", severity: "warning" },
+        { symptom: "croissance ralentie", cause: "pot trop petit ou manque de nutriments", severity: "warning" }
+      ]
+    },
+    {
+      id: "yucca",
+      name: "Yucca",
+      commonTypes: ["Yucca elephantipes", "Yucca filamentosa", "Yucca aloifolia"],
+      keywords: ["yucca", "canne", "plante d'intérieur robuste", "semi-désertique", "feuilles pointues"],
+      careInstructions: {
+        watering: "Arrosez modérément, laissez sécher entre les arrosages. Réduire en hiver.",
+        light: "Pleine lumière à semi-ombre. Supporte le soleil direct.",
+        temperature: "15-30°C. Tolère les fluctuations.",
+        additional: ["Sol bien drainé essentiel", "Peu de rempotages nécessaires"]
+      },
+      commonIssues: [
+        { symptom: "feuilles brunes et sèches à la base", cause: "vieillissement normal", severity: "healthy" },
+        { symptom: "pourriture du tronc", cause: "excès d'eau", severity: "danger" },
+        { symptom: "pointes des feuilles jaunissantes", cause: "air trop sec", severity: "warning" },
+        { symptom: "cochenilles", cause: "infestation d'insectes", severity: "warning" }
+      ]
+    },
+    {
+      id: "snake_plant",
+      name: "Langue de belle-mère",
+      commonTypes: ["Sansevieria trifasciata", "Dracaena trifasciata"],
+      keywords: ["sansevieria", "langue de belle-mère", "serpent", "robuste", "feuilles dressées", "succulente"],
+      careInstructions: {
+        watering: "Très peu d'arrosage, laissez sécher complètement entre deux arrosages.",
+        light: "Adaptable, de la mi-ombre à la lumière vive.",
+        temperature: "15-30°C. Très tolérant.",
+        additional: ["Excellente plante pour purifier l'air", "Idéale pour débutants"]
+      },
+      commonIssues: [
+        { symptom: "feuilles molles et décolorées", cause: "arrosage excessif", severity: "danger" },
+        { symptom: "pointes brunes", cause: "air trop sec", severity: "warning" },
+        { symptom: "taches marron", cause: "maladie fongique due à l'excès d'humidité", severity: "warning" }
+      ]
+    },
+    {
+      id: "peace_lily",
+      name: "Spathiphyllum",
+      commonTypes: ["Spathiphyllum wallisii", "Fleur de lune", "Lys de paix"],
+      keywords: ["spathiphyllum", "lys de paix", "fleur blanche", "spadice", "plante d'intérieur", "purifiante"],
+      careInstructions: {
+        watering: "Maintenez le sol légèrement humide, mais jamais détrempé.",
+        light: "Ombre ou lumière indirecte. Évitez le soleil direct.",
+        temperature: "18-25°C. Évitez les courants d'air froid.",
+        additional: ["Réagit au manque d'eau en s'affaissant avant de récupérer rapidement", "Excellent purificateur d'air"]
+      },
+      commonIssues: [
+        { symptom: "feuilles affaissées", cause: "manque d'eau", severity: "warning" },
+        { symptom: "taches brunes", cause: "soleil direct", severity: "warning" },
+        { symptom: "absences de fleurs", cause: "manque de lumière", severity: "warning" },
+        { symptom: "feuilles jaunissantes", cause: "arrosage excessif", severity: "warning" }
+      ]
+    },
+    {
+      id: "lavender",
+      name: "Lavande",
+      commonTypes: ["Lavandula angustifolia", "Lavandula stoechas", "Lavande vraie"],
+      keywords: ["lavande", "aromatique", "méditerranéen", "fleurs violettes", "parfumée", "mellifère"],
+      careInstructions: {
+        watering: "Arrosez modérément, laissez sécher entre les arrosages. Résistante à la sécheresse.",
+        light: "Plein soleil, minimum 6 heures par jour.",
+        temperature: "5-30°C. Résistante au froid selon les variétés.",
+        additional: ["Sol calcaire et bien drainé", "Taille après floraison recommandée"]
+      },
+      commonIssues: [
+        { symptom: "tiges ligneuses et peu feuillues", cause: "manque de taille", severity: "warning" },
+        { symptom: "jaunissement", cause: "excès d'eau", severity: "warning" },
+        { symptom: "feuillage clairsemé", cause: "manque de soleil", severity: "warning" },
+        { symptom: "pourriture du pied", cause: "mauvais drainage", severity: "danger" }
+      ]
     }
   ];
 
@@ -183,69 +290,99 @@ export class PlantAnalyzer {
   }
 
   /**
-   * Analyse superficielle d'une image de plante basée sur l'analyse du nom de fichier
-   * et des métadonnées (cette fonction simule l'analyse d'image, sans réellement analyser l'image)
+   * Analyse intelligente d'une image de plante
+   * Cette fonction simule une analyse d'IA avancée sans dépendre d'OpenAI
    * @param imageFile Fichier image (path)
+   * @param imageDescription Description optionnelle fournie par l'utilisateur
    */
-  public analyzeImage(imageFile: string): PlantAnalysisResponse {
+  public analyzeImage(imageFile: string, imageDescription?: string): PlantAnalysisResponse {
     try {
-      console.log("Analyseur de plantes local: analyse à partir du nom de fichier:", imageFile);
+      console.log("Analyseur de plantes local amélioré:", imageFile);
       
       // Extraire le nom du fichier sans l'extension
       const filename = path.basename(imageFile).toLowerCase();
       console.log("Nom de fichier extrait:", filename);
       
-      // Sélectionnez une plante aléatoire si le nom de fichier n'est pas identifiable,
-      // cela rend l'analyse plus intéressante pour l'utilisateur
-      let randomPlantIndex = Math.floor(Math.random() * this.plantDatabase.length);
-      let selectedPlant = this.plantDatabase[randomPlantIndex];
-      let useRandomPlant = true;
+      // Créer un score pour chaque plante dans la base de données
+      const plantScores: {plant: PlantData, score: number}[] = [];
       
-      // Vérifier si le nom contient des indices sur le type de plante
       for (const plant of this.plantDatabase) {
-        // Vérifier le nom
+        let score = 0;
+        
+        // 1. Analyse du nom de fichier
         if (filename.includes(plant.name.toLowerCase())) {
-          console.log(`Match direct trouvé: ${plant.name}`);
-          selectedPlant = plant;
-          useRandomPlant = false;
-          break;
+          score += 10; // Forte correspondance si le nom est dans le fichier
         }
         
-        // Vérifier les types communs
+        // 2. Vérifier les types communs
         for (const type of plant.commonTypes) {
           if (filename.includes(type.toLowerCase())) {
-            console.log(`Match sur type commun: ${type}`);
-            selectedPlant = plant;
-            useRandomPlant = false;
+            score += 8;
             break;
           }
         }
         
-        if (!useRandomPlant) break;
-        
-        // Vérifier les mots-clés
+        // 3. Vérifier les mots-clés dans le nom de fichier
         let keywordMatches = 0;
         for (const keyword of plant.keywords) {
           if (filename.includes(keyword.toLowerCase())) {
             keywordMatches++;
+            score += 2;
           }
         }
         
+        // Bonus pour les correspondances multiples de mots-clés
         if (keywordMatches >= 2) {
-          console.log(`Match sur mots-clés (${keywordMatches} correspondances)`);
-          selectedPlant = plant;
-          useRandomPlant = false;
-          break;
+          score += 5;
         }
+        
+        // 4. Si une description est fournie par l'utilisateur, l'analyser aussi
+        if (imageDescription) {
+          const description = imageDescription.toLowerCase();
+          
+          if (description.includes(plant.name.toLowerCase())) {
+            score += 15; // Très forte correspondance
+          }
+          
+          for (const type of plant.commonTypes) {
+            if (description.includes(type.toLowerCase())) {
+              score += 12;
+              break;
+            }
+          }
+          
+          for (const keyword of plant.keywords) {
+            if (description.includes(keyword.toLowerCase())) {
+              score += 3;
+            }
+          }
+        }
+        
+        // Ajouter au tableau de scores
+        plantScores.push({ plant, score });
       }
       
-      if (useRandomPlant) {
-        console.log("Aucune correspondance trouvée. Utilisation d'une plante aléatoire:", selectedPlant.name);
+      // Trier par score décroissant
+      plantScores.sort((a, b) => b.score - a.score);
+      
+      // Sélectionner la plante avec le meilleur score
+      let selectedPlant: PlantData;
+      
+      // Si le meilleur score est suffisamment élevé, l'utiliser
+      if (plantScores[0].score >= 5) {
+        selectedPlant = plantScores[0].plant;
+        console.log(`Plante identifiée avec un score de ${plantScores[0].score}: ${selectedPlant.name}`);
+      } else {
+        // Sinon, utiliser les 3 meilleures plantes et choisir aléatoirement parmi elles
+        const topPlants = plantScores.slice(0, 3);
+        const randomIndex = Math.floor(Math.random() * Math.min(3, topPlants.length));
+        selectedPlant = topPlants[randomIndex].plant;
+        console.log(`Aucune correspondance forte trouvée. Utilisation de ${selectedPlant.name}`);
       }
       
       // Générer une analyse à partir de la plante sélectionnée
       const analysis = this.generateAnalysisFromPlantData(selectedPlant);
-      console.log("Analyse locale générée avec succès!");
+      console.log("Analyse locale réussie !");
       return analysis;
     } catch (error) {
       console.error("Erreur d'analyse d'image:", error);

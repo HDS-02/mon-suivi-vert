@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,41 @@ export default function AddPlantManually() {
   const [wateringFrequency, setWateringFrequency] = useState(7);
   const [careNotes, setCareNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // Gérer le changement de fichier d'image
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  // Gérer le glisser-déposer d'image
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      setSelectedImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -40,11 +74,31 @@ export default function AddPlantManually() {
     setIsSaving(true);
     
     try {
+      let imagePath = "";
+
+      // Si une image est sélectionnée, l'uploader d'abord
+      if (selectedImage) {
+        const formData = new FormData();
+        formData.append("image", selectedImage);
+        
+        const analyzeResponse = await fetch("/api/analyze", {
+          method: "POST",
+          body: formData,
+        });
+        
+        if (!analyzeResponse.ok) {
+          throw new Error("Erreur lors de l'upload de l'image");
+        }
+        
+        const analyzeResult = await analyzeResponse.json();
+        imagePath = analyzeResult.imagePath;
+      }
+      
       const plantData: InsertPlant = {
         name,
         species,
         status: status as any,
-        image: "", // Pas d'image pour le moment
+        image: imagePath, // Chemin de l'image uploadée
         wateringFrequency: parseInt(wateringFrequency.toString()),
         light,
         temperature,
@@ -95,6 +149,57 @@ export default function AddPlantManually() {
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
+              {/* Section d'upload d'image */}
+              <div>
+                <Label>Photo de la plante</Label>
+                <div 
+                  className="mt-1 border-2 border-dashed border-gray-300 rounded-lg p-4 flex flex-col items-center justify-center text-center"
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
+                  {imagePreview ? (
+                    <div className="relative w-full max-w-md mb-2">
+                      <img 
+                        src={imagePreview} 
+                        alt="Aperçu de la plante" 
+                        className="w-full h-48 object-contain rounded-lg" 
+                      />
+                      <button 
+                        type="button"
+                        className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
+                        onClick={() => {
+                          setSelectedImage(null);
+                          setImagePreview(null);
+                        }}
+                      >
+                        <span className="material-icons text-gray-600">close</span>
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="material-icons text-gray-400 text-3xl mb-2">add_photo_alternate</span>
+                      <p className="text-sm text-gray-500 mb-2">Glissez-déposez une photo ici ou</p>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <span className="material-icons mr-1 text-sm">upload</span>
+                        Choisir une image
+                      </Button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/*"
+                        className="hidden"
+                      />
+                    </>
+                  )}
+                </div>
+              </div>
+
               <div>
                 <Label htmlFor="name">Nom de la plante *</Label>
                 <Input
