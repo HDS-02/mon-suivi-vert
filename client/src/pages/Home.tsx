@@ -250,12 +250,21 @@ export default function Home() {
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {plantsLoading ? (
-            <div className="col-span-full text-center p-4">Chargement des plantes...</div>
+            <div className="col-span-full bg-white/80 backdrop-blur-sm rounded-xl p-8 text-center">
+              <div className="animate-pulse flex flex-col items-center justify-center">
+                <div className="h-12 w-12 rounded-full bg-primary/20 mb-4 flex items-center justify-center">
+                  <span className="material-icons text-primary/40 animate-bounce">eco</span>
+                </div>
+                <div className="h-4 bg-gray-200 rounded w-1/2 mb-2"></div>
+                <div className="h-3 bg-gray-100 rounded w-1/3"></div>
+              </div>
+              <p className="text-gray-400 mt-4">Chargement des plantes...</p>
+            </div>
           ) : plants && plants.length > 0 ? (
             plants.slice(0, 4).map((plant: Plant) => (
               <Link key={plant.id} href={`/plants/${plant.id}`}>
-                <a className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                  <div className="h-32 bg-gray-200 relative">
+                <div className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:scale-[1.02] border border-gray-100">
+                  <div className="h-36 relative">
                     {plant.image ? (
                       <img 
                         src={plant.image} 
@@ -263,29 +272,43 @@ export default function Home() {
                         className="w-full h-full object-cover" 
                       />
                     ) : (
-                      <div className="w-full h-full flex items-center justify-center bg-primary/10">
-                        <span className="material-icons text-primary text-4xl">eco</span>
+                      <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/10 to-primary-light/10">
+                        <span className="material-icons text-primary/80 text-5xl">eco</span>
                       </div>
                     )}
-                    <div className="absolute bottom-2 right-2 bg-white rounded-full p-1 shadow">
-                      {getPlantStatusIcon(plant.status)}
+                    <div className={`absolute top-2 right-2 ${
+                      plant.status === 'healthy' ? 'bg-green-500/90' : 
+                      plant.status === 'warning' ? 'bg-yellow-500/90' : 
+                      plant.status === 'danger' ? 'bg-alert/90' : 
+                      'bg-gray-500/90'
+                    } text-white backdrop-blur-sm shadow-sm px-2 py-1 rounded-full text-xs flex items-center`}>
+                      {plant.status === 'healthy' && <span className="material-icons text-sm mr-1">favorite</span>}
+                      {plant.status === 'warning' && <span className="material-icons text-sm mr-1">warning</span>}
+                      {plant.status === 'danger' && <span className="material-icons text-sm mr-1">warning</span>}
+                      {getPlantStatusText(plant.status)}
                     </div>
                   </div>
-                  <div className="p-3">
+                  <div className="p-4">
                     <h3 className="font-medium text-sm mb-1">{plant.name}</h3>
-                    <div className="flex items-center">
-                      <div className={`w-2 h-2 rounded-full ${getPlantStatusColor(plant.status)} mr-2`}></div>
-                      <span className="text-xs text-gray-500">{getPlantStatusText(plant.status)}</span>
+                    <div className="text-xs text-gray-500 flex items-center">
+                      <span className="material-icons text-xs mr-1">calendar_today</span>
+                      {plant.dateAdded ? new Date(plant.dateAdded).toLocaleDateString("fr-FR", {
+                        day: 'numeric',
+                        month: 'short'
+                      }) : 'Date inconnue'}
                     </div>
                   </div>
-                </a>
+                </div>
               </Link>
             ))
           ) : (
-            <div className="col-span-full bg-white rounded-lg p-6 text-center">
-              <p className="text-gray-500 mb-4">Vous n'avez pas encore de plantes</p>
+            <div className="col-span-full bg-white/80 backdrop-blur-sm rounded-xl p-8 text-center border border-gray-100">
+              <div className="mb-4 rounded-full bg-primary/10 p-5 inline-block">
+                <span className="material-icons text-primary/70 text-3xl">eco</span>
+              </div>
+              <p className="text-gray-500 mb-6">Vous n'avez pas encore de plantes</p>
               <Link href="/analyze">
-                <Button className="bg-primary text-white hover:bg-primary-light">
+                <Button className="bg-gradient-to-r from-primary to-primary-light text-white hover:shadow-md transition-shadow">
                   Ajouter une plante
                 </Button>
               </Link>

@@ -114,10 +114,12 @@ export default function WeatherWidget() {
 
   if (error) {
     return (
-      <Card className="bg-card border-border">
+      <Card className="bg-white/80 backdrop-blur-sm border-gray-100 rounded-xl shadow-md">
         <CardContent className="pt-6">
           <div className="text-center text-destructive">
-            <span className="material-icons text-3xl">error_outline</span>
+            <div className="bg-red-50 rounded-full inline-block p-3">
+              <span className="material-icons text-3xl text-red-500">error_outline</span>
+            </div>
             <p className="mt-2">{error}</p>
           </div>
         </CardContent>
@@ -126,50 +128,68 @@ export default function WeatherWidget() {
   }
 
   return (
-    <Card className="bg-card border-border overflow-hidden">
-      <CardContent className="pt-6">
-        <h3 className="text-lg font-semibold mb-4 flex items-center">
+    <Card className="bg-white/80 backdrop-blur-sm border-gray-100 rounded-xl shadow-md overflow-hidden">
+      <div className="bg-gradient-to-r from-blue-500/90 to-blue-400/90 text-white p-4">
+        <h3 className="text-lg font-semibold flex items-center">
           <span className="material-icons mr-2">wb_sunny</span>
           Météo et conseils d'entretien
         </h3>
-        
+      </div>
+      <CardContent className="pt-6">
         {loading ? (
-          <div className="space-y-4">
-            <div className="flex items-center gap-4">
-              <Skeleton className="h-12 w-12 rounded-full" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-[100px]" />
-                <Skeleton className="h-4 w-[150px]" />
+          <div className="space-y-4 py-4">
+            <div className="flex justify-center mb-4">
+              <div className="h-16 w-16 rounded-full bg-blue-100 animate-pulse flex items-center justify-center">
+                <span className="material-icons text-blue-300 text-2xl">wb_cloudy</span>
               </div>
             </div>
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-5/6" />
+            <div className="space-y-3">
+              <div className="flex justify-center">
+                <Skeleton className="h-5 w-[80px] bg-blue-50" />
+              </div>
+              <div className="flex justify-center">
+                <Skeleton className="h-4 w-[120px] bg-blue-50" />
+              </div>
+            </div>
+            <div className="pt-4 space-y-2">
+              <Skeleton className="h-4 w-full bg-gray-50" />
+              <Skeleton className="h-4 w-5/6 bg-gray-50" />
+              <Skeleton className="h-4 w-4/5 bg-gray-50" />
+            </div>
           </div>
         ) : weatherData ? (
           <div>
-            <div className="flex items-center mb-4">
-              <span className="material-icons text-4xl text-primary mr-3">
-                {getWeatherIcon(weatherData.icon)}
-              </span>
-              <div>
-                <div className="text-xl font-medium">
-                  {weatherData.temperature}°C
-                </div>
-                <div className="text-muted-foreground">
-                  Humidité: {weatherData.humidity}%
-                </div>
+            <div className="flex items-center justify-center mb-6">
+              <div className="bg-gradient-to-br from-blue-500/10 to-blue-400/10 p-4 rounded-full shadow-inner">
+                <span className="material-icons text-5xl text-blue-500">
+                  {getWeatherIcon(weatherData.icon)}
+                </span>
               </div>
             </div>
             
-            <div className="text-muted-foreground mb-2">{weatherData.description}</div>
+            <div className="flex justify-between mb-4">
+              <div className="text-center">
+                <div className="text-gray-500 text-sm mb-1">Température</div>
+                <div className="text-2xl font-medium">{weatherData.temperature}°C</div>
+              </div>
+              <div className="text-center">
+                <div className="text-gray-500 text-sm mb-1">Humidité</div>
+                <div className="text-2xl font-medium">{weatherData.humidity}%</div>
+              </div>
+            </div>
             
-            <div className="mt-4">
-              <h4 className="font-medium mb-2">Conseils d'entretien:</h4>
-              <ul className="space-y-1">
+            <div className="text-center text-gray-600 mb-4 font-medium">{weatherData.description}</div>
+            
+            <div className="mt-6 bg-blue-50/50 p-4 rounded-lg">
+              <h4 className="font-medium mb-3 text-blue-700 flex items-center">
+                <span className="material-icons mr-2 text-sm">tips_and_updates</span>
+                Conseils d'entretien
+              </h4>
+              <ul className="space-y-2">
                 {weatherData.recommendations.map((recommendation, index) => (
                   <li key={index} className="flex items-start">
-                    <span className="material-icons text-primary mr-2 text-sm">eco</span>
-                    <span className="text-sm">{recommendation}</span>
+                    <span className="material-icons text-green-500 mr-2 text-sm">eco</span>
+                    <span className="text-sm text-gray-700">{recommendation}</span>
                   </li>
                 ))}
               </ul>
