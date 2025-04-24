@@ -119,7 +119,7 @@ export default function Calendar() {
 
       <div className="px-4">
         <Card className="glass-card backdrop-blur-sm shadow-lg border border-gray-100/80 rounded-xl mb-6">
-          <CardContent className="p-4">
+          <CardContent className="p-2 md:p-4">
             <CalendarUI
               mode="single"
               selected={date}
@@ -136,7 +136,7 @@ export default function Calendar() {
                 }
               }}
               classNames={{
-                head_cell: "text-primary-dark font-medium",
+                head_cell: "text-primary-dark font-medium text-center",
                 day_today: "bg-primary/10",
                 day_selected: "bg-gradient-to-r from-primary to-primary-light text-white",
                 nav_button: "hover:bg-primary/10",
@@ -154,7 +154,7 @@ export default function Calendar() {
                     <div className="relative w-full h-full flex items-center justify-center">
                       <div>{day}</div>
                       {color && (
-                        <div className="absolute bottom-1">
+                        <div className="absolute bottom-0.5">
                           <div className={`h-1.5 w-1.5 rounded-full ${color}`} />
                         </div>
                       )}
@@ -166,12 +166,12 @@ export default function Calendar() {
           </CardContent>
         </Card>
 
-        <div className="mb-4 flex justify-between items-center">
+        <div className="mb-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-0">
           <h3 className="text-lg font-raleway font-medium text-primary-dark">
             Tâches du {date ? formatDate(date) : ""}
           </h3>
           <Button 
-            className="bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
+            className="bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 w-full sm:w-auto"
             onClick={() => setIsNewTaskDialogOpen(true)}
           >
             <span className="material-icons mr-2">add_circle</span>
@@ -194,15 +194,15 @@ export default function Calendar() {
             ) : tasksForSelectedDate.length > 0 ? (
               <div className="divide-y divide-gray-100/50">
                 {tasksForSelectedDate.map((task: Task) => (
-                  <div key={task.id} className="py-4 flex items-center">
-                    <div className={`w-12 h-12 ${getTaskTypeBackground(task.type)} rounded-full flex items-center justify-center mr-4 shadow-sm`}>
+                  <div key={task.id} className="py-4 flex flex-col sm:flex-row items-start sm:items-center">
+                    <div className={`w-12 h-12 ${getTaskTypeBackground(task.type)} rounded-full flex items-center justify-center mr-4 shadow-sm mb-3 sm:mb-0`}>
                       {getTaskIcon(task.type)}
                     </div>
                     <div className="flex-grow">
-                      <div className="flex items-center">
+                      <div className="flex flex-wrap items-center gap-2">
                         <h4 className="font-medium text-primary-dark">{task.description}</h4>
                         {task.completed && (
-                          <span className="ml-2 px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs flex items-center">
+                          <span className="px-2 py-0.5 bg-green-100 text-green-700 rounded-full text-xs flex items-center">
                             <span className="material-icons text-xs mr-1">check_circle</span>
                             Terminé
                           </span>
@@ -218,10 +218,11 @@ export default function Calendar() {
                     {!task.completed && (
                       <Button
                         variant="outline"
-                        className="ml-2 p-2.5 rounded-full bg-primary/5 border border-primary/20 hover:bg-primary/10 transition-colors"
+                        className="mt-3 sm:mt-0 sm:ml-2 p-2.5 rounded-full bg-primary/5 border border-primary/20 hover:bg-primary/10 transition-colors w-full sm:w-auto"
                         onClick={() => completeTask(task.id)}
                       >
-                        <span className="material-icons text-primary">check_circle</span>
+                        <span className="material-icons text-primary mr-2 sm:mr-0">check_circle</span>
+                        <span className="sm:hidden">Marquer comme terminée</span>
                       </Button>
                     )}
                   </div>
