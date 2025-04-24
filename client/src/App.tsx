@@ -16,6 +16,7 @@ import Calendar from "@/pages/Calendar";
 import Tips from "@/pages/Tips";
 import Badges from "@/pages/Badges";
 import AuthPage from "@/pages/auth-page";
+import AddPlantManually from "@/pages/AddPlantManually";
 
 function AppRoutes() {
   return (
@@ -28,6 +29,7 @@ function AppRoutes() {
         <ProtectedRoute path="/calendar" component={Calendar} />
         <ProtectedRoute path="/tips" component={Tips} />
         <ProtectedRoute path="/badges" component={Badges} />
+        <ProtectedRoute path="/add-plant" component={AddPlantManually} />
         <Route path="/auth" component={AuthPage} />
         <Route component={NotFound} />
       </Switch>

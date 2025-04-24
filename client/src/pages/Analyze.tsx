@@ -295,6 +295,14 @@ export default function Analyze() {
                   <span className="material-icons mr-2">photo_library</span>
                   Importer une image
                 </Button>
+                <Button
+                  variant="outline"
+                  className="border border-primary text-primary"
+                  onClick={() => navigate("/add-plant")}
+                >
+                  <span className="material-icons mr-2">edit</span>
+                  Ajouter manuellement
+                </Button>
                 <input
                   type="file"
                   ref={fileInputRef}
