@@ -549,11 +549,34 @@ export function searchPlants(query: string): PlantEntry[] {
   
   console.log("Recherche de plantes avec requête:", query);
   
-  const results = plantDatabase.filter(plant => 
-    plant.name.toLowerCase().includes(normalizedQuery) ||
-    plant.species.toLowerCase().includes(normalizedQuery)
-  );
-  
+  // Recherche plus sophistiquée avec gestion des scores de pertinence
+  const results = plantDatabase
+    .map(plant => {
+      // Calcul du score de correspondance
+      let score = 0;
+      
+      // Correspondance dans le nom (plus important)
+      const nameMatch = plant.name.toLowerCase().includes(normalizedQuery);
+      if (nameMatch) score += 10;
+      
+      // Le nom commence par la requête (encore plus important)
+      const nameStartsWith = plant.name.toLowerCase().startsWith(normalizedQuery);
+      if (nameStartsWith) score += 15;
+      
+      // Correspondance exacte (priorité maximale)
+      const exactMatch = plant.name.toLowerCase() === normalizedQuery;
+      if (exactMatch) score += 30;
+      
+      // Correspondance dans l'espèce (moins important)
+      const speciesMatch = plant.species.toLowerCase().includes(normalizedQuery);
+      if (speciesMatch) score += 5;
+      
+      return { plant, score };
+    })
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)  // Tri par pertinence décroissante
+    .map(item => item.plant);
+    
   console.log(`${results.length} plantes trouvées pour "${query}"`);
   return results;
 }

@@ -485,14 +485,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
       
       console.log("API plant-database appelée avec requête:", query);
       
-      if (query) {
+      if (query && query.trim().length > 0) {
         // Recherche de plantes selon le critère de recherche
-        const results = searchPlants(query);
+        const results = searchPlants(query.trim());
+        console.log(`Résultats trouvés: ${results.length} suggestions`);
         return res.json(results);
       }
       
       // Sans critère de recherche, retourne une partie de la base de données
-      res.json(plantDatabase.slice(0, 10)); // Limiter à 10 résultats par défaut
+      const defaultResults = plantDatabase.slice(0, 10); // Limiter à 10 résultats par défaut
+      console.log(`Renvoi des 10 premiers résultats par défaut`);
+      res.json(defaultResults);
     } catch (error: any) {
       console.error("Erreur lors de la recherche:", error);
       res.status(500).json({ message: error.message });
