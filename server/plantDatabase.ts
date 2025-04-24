@@ -2,6 +2,8 @@
  * Base de données de plantes disponibles pour l'ajout manuel
  */
 
+import { fruitTrees } from './fruitTreeDatabase';
+
 export type PlantCategory = 'interieur' | 'exterieur' | 'fruitier' | 'fleurs' | 'legumes';
 
 export interface PlantEntry {
@@ -70,6 +72,16 @@ function assignCategories(plants: Omit<PlantEntry, 'category'>[]): PlantEntry[] 
     'pissenlit', 'romarin', 'roquette', 'rutabaga', 'thym', 'tomate'
   ];
   
+  // Liste des arbres fruitiers courants
+  const fruitierNames = [
+    'avocatier', 'abricotier', 'amandier', 'asiminier', 'bananier', 'brugnonier',
+    'cedratier', 'cerisier', 'châtaignier', 'citronnier', 'citrus', 'clémentinier', 'cognassier',
+    'figuier', 'goyavier', 'grenadier', 'kumquat', 'mirabellier', 'mûrier',
+    'nashi', 'nectarinier', 'néflier', 'noisetier', 'noyer', 'olivier',
+    'oranger', 'pacanier', 'pamplemoussier', 'pêcher', 'plaqueminier', 'poirier',
+    'pommier', 'prunier', 'pawpaw', 'kaki', 'mandarinier', 'lime', 'satsuma'
+  ];
+  
   return plants.map(plant => {
     let category: PlantCategory = 'interieur';
     
@@ -78,20 +90,29 @@ function assignCategories(plants: Omit<PlantEntry, 'category'>[]): PlantEntry[] 
       plant.name.toLowerCase().includes(legume.toLowerCase())
     );
     
+    // Vérifier si le nom de la plante contient un des arbres fruitiers connus
+    const isFruitier = fruitierNames.some(fruit => 
+      plant.name.toLowerCase().includes(fruit.toLowerCase())
+    );
+    
     if (isLegume) {
       category = 'legumes';
     }
-    // Les plantes qui préfèrent la lumière directe sont souvent d'extérieur
-    else if (plant.light.toLowerCase().includes('directe') && !plant.name.toLowerCase().includes('éléphant') && !plant.name.toLowerCase().includes('jade')) {
-      category = 'exterieur';
+    else if (isFruitier) {
+      category = 'fruitier';
     }
     // Les plantes fleuries
-    else if (plant.name.toLowerCase().includes('fleur') || plant.name.toLowerCase().includes('orchid') || plant.name.toLowerCase().includes('rose') || plant.name.toLowerCase().includes('bégonia')) {
+    else if (plant.name.toLowerCase().includes('fleur') || 
+            plant.name.toLowerCase().includes('orchid') || 
+            plant.name.toLowerCase().includes('rose') || 
+            plant.name.toLowerCase().includes('bégonia')) {
       category = 'fleurs';
     }
-    // Les arbres fruitiers
-    else if (plant.name.toLowerCase().includes('citronnier') || plant.name.toLowerCase().includes('arbre') || plant.name.toLowerCase().includes('pommier')) {
-      category = 'fruitier';
+    // Les plantes qui préfèrent la lumière directe sont souvent d'extérieur
+    else if (plant.light.toLowerCase().includes('directe') && 
+            !plant.name.toLowerCase().includes('éléphant') && 
+            !plant.name.toLowerCase().includes('jade')) {
+      category = 'exterieur';
     }
     
     return {
@@ -1068,8 +1089,11 @@ const plantsWithoutCategories = [
   },
 ];
 
+// Combinons les plantes de légumes avec les arbres fruitiers
+const allPlantsWithoutCategories = [...plantsWithoutCategories, ...fruitTrees];
+
 // Application de la fonction pour assigner les catégories
-export const plantDatabase: PlantEntry[] = assignCategories(plantsWithoutCategories);
+export const plantDatabase: PlantEntry[] = assignCategories(allPlantsWithoutCategories);
 
 /**
  * Recherche des plantes par catégorie
