@@ -4,6 +4,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
 import useNotifications from "@/hooks/useNotifications";
 import useTasks from "@/hooks/useTasks";
+import { motion } from "framer-motion";
+import { Separator } from "@/components/ui/separator";
 
 interface NotificationsDialogProps {
   open: boolean;
@@ -103,71 +105,118 @@ export default function NotificationsDialog({ open, onOpenChange }: Notification
 
       <ScrollArea className="h-[300px] py-2">
         {notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-52 text-center text-gray-500">
-            <span className="material-icons text-3xl mb-2">notifications_none</span>
-            <p>Aucune notification pour le moment</p>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex flex-col items-center justify-center h-52 text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center mb-4">
+              <span className="material-icons text-3xl text-primary/40">notifications_none</span>
+            </div>
+            <h3 className="text-lg font-medium text-gray-700 mb-1">Aucune notification</h3>
+            <p className="text-sm text-gray-500 max-w-xs">Vous recevrez des notifications concernant vos plantes et vos tâches d'entretien ici.</p>
+          </motion.div>
         ) : (
-          <div className="space-y-2">
-            {notifications.map((notification) => (
-              <div 
-                key={notification.id} 
-                className={`p-3 rounded-lg ${notification.read ? 'bg-white' : 'bg-primary/5'} hover:bg-gray-100 transition-colors cursor-pointer`}
+          <div className="space-y-3">
+            {notifications.map((notification, index) => (
+              <motion.div 
+                key={notification.id}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+                className={`
+                  p-4 rounded-lg border border-gray-100 shadow-sm 
+                  ${notification.read ? 'bg-white' : 'bg-green-50/50 border-green-100'} 
+                  hover:shadow-md hover:border-primary/20 transition-all duration-200 cursor-pointer
+                `}
                 onClick={() => markAsRead(notification.id)}
               >
                 <div className="flex items-start gap-3">
-                  <div className="mt-1">{getNotificationIcon(notification.type)}</div>
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center mt-1">
+                    {getNotificationIcon(notification.type)}
+                  </div>
                   <div className="flex-grow">
                     <div className="flex justify-between items-start">
-                      <h4 className="font-medium text-sm">{notification.title}</h4>
-                      <div className="flex items-center gap-1">
-                        <span className="text-xs text-gray-500">{formatDate(notification.date)}</span>
+                      <h4 className="font-semibold text-sm text-gray-800">{notification.title}</h4>
+                      <div className="flex items-center gap-2 ml-2">
+                        <span className="text-xs text-gray-500 bg-gray-50 px-2 py-0.5 rounded-full">
+                          {formatDate(notification.date)}
+                        </span>
                         <button 
                           onClick={(e) => {
                             e.stopPropagation();
                             removeNotification(notification.id);
                           }}
-                          className="text-gray-400 hover:text-gray-600"
+                          className="w-5 h-5 rounded-full bg-gray-100 hover:bg-red-100 flex items-center justify-center transition-colors"
+                          aria-label="Supprimer"
                         >
-                          <span className="material-icons text-sm">close</span>
+                          <span className="material-icons text-xs text-gray-500 hover:text-red-500">close</span>
                         </button>
                       </div>
                     </div>
-                    <p className="text-sm text-gray-600">{notification.message}</p>
+                    <p className="text-sm text-gray-600 mt-1">{notification.message}</p>
+                    
+                    {!notification.read && (
+                      <div className="mt-2 flex justify-end">
+                        <span className="text-xs text-primary font-medium bg-primary/5 px-2 py-0.5 rounded-full">
+                          Non lu
+                        </span>
+                      </div>
+                    )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
       </ScrollArea>
 
-      <div className="mt-2 flex justify-between items-center pt-3 border-t border-gray-100">
-        <div className="text-xs text-gray-500">
+      <div className="mt-4">
+        <Separator className="mb-4" />
+        
+        <div className="flex flex-wrap justify-between items-center gap-2">
           {notifications.length > 0 && (
-            <>{notifications.filter(n => !n.read).length} non lu(s)</>
+            <div className="px-3 py-1 bg-primary/5 rounded-full text-xs font-medium text-primary">
+              {notifications.filter(n => !n.read).length} non lu(s)
+            </div>
           )}
-        </div>
-        <div className="flex gap-2">
-          {notifications.length > 0 && (
-            <>
-              <Button variant="outline" size="sm" onClick={markAllAsRead}>
-                Tout marquer comme lu
-              </Button>
-              <Button variant="ghost" size="sm" onClick={clearNotifications}>
-                Effacer tout
-              </Button>
-            </>
-          )}
-          <Button 
-            variant="outline" 
-            size="sm" 
-            onClick={() => onOpenChange(false)}
-            className="border-red-200 text-red-500 hover:bg-red-50 hover:text-red-600"
-          >
-            <span className="material-icons text-sm mr-1">close</span>
-            Fermer
-          </Button>
+          
+          <div className="flex flex-wrap gap-2 ml-auto">
+            {notifications.length > 0 && (
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={markAllAsRead}
+                  className="rounded-full border-primary/20 text-primary hover:bg-primary/5 hover:border-primary/30 transition-all"
+                >
+                  <span className="material-icons text-sm mr-1">mark_email_read</span>
+                  Tout marquer comme lu
+                </Button>
+                
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={clearNotifications}
+                  className="rounded-full text-gray-600 hover:bg-gray-100"
+                >
+                  <span className="material-icons text-sm mr-1">clear_all</span>
+                  Effacer tout
+                </Button>
+              </>
+            )}
+            
+            <Button 
+              variant="outline" 
+              size="sm" 
+              onClick={() => onOpenChange(false)}
+              className="rounded-full border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+            >
+              <span className="material-icons text-sm mr-1">close</span>
+              Fermer
+            </Button>
+          </div>
         </div>
       </div>
     </StableDialog>

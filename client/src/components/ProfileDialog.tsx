@@ -7,6 +7,8 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { motion } from "framer-motion";
+import { Separator } from "@/components/ui/separator";
 import {
   Form,
   FormControl,
@@ -14,6 +16,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { StableDialog } from "./StableDialog";
 
@@ -96,71 +99,155 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
       className="glass-card backdrop-blur-sm border border-primary/20 shadow-xl"
       showCloseButton={true}
     >
-      <Form {...profileForm}>
-        <form onSubmit={profileForm.handleSubmit(onSubmitProfileForm)} className="space-y-4 py-2">
-          <FormField
-            control={profileForm.control}
-            name="username"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nom d'utilisateur</FormLabel>
-                <FormControl>
-                  <Input placeholder="Votre nom d'utilisateur" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={profileForm.control}
-            name="firstName"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Prénom</FormLabel>
-                <FormControl>
-                  <Input placeholder="Votre prénom" {...field} value={field.value || ''} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={profileForm.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email (optionnel)</FormLabel>
-                <FormControl>
-                  <Input type="email" placeholder="Votre email" {...field} value={field.value || ''} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <div className="flex justify-between mt-6">
-            <Button
-              variant="outline"
-              type="button"
-              onClick={() => onOpenChange(false)}
-              className="border-primary/20 text-primary hover:bg-primary/5"
+      <div className="py-2">
+        {/* Profil utilisateur */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
+            <motion.span 
+              className="material-icons text-3xl text-primary"
+              initial={{ scale: 0.8 }}
+              animate={{ scale: 1 }}
+              transition={{ duration: 0.3 }}
             >
-              <span className="material-icons mr-2 text-sm">close</span>
-              Annuler
-            </Button>
-            <Button
-              type="submit"
-              className="bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
-              disabled={profileForm.formState.isSubmitting}
-            >
-              <span className="material-icons mr-2 text-sm">{profileForm.formState.isSubmitting ? "pending" : "save"}</span>
-              {profileForm.formState.isSubmitting ? "Enregistrement..." : "Enregistrer"}
-            </Button>
+              person
+            </motion.span>
           </div>
-        </form>
-      </Form>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800">
+              {user?.firstName || user?.username || 'Bienvenue !'}
+            </h3>
+            <p className="text-sm text-gray-500">
+              Membre depuis {new Date(user?.createdAt || new Date()).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}
+            </p>
+          </div>
+        </div>
+        
+        <Separator className="my-4" />
+        
+        <Form {...profileForm}>
+          <form onSubmit={profileForm.handleSubmit(onSubmitProfileForm)} className="space-y-5">
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <FormField
+                control={profileForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Nom d'utilisateur</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          <span className="material-icons text-base">alternate_email</span>
+                        </span>
+                        <Input 
+                          className="pl-9 rounded-md border-gray-200 focus:border-primary/40" 
+                          placeholder="Votre nom d'utilisateur" 
+                          {...field} 
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription className="text-xs">
+                      Ce nom sera visible par les autres utilisateurs
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.1 }}
+            >
+              <FormField
+                control={profileForm.control}
+                name="firstName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Prénom</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          <span className="material-icons text-base">person</span>
+                        </span>
+                        <Input 
+                          className="pl-9 rounded-md border-gray-200 focus:border-primary/40" 
+                          placeholder="Votre prénom"
+                          {...field} 
+                          value={field.value || ''} 
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3, delay: 0.2 }}
+            >
+              <FormField
+                control={profileForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-sm font-medium">Email (optionnel)</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
+                          <span className="material-icons text-base">email</span>
+                        </span>
+                        <Input 
+                          className="pl-9 rounded-md border-gray-200 focus:border-primary/40" 
+                          type="email" 
+                          placeholder="Votre email" 
+                          {...field} 
+                          value={field.value || ''} 
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription className="text-xs">
+                      Utilisé pour les rappels d'entretien (si activé)
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </motion.div>
+
+            <Separator className="my-2" />
+            
+            <div className="flex justify-end gap-3 pt-3">
+              <Button
+                variant="outline"
+                type="button"
+                onClick={() => onOpenChange(false)}
+                className="rounded-full border-gray-200 text-gray-600 hover:bg-gray-50 transition-all duration-200"
+              >
+                <span className="material-icons mr-1 text-sm">arrow_back</span>
+                Annuler
+              </Button>
+              <Button
+                type="submit"
+                className="rounded-full bg-gradient-to-r from-primary to-primary-light text-white shadow-md hover:shadow-lg hover:translate-y-[-2px] transition-all duration-200"
+                disabled={profileForm.formState.isSubmitting}
+              >
+                <span className="material-icons mr-1 text-sm">
+                  {profileForm.formState.isSubmitting ? "pending" : "save"}
+                </span>
+                {profileForm.formState.isSubmitting ? "Enregistrement..." : "Enregistrer"}
+              </Button>
+            </div>
+          </form>
+        </Form>
+      </div>
     </StableDialog>
   );
 }
