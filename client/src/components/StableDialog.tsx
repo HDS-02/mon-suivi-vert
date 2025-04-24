@@ -1,109 +1,101 @@
-import React, { ReactNode, useState, useEffect } from 'react';
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
+/**
+ * StableDialog - Un composant de dialogue robuste pour remplacer Dialog de shadcn/ui
+ * Ce composant est spécialement conçu pour fonctionner de façon fiable avec un contenu complexe
+ */
 interface StableDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  children: ReactNode;
-  title?: ReactNode;
-  description?: ReactNode;
+  title?: React.ReactNode;
+  description?: React.ReactNode;
+  children: React.ReactNode;
   className?: string;
+  maxWidth?: string;
   showCloseButton?: boolean;
 }
 
-export function StableDialog({
+function StableDialog({
   open,
   onOpenChange,
-  children,
   title,
   description,
+  children,
   className,
-  showCloseButton = false
+  maxWidth = "max-w-2xl",
+  showCloseButton = true,
 }: StableDialogProps) {
-  const [isOpen, setIsOpen] = useState(open);
-  
-  // Synchroniser notre état local avec les props
-  useEffect(() => {
-    setIsOpen(open);
-  }, [open]);
-  
-  // Fonction de mise à jour contrôlée pour éviter les fermetures accidentelles
-  const handleOpenChange = (newOpen: boolean) => {
-    // Si on tente de fermer avec un clic, ne rien faire
-    if (isOpen && !newOpen) {
-      return;
-    }
-    
-    // Sinon, autoriser le changement et notifier le parent
-    setIsOpen(newOpen);
-    onOpenChange(newOpen);
-  };
+  const [isVisible, setIsVisible] = useState(open);
 
-  // Empêcher toutes les formes de fermeture automatique
-  const preventClose = (e: Event) => {
-    e.preventDefault();
-    e.stopPropagation();
-  };
+  // Synchroniser l'état d'ouverture externe avec l'état interne
+  useEffect(() => {
+    if (open) {
+      setIsVisible(true);
+      document.body.style.overflow = 'hidden';
+    } else {
+      const timer = setTimeout(() => {
+        setIsVisible(false);
+        document.body.style.overflow = '';
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
+  if (!isVisible && !open) {
+    return null;
+  }
 
   return (
-    <DialogPrimitive.Root open={isOpen} onOpenChange={handleOpenChange} modal={true}>
-      <DialogPrimitive.Portal>
-        <DialogPrimitive.Overlay 
-          className="fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
-          onClick={(e: React.MouseEvent) => e.stopPropagation()}
-        />
-        <div className="fixed inset-0 z-50 flex items-center justify-center">
-          <DialogPrimitive.Content
-            className={cn(
-              "fixed z-50 w-full max-w-md rounded-lg bg-white p-6 shadow-lg data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95",
-              className
-            )}
-            onPointerDownOutside={preventClose}
-            onInteractOutside={preventClose}
-            onEscapeKeyDown={preventClose}
-            onClick={(e: React.MouseEvent) => e.stopPropagation()}
-            onOpenAutoFocus={(e: Event) => e.preventDefault()}
-          >
-            {title && (
-              <div className="mb-4 border-b pb-3">
-                {typeof title === 'string' ? (
-                  <DialogPrimitive.Title className="text-lg font-semibold">
-                    {title}
-                  </DialogPrimitive.Title>
-                ) : (
-                  title
-                )}
-                
-                {description && (
-                  typeof description === 'string' ? (
-                    <DialogPrimitive.Description className="text-sm text-gray-500 mt-1">
-                      {description}
-                    </DialogPrimitive.Description>
-                  ) : (
-                    description
-                  )
-                )}
-              </div>
-            )}
-            
-            <div className="relative" onClick={(e: React.MouseEvent) => e.stopPropagation()}>
-              {children}
+    <div 
+      className={cn(
+        "fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 transition-opacity duration-200",
+        open ? "opacity-100" : "opacity-0"
+      )}
+      aria-modal="true"
+      role="dialog"
+      onClick={() => onOpenChange(false)}
+    >
+      <div 
+        className={cn(
+          "bg-white dark:bg-gray-900 rounded-xl shadow-lg w-full transition-all transform duration-200 overflow-hidden",
+          maxWidth,
+          open ? "scale-100 opacity-100" : "scale-95 opacity-0",
+          className
+        )}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {(title || showCloseButton) && (
+          <div className="flex items-center justify-between p-4 border-b">
+            <div>
+              {title && (
+                <h2 className="text-xl font-semibold">{title}</h2>
+              )}
+              {description && (
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">{description}</p>
+              )}
             </div>
-            
             {showCloseButton && (
-              <button 
-                className="absolute top-3 right-3 rounded-full p-1 text-gray-500 opacity-70 hover:opacity-100 focus:outline-none focus:ring-1 focus:ring-primary"
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                className="rounded-full" 
                 onClick={() => onOpenChange(false)}
               >
-                <X className="h-4 w-4" />
-                <span className="sr-only">Fermer</span>
-              </button>
+                <X className="w-4 h-4" />
+              </Button>
             )}
-          </DialogPrimitive.Content>
+          </div>
+        )}
+        
+        <div className="max-h-[80vh] overflow-y-auto">
+          {children}
         </div>
-      </DialogPrimitive.Portal>
-    </DialogPrimitive.Root>
+      </div>
+    </div>
   );
 }
+
+export { StableDialog };

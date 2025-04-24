@@ -5,15 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Loader2 } from "lucide-react";
 import { Plant } from "@shared/schema";
 import { useToast } from "@/hooks/use-toast";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
+import { StableDialog } from "./StableDialog";
 import {
   Form,
   FormControl,
@@ -31,7 +23,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { apiRequest } from "@/lib/queryClient";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -141,24 +132,26 @@ export default function SOSPlantDialog({
     }
   };
 
-  return (
-    <Dialog open={open} onOpenChange={(newOpen) => {
-      if (!newOpen) {
-        resetForm();
-      }
-      onOpenChange(newOpen);
-    }}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto max-w-2xl w-[90vw]">
-        <DialogHeader>
-          <DialogTitle className="flex items-center text-xl">
-            <span className="material-icons text-red-500 mr-2">healing</span>
-            SOS Assistance Plante
-          </DialogTitle>
-          <DialogDescription>
-            Obtenez un diagnostic et des conseils personnalisés pour votre {plant.name}
-          </DialogDescription>
-        </DialogHeader>
+  const handleOpenChange = (newOpen: boolean) => {
+    if (!newOpen) {
+      resetForm();
+    }
+    onOpenChange(newOpen);
+  };
 
+  return (
+    <StableDialog 
+      open={open} 
+      onOpenChange={handleOpenChange}
+      title={
+        <div className="flex items-center">
+          <span className="material-icons text-red-500 mr-2">healing</span>
+          SOS Assistance Plante
+        </div>
+      }
+      description={`Obtenez un diagnostic et des conseils personnalisés pour votre ${plant.name}`}
+    >
+      <div className="p-4 max-h-[80vh] overflow-y-auto">
         {diagnosis ? (
           <div className="space-y-4">
             <div className="flex flex-col space-y-4">
@@ -192,7 +185,7 @@ export default function SOSPlantDialog({
               </div>
             </div>
             
-            <DialogFooter>
+            <div className="flex justify-between mt-6">
               <Button 
                 variant="outline" 
                 onClick={() => setDiagnosis(null)}
@@ -201,7 +194,7 @@ export default function SOSPlantDialog({
                 Nouveau diagnostic
               </Button>
               <Button onClick={() => onOpenChange(false)}>Fermer</Button>
-            </DialogFooter>
+            </div>
           </div>
         ) : (
           <Form {...form}>
@@ -465,7 +458,7 @@ export default function SOSPlantDialog({
                           />
                         </FormControl>
                         <div className="space-y-1 leading-none">
-                          <FormLabel>Problèmes de racines visibles</FormLabel>
+                          <FormLabel>Problèmes de racines</FormLabel>
                         </div>
                       </FormItem>
                     )}
@@ -478,41 +471,46 @@ export default function SOSPlantDialog({
                 name="additionalNotes"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Notes supplémentaires (optionnel)</FormLabel>
+                    <FormLabel>Notes complémentaires (facultatif)</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="Décrivez d'autres symptômes ou informations importantes concernant votre plante..."
+                        placeholder="Ajoutez d'autres observations ou détails sur l'état de votre plante..."
                         className="resize-none"
                         {...field}
                       />
                     </FormControl>
-                    <FormDescription>
-                      Ajoutez tout autre détail qui pourrait être utile pour le diagnostic.
-                    </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              <DialogFooter>
-                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="mr-auto">
+              <div className="flex justify-end gap-2 pt-4">
+                <Button 
+                  variant="outline" 
+                  type="button"
+                  onClick={() => onOpenChange(false)}
+                >
                   Annuler
                 </Button>
-                <Button type="submit" disabled={isSubmitting}>
+                <Button 
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-primary hover:bg-primary/90"
+                >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Analyse en cours...
+                      Diagnostic en cours
                     </>
                   ) : (
-                    "Obtenir un diagnostic"
+                    "Diagnostiquer ma plante"
                   )}
                 </Button>
-              </DialogFooter>
+              </div>
             </form>
           </Form>
         )}
-      </DialogContent>
-    </Dialog>
+      </div>
+    </StableDialog>
   );
 }
