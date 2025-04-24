@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { queryClient } from "@/lib/queryClient";
 import EditPlantDialog from "@/components/EditPlantDialog";
+import SOSPlantDialog from "@/components/SOSPlantDialog";
 
 export default function PlantDetail() {
   const { id } = useParams();
@@ -15,6 +16,7 @@ export default function PlantDetail() {
   const { toast } = useToast();
   const [displayTab, setDisplayTab] = useState<"overview" | "history">("overview");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [sosDialogOpen, setSosDialogOpen] = useState(false);
   
   const { data: plant, isLoading: plantLoading } = useQuery<Plant>({
     queryKey: [`/api/plants/${id}`],

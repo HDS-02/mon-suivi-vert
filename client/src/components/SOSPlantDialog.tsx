@@ -1,0 +1,497 @@
+import { useState } from "react";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2 } from "lucide-react";
+import { Plant } from "@shared/schema";
+import { useToast } from "@/hooks/use-toast";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { apiRequest } from "@/lib/queryClient";
+import { Checkbox } from "@/components/ui/checkbox";
+
+// Schéma de validation pour le formulaire SOS
+const sosDiagnosticSchema = z.object({
+  lastWatering: z.string().min(1, { message: "Veuillez sélectionner une option" }),
+  environment: z.object({
+    directSunlight: z.boolean().default(false),
+    brightIndirect: z.boolean().default(false),
+    lowLight: z.boolean().default(false),
+  }),
+  temperature: z.string().min(1, { message: "Veuillez sélectionner une option" }),
+  symptoms: z.object({
+    yellowLeaves: z.boolean().default(false),
+    brownSpots: z.boolean().default(false),
+    droppingLeaves: z.boolean().default(false),
+    dryLeaves: z.boolean().default(false),
+    moldOrFungus: z.boolean().default(false),
+    insects: z.boolean().default(false),
+    slowGrowth: z.boolean().default(false),
+    rootIssues: z.boolean().default(false),
+  }),
+  additionalNotes: z.string().optional(),
+});
+
+type SOSDiagnosticFormValues = z.infer<typeof sosDiagnosticSchema>;
+
+interface SOSPlantDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  plant: Plant;
+}
+
+export default function SOSPlantDialog({
+  open,
+  onOpenChange,
+  plant,
+}: SOSPlantDialogProps) {
+  const { toast } = useToast();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [diagnosis, setDiagnosis] = useState<string | null>(null);
+
+  const form = useForm<SOSDiagnosticFormValues>({
+    resolver: zodResolver(sosDiagnosticSchema),
+    defaultValues: {
+      lastWatering: "",
+      environment: {
+        directSunlight: false,
+        brightIndirect: false,
+        lowLight: false,
+      },
+      temperature: "",
+      symptoms: {
+        yellowLeaves: false,
+        brownSpots: false,
+        droppingLeaves: false,
+        dryLeaves: false,
+        moldOrFungus: false,
+        insects: false,
+        slowGrowth: false,
+        rootIssues: false,
+      },
+      additionalNotes: "",
+    },
+  });
+
+  const resetForm = () => {
+    form.reset();
+    setDiagnosis(null);
+  };
+
+  const onSubmit = async (data: SOSDiagnosticFormValues) => {
+    try {
+      setIsSubmitting(true);
+
+      // Envoyer les données à l'API
+      const response = await apiRequest("POST", `/api/plants/${plant.id}/sos-diagnostic`, {
+        ...data,
+        plantId: plant.id,
+        plantName: plant.name,
+        plantSpecies: plant.species,
+      });
+
+      if (!response.ok) {
+        throw new Error("Une erreur est survenue lors de l'envoi du diagnostic");
+      }
+
+      const result = await response.json();
+      
+      // Afficher le résultat du diagnostic
+      setDiagnosis(result.diagnosis);
+      
+      toast({
+        title: "Diagnostic terminé",
+        description: "Un diagnostic a été généré pour votre plante.",
+      });
+    } catch (error) {
+      console.error("Erreur lors de l'envoi du diagnostic:", error);
+      toast({
+        title: "Erreur lors de la demande",
+        description: "Impossible d'obtenir un diagnostic pour votre plante pour le moment.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={(newOpen) => {
+      if (!newOpen) {
+        resetForm();
+      }
+      onOpenChange(newOpen);
+    }}>
+      <DialogContent className="max-h-[90vh] overflow-y-auto max-w-2xl w-[90vw]">
+        <DialogHeader>
+          <DialogTitle className="flex items-center text-xl">
+            <span className="material-icons text-red-500 mr-2">healing</span>
+            SOS Assistance Plante
+          </DialogTitle>
+          <DialogDescription>
+            Obtenez un diagnostic et des conseils personnalisés pour votre {plant.name}
+          </DialogDescription>
+        </DialogHeader>
+
+        {diagnosis ? (
+          <div className="space-y-4">
+            <div className="bg-green-50 p-4 rounded-lg border border-green-100">
+              <h3 className="font-medium text-green-800 flex items-center mb-2">
+                <span className="material-icons text-green-600 mr-2">analytics</span>
+                Diagnostic de votre plante
+              </h3>
+              <div className="prose prose-sm text-green-700 whitespace-pre-line">
+                {diagnosis}
+              </div>
+            </div>
+            
+            <DialogFooter>
+              <Button 
+                variant="outline" 
+                onClick={() => setDiagnosis(null)}
+                className="mr-auto"
+              >
+                Nouveau diagnostic
+              </Button>
+              <Button onClick={() => onOpenChange(false)}>Fermer</Button>
+            </DialogFooter>
+          </div>
+        ) : (
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+              <FormField
+                control={form.control}
+                name="lastWatering"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>À quand remonte le dernier arrosage ?</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez une option" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="today">Aujourd'hui</SelectItem>
+                        <SelectItem value="yesterday">Hier</SelectItem>
+                        <SelectItem value="few_days">Il y a 2-3 jours</SelectItem>
+                        <SelectItem value="week">Il y a environ une semaine</SelectItem>
+                        <SelectItem value="more_than_week">Il y a plus d'une semaine</SelectItem>
+                        <SelectItem value="dont_remember">Je ne m'en souviens pas</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-3">
+                <FormLabel>Dans quel environnement lumineux est placée votre plante ?</FormLabel>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="environment.directSunlight"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Lumière directe / Soleil</FormLabel>
+                          <FormDescription>
+                            Exposée aux rayons directs du soleil
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="environment.brightIndirect"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Lumière indirecte</FormLabel>
+                          <FormDescription>
+                            Pièce lumineuse sans soleil direct
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="environment.lowLight"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Faible luminosité</FormLabel>
+                          <FormDescription>
+                            Pièce sombre ou éloignée des fenêtres
+                          </FormDescription>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="temperature"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Quelle est la température autour de votre plante ?</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Sélectionnez une option" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="very_cold">Très froide (moins de 10°C)</SelectItem>
+                        <SelectItem value="cold">Froide (10-15°C)</SelectItem>
+                        <SelectItem value="cool">Fraîche (15-18°C)</SelectItem>
+                        <SelectItem value="normal">Normale (18-24°C)</SelectItem>
+                        <SelectItem value="warm">Chaude (24-30°C)</SelectItem>
+                        <SelectItem value="hot">Très chaude (plus de 30°C)</SelectItem>
+                        <SelectItem value="fluctuating">Fluctuante (variations importantes)</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="space-y-3">
+                <FormLabel>Quels symptômes observez-vous ? (sélectionnez tous ceux qui s'appliquent)</FormLabel>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="symptoms.yellowLeaves"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Feuilles jaunissantes</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="symptoms.brownSpots"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Taches brunes</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="symptoms.droppingLeaves"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Feuilles tombantes</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="symptoms.dryLeaves"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Feuilles sèches/croustillantes</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="symptoms.moldOrFungus"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Moisissure ou champignons</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="symptoms.insects"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Présence d'insectes</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="symptoms.slowGrowth"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Croissance lente/stagnante</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="symptoms.rootIssues"
+                    render={({ field }) => (
+                      <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-md border p-4">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                          />
+                        </FormControl>
+                        <div className="space-y-1 leading-none">
+                          <FormLabel>Problèmes de racines visibles</FormLabel>
+                        </div>
+                      </FormItem>
+                    )}
+                  />
+                </div>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="additionalNotes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Notes supplémentaires (optionnel)</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Décrivez d'autres symptômes ou informations importantes concernant votre plante..."
+                        className="resize-none"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Ajoutez tout autre détail qui pourrait être utile pour le diagnostic.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <DialogFooter>
+                <Button type="button" variant="outline" onClick={() => onOpenChange(false)} className="mr-auto">
+                  Annuler
+                </Button>
+                <Button type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Analyse en cours...
+                    </>
+                  ) : (
+                    "Obtenir un diagnostic"
+                  )}
+                </Button>
+              </DialogFooter>
+            </form>
+          </Form>
+        )}
+      </DialogContent>
+    </Dialog>
+  );
+}

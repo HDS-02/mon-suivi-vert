@@ -11,6 +11,7 @@ import { nanoid } from "nanoid";
 import { setupAuth } from "./auth";
 import { badgeService } from "./badgeService";
 import { plantDatabase, searchPlants, getPlantByName } from "./plantDatabase";
+import { plantDiagnosticService } from "./plantDiagnosticService";
 
 // Configure multer for in-memory file storage
 const upload = multer({
@@ -377,6 +378,102 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Données invalides", errors: error.errors });
       }
       res.status(500).json({ message: error.message });
+    }
+  });
+  
+  // SOS ASSISTANCE PLANTE - Endpoint de diagnostic
+  app.post("/api/plants/:id/sos-diagnostic", async (req: Request, res: Response) => {
+    try {
+      const plantId = parseInt(req.params.id);
+      if (isNaN(plantId)) {
+        return res.status(400).json({ message: "ID de plante invalide" });
+      }
+      
+      // Récupérer les informations de la plante
+      const plant = await storage.getPlant(plantId);
+      if (!plant) {
+        return res.status(404).json({ message: "Plante non trouvée" });
+      }
+      
+      // Valider les données d'entrée avec Zod
+      const diagnosticInputSchema = z.object({
+        plantId: z.number(),
+        plantName: z.string(),
+        plantSpecies: z.string().optional(),
+        lastWatering: z.string(),
+        environment: z.object({
+          directSunlight: z.boolean(),
+          brightIndirect: z.boolean(),
+          lowLight: z.boolean(),
+        }),
+        temperature: z.string(),
+        symptoms: z.object({
+          yellowLeaves: z.boolean(),
+          brownSpots: z.boolean(),
+          droppingLeaves: z.boolean(),
+          dryLeaves: z.boolean(),
+          moldOrFungus: z.boolean(),
+          insects: z.boolean(),
+          slowGrowth: z.boolean(),
+          rootIssues: z.boolean(),
+        }),
+        additionalNotes: z.string().optional(),
+      });
+      
+      const validatedData = diagnosticInputSchema.parse({
+        ...req.body,
+        plantId,
+        plantName: plant.name,
+        plantSpecies: plant.species,
+      });
+      
+      // Générer le diagnostic en utilisant le service de diagnostic
+      const diagnosticResult = plantDiagnosticService.generateDiagnosis(validatedData);
+      
+      // Si le diagnostic indique un problème grave, mettre à jour le statut de la plante
+      if (diagnosticResult.status === "danger") {
+        await storage.updatePlant(plantId, { status: "danger" });
+      } else if (diagnosticResult.status === "warning" && plant.status === "healthy") {
+        await storage.updatePlant(plantId, { status: "warning" });
+      }
+      
+      // Créer une analyse à partir du diagnostic
+      await storage.createPlantAnalysis({
+        plantId,
+        status: diagnosticResult.status,
+        recommendations: diagnosticResult.diagnosis,
+        healthIssues: req.body.additionalNotes || ""
+      });
+      
+      // Vérifier et débloquer des badges si nécessaire
+      let unlockedBadges = [];
+      if (req.isAuthenticated() && req.user?.id) {
+        const userId = req.user.id;
+        const analysisCount = (await storage.getPlantAnalyses(plantId)).length;
+        unlockedBadges = badgeService.checkAnalysisBadges(userId, analysisCount);
+      }
+      
+      // Retourner le résultat du diagnostic
+      res.json({
+        diagnosis: diagnosticResult.diagnosis,
+        status: diagnosticResult.status,
+        actionRequired: diagnosticResult.actionRequired,
+        unlockedBadges: unlockedBadges.length > 0 ? unlockedBadges : undefined
+      });
+    } catch (error: any) {
+      console.error("Erreur lors du diagnostic SOS:", error);
+      
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ 
+          message: "Données invalides pour le diagnostic", 
+          errors: error.errors 
+        });
+      }
+      
+      res.status(500).json({ 
+        message: "Une erreur est survenue lors du diagnostic",
+        error: error.message
+      });
     }
   });
 
