@@ -138,12 +138,12 @@ export default function Home() {
         <div className="md:col-span-2">
           <h2 className="text-lg font-raleway font-semibold mb-4">Actions rapides</h2>
           <div className="grid grid-cols-2 gap-4">
-            <Link href="/analyze">
+            <Link href="/add-plant">
               <Button variant="ghost" className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-4 h-auto hover:shadow-lg hover:bg-white/90 transition-all duration-200 flex flex-col items-center w-full border border-gray-100">
                 <div className="bg-gradient-to-br from-primary/90 to-primary-light/90 rounded-full p-3 mb-2 text-white">
-                  <span className="material-icons">add_a_photo</span>
+                  <span className="material-icons">add_circle</span>
                 </div>
-                <span className="text-sm font-medium">Analyser une plante</span>
+                <span className="text-sm font-medium">Ajouter une plante</span>
               </Button>
             </Link>
             <Link href="/plants">
@@ -307,7 +307,7 @@ export default function Home() {
                 <span className="material-icons text-primary/70 text-3xl">eco</span>
               </div>
               <p className="text-gray-500 mb-6">Vous n'avez pas encore de plantes</p>
-              <Link href="/analyze">
+              <Link href="/add-plant">
                 <Button className="bg-gradient-to-r from-primary to-primary-light text-white hover:shadow-md transition-shadow">
                   Ajouter une plante
                 </Button>

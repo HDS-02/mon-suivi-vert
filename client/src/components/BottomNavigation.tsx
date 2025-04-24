@@ -12,10 +12,10 @@ export default function BottomNavigation() {
             <span className="text-xs mt-1">Accueil</span>
           </div>
         </Link>
-        <Link href="/analyze">
-          <div className={`py-3 px-4 flex flex-col items-center ${location === "/analyze" ? "text-primary" : "text-gray-500"}`}>
-            <span className="material-icons text-current">search</span>
-            <span className="text-xs mt-1">Analyser</span>
+        <Link href="/add-plant">
+          <div className={`py-3 px-4 flex flex-col items-center ${location === "/add-plant" ? "text-primary" : "text-gray-500"}`}>
+            <span className="material-icons text-current">add_circle</span>
+            <span className="text-xs mt-1">Ajouter</span>
           </div>
         </Link>
         <Link href="/plants">

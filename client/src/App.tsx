@@ -9,7 +9,6 @@ import { ProtectedRoute } from "@/lib/protected-route";
 import NotFound from "@/pages/not-found";
 import Layout from "@/components/Layout";
 import Home from "@/pages/Home";
-import Analyze from "@/pages/Analyze";
 import PlantDetail from "@/pages/PlantDetail";
 import MyPlants from "@/pages/MyPlants";
 import Calendar from "@/pages/Calendar";
@@ -23,13 +22,12 @@ function AppRoutes() {
     <Layout>
       <Switch>
         <ProtectedRoute path="/" component={Home} />
-        <ProtectedRoute path="/analyze" component={Analyze} />
+        <ProtectedRoute path="/add-plant" component={AddPlantManually} />
         <ProtectedRoute path="/plants" component={MyPlants} />
         <ProtectedRoute path="/plants/:id" component={PlantDetail} />
         <ProtectedRoute path="/calendar" component={Calendar} />
         <ProtectedRoute path="/tips" component={Tips} />
         <ProtectedRoute path="/badges" component={Badges} />
-        <ProtectedRoute path="/add-plant" component={AddPlantManually} />
         <Route path="/auth" component={AuthPage} />
         <Route component={NotFound} />
       </Switch>
