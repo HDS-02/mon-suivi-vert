@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import Anthropic from '@anthropic-ai/sdk';
 import { PlantAnalyzer } from "./plantAnalyzer";
 import { PlantAnalysisResponse } from "@shared/schema";
 
@@ -8,6 +9,12 @@ const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "", 
   timeout: 60000, // Augmenter le timeout à 60 secondes
   maxRetries: 3 // Essayer jusqu'à 3 fois en cas d'erreur temporaire
+});
+
+// Configuration de l'API Anthropic Claude
+// The newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY || "",
 });
 
 // Nouvel analyseur de plantes basé sur des règles (ne nécessite pas d'API)
@@ -97,9 +104,96 @@ export async function getPlantInfoByName(plantName: string): Promise<PlantAnalys
   } catch (error: any) {
     console.error("Erreur lors de la recherche avec ChatGPT:", error.message || "Erreur inconnue");
     
-    // Utiliser l'analyseur local comme solution de repli
+    // Essayer avec Anthropic si la clé API est définie
+    if (process.env.ANTHROPIC_API_KEY) {
+      try {
+        console.log(`Tentative avec Anthropic Claude pour "${plantName}"...`);
+        
+        const anthropicResponse = await useClaude(plantName);
+        console.log("Recherche avec Claude réussie");
+        return anthropicResponse;
+      } catch (claudeError: any) {
+        console.error("Erreur lors de la recherche avec Claude:", claudeError.message || "Erreur inconnue");
+      }
+    }
+    
+    // Utiliser l'analyseur local comme solution de repli en dernier recours
     console.log("Utilisation de l'analyseur local comme solution de remplacement");
     return plantAnalyzer.analyzeByDescription(plantName);
+  }
+}
+
+/**
+ * Utilise l'API Anthropic Claude pour obtenir des informations sur une plante
+ * @param plantName Nom de la plante à analyser
+ * @returns Informations détaillées sur la plante
+ */
+async function useClaude(plantName: string): Promise<PlantAnalysisResponse> {
+  const prompt = `
+  Analyse le nom de plante suivant et fournis-moi des informations détaillées en français dans un format JSON:
+  "${plantName}"
+
+  Retourne les informations suivantes:
+  - Le nom commun complet de la plante en français (clé "nom")
+  - L'espèce scientifique exacte si identifiable (clé "espece")
+  - Des instructions d'entretien précises:
+    - Fréquence et méthode d'arrosage (clé "arrosage")
+    - Besoins en lumière (intensité et durée) (clé "lumiere") 
+    - Plage de température idéale (clé "temperature")
+    - Conseils supplémentaires d'entretien (clé "conseils", en tableau)
+  - État de santé typique et problèmes courants (clé "etat", choisir parmi: "healthy", "warning", "danger")
+  - Des recommandations spécifiques pour bien entretenir cette plante (clé "recommandations", en tableau)
+
+  Même si le nom fourni est vague ou générique, essaie de donner des informations utiles et pertinentes.
+  Indique clairement si tu n'es pas certain de l'identification.
+  
+  Réponds UNIQUEMENT avec du JSON valide sans texte autour. Assure-toi que ta réponse puisse être directement parsée avec JSON.parse().
+  `;
+
+  // The newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
+  const response = await anthropic.messages.create({
+    model: "claude-3-7-sonnet-20250219",
+    max_tokens: 800,
+    system: "Tu es un expert botaniste spécialisé dans les plantes d'intérieur et d'extérieur. Tu réponds uniquement en JSON valide sans texte autour.",
+    messages: [
+      { role: "user", content: prompt }
+    ],
+  });
+
+  const content = response.content[0].text;
+  if (!content) {
+    throw new Error("Aucune réponse reçue de Claude");
+  }
+
+  // Analyser la réponse JSON
+  try {
+    const parsedContent = JSON.parse(content);
+    
+    // Transformer la réponse au format PlantAnalysisResponse
+    const plantInfo: PlantAnalysisResponse = {
+      plantName: parsedContent.nom || plantName,
+      species: parsedContent.espece || parsedContent.espèce || parsedContent.especeScientifique || undefined,
+      status: parsedContent.etat || parsedContent.état || "healthy",
+      healthIssues: parsedContent.problemes || parsedContent.problèmes || parsedContent.problemesCommuns || [],
+      recommendations: Array.isArray(parsedContent.recommandations) ? 
+        parsedContent.recommandations : 
+        [parsedContent.recommandations].filter(Boolean),
+      careInstructions: {
+        watering: parsedContent.entretien?.arrosage || parsedContent.arrosage || "Arrosage modéré",
+        light: parsedContent.entretien?.lumiere || parsedContent.entretien?.lumière || parsedContent.lumiere || parsedContent.lumière || "Lumière indirecte",
+        temperature: parsedContent.entretien?.temperature || parsedContent.temperature || parsedContent.température || "18-24°C",
+        additional: Array.isArray(parsedContent.entretien?.conseils) ? 
+          parsedContent.entretien.conseils : 
+          parsedContent.conseils ? 
+            [parsedContent.conseils].filter(Boolean) : 
+            ["Vérifiez régulièrement l'état des feuilles"]
+      }
+    };
+
+    return plantInfo;
+  } catch (parseError) {
+    console.error("Erreur lors du parsing de la réponse JSON de Claude:", content);
+    throw new Error("Le format de réponse reçu de Claude n'est pas un JSON valide");
   }
 }
 
