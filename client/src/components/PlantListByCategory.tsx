@@ -32,7 +32,7 @@ export default function PlantListByCategory({
 
   // Récupérer les plantes pour la catégorie sélectionnée
   const { data: plants, isLoading, error } = useQuery<PlantEntry[]>({
-    queryKey: ['/api/plant-database/category', category.id],
+    queryKey: [`/api/plant-database/category/${category.id}`],
   });
 
   // Filtrer les plantes en fonction du terme de recherche

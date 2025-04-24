@@ -38,7 +38,7 @@ export const plantCategories: PlantCategoryInfo[] = [
     id: "fruitier",
     name: "Arbres fruitiers",
     description: "Arbres et arbustes produisant des fruits comestibles",
-    icon: "nutrition"
+    icon: "agriculture"
   },
   {
     id: "fleurs",
