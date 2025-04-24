@@ -6,6 +6,46 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 export default function useBadges() {
   const { toast } = useToast();
   
+  // Pour limiter les notifications de badges
+  const showBadgeNotification = () => {
+    const lastTime = localStorage.getItem('lastBadgeNotification');
+    if (!lastTime) {
+      localStorage.setItem('lastBadgeNotification', Date.now().toString());
+      return true;
+    }
+    
+    // Attendre au moins 5 secondes entre les notifications
+    const cooldownPeriod = 5000;
+    const now = Date.now();
+    const lastNotification = parseInt(lastTime);
+    
+    if (now - lastNotification > cooldownPeriod) {
+      localStorage.setItem('lastBadgeNotification', now.toString());
+      return true;
+    }
+    
+    return false;
+  };
+  
+  // Fonction de notification groupée pour les badges
+  const notifyBadges = (badges: Badge[]) => {
+    if (!badges || !badges.length || !showBadgeNotification()) {
+      return;
+    }
+    
+    if (badges.length === 1) {
+      toast({
+        title: "🏆 Nouveau badge débloqué !",
+        description: `${badges[0].name} - ${badges[0].description}`
+      });
+    } else {
+      toast({
+        title: "🏆 Nouveaux badges débloqués !",
+        description: `Vous avez débloqué ${badges.length} nouveaux badges`
+      });
+    }
+  };
+  
   // Récupérer tous les badges
   const {
     data: badges = [],
@@ -28,21 +68,7 @@ export default function useBadges() {
       queryClient.invalidateQueries({ queryKey: ["/api/badges"] });
       
       if (data.unlockedBadges && data.unlockedBadges.length > 0) {
-        // Notifier l'utilisateur des nouveaux badges débloqués
-        data.unlockedBadges.forEach(badge => {
-          toast({
-            title: "🏆 Nouveau badge débloqué !",
-            description: `${badge.name} - ${badge.description}`
-          });
-        });
-      }
-      
-      if (data.updatedBadge) {
-        // Progression d'un badge mise à jour
-        toast({
-          title: "🔝 Progression de badge mise à jour",
-          description: `${data.updatedBadge.name} - ${data.updatedBadge.progress}/${data.updatedBadge.maxProgress}`
-        });
+        notifyBadges(data.unlockedBadges);
       }
     },
     onError: (error: Error) => {
@@ -60,21 +86,7 @@ export default function useBadges() {
       queryClient.invalidateQueries({ queryKey: ["/api/badges"] });
       
       if (data.unlockedBadges && data.unlockedBadges.length > 0) {
-        // Notifier l'utilisateur des nouveaux badges débloqués
-        data.unlockedBadges.forEach(badge => {
-          toast({
-            title: "🏆 Nouveau badge débloqué !",
-            description: `${badge.name} - ${badge.description}`
-          });
-        });
-      }
-      
-      if (data.updatedBadge) {
-        // Progression d'un badge mise à jour
-        toast({
-          title: "🔝 Progression de badge mise à jour",
-          description: `${data.updatedBadge.name} - ${data.updatedBadge.progress}/${data.updatedBadge.maxProgress}`
-        });
+        notifyBadges(data.unlockedBadges);
       }
     },
     onError: (error: Error) => {
@@ -92,21 +104,7 @@ export default function useBadges() {
       queryClient.invalidateQueries({ queryKey: ["/api/badges"] });
       
       if (data.unlockedBadges && data.unlockedBadges.length > 0) {
-        // Notifier l'utilisateur des nouveaux badges débloqués
-        data.unlockedBadges.forEach(badge => {
-          toast({
-            title: "🏆 Nouveau badge débloqué !",
-            description: `${badge.name} - ${badge.description}`
-          });
-        });
-      }
-      
-      if (data.updatedBadge) {
-        // Progression d'un badge mise à jour
-        toast({
-          title: "🔝 Progression de badge mise à jour",
-          description: `${data.updatedBadge.name} - ${data.updatedBadge.progress}/${data.updatedBadge.maxProgress}`
-        });
+        notifyBadges(data.unlockedBadges);
       }
     },
     onError: (error: Error) => {
