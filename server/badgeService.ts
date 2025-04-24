@@ -60,22 +60,22 @@ const availableBadges: Omit<Badge, "unlocked" | "unlockedAt">[] = [
     maxProgress: 7
   },
   
-  // Badges d'analyse
+  // Badges de diagnostic SOS (remplaçant les badges d'analyse)
   {
-    id: "analysis-1",
-    name: "Observateur débutant",
-    description: "Analysez votre première plante",
-    icon: "search",
-    category: "analyse",
+    id: "sos-diagnostic-1",
+    name: "Premier secours",
+    description: "Utilisez SOS Assistance Plante pour la première fois",
+    icon: "health_and_safety",
+    category: "entretien",
     progress: 0,
     maxProgress: 1
   },
   {
-    id: "analysis-5",
-    name: "Analyste en herbe",
-    description: "Analysez 5 plantes différentes",
-    icon: "analytics",
-    category: "analyse",
+    id: "sos-diagnostic-5",
+    name: "Médecin des plantes",
+    description: "Diagnostiquez 5 problèmes différents avec SOS Assistance",
+    icon: "healing",
+    category: "entretien",
     progress: 0,
     maxProgress: 5
   },
@@ -203,19 +203,19 @@ export class BadgeService {
   }
 
   /**
-   * Vérifie et met à jour les badges liés aux analyses de plantes
+   * Vérifie et met à jour les badges liés aux diagnostics SOS
    */
-  public checkAnalysisBadges(userId: number, analysisCount: number): Badge[] {
+  public checkSOSDiagnosticBadges(userId: number, diagnosticCount: number): Badge[] {
     const unlockedBadges: Badge[] = [];
     
     // Badges à vérifier
     const badgesToCheck = [
-      { id: "analysis-1", threshold: 1 },
-      { id: "analysis-5", threshold: 5 }
+      { id: "sos-diagnostic-1", threshold: 1 },
+      { id: "sos-diagnostic-5", threshold: 5 }
     ];
     
     for (const badgeInfo of badgesToCheck) {
-      const updatedBadge = this.updateBadgeProgress(userId, badgeInfo.id, analysisCount);
+      const updatedBadge = this.updateBadgeProgress(userId, badgeInfo.id, diagnosticCount);
       
       if (updatedBadge && updatedBadge.unlocked && updatedBadge.unlockedAt) {
         // Vérifier si le badge vient juste d'être débloqué
