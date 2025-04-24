@@ -93,7 +93,8 @@ export default function ProfileDialog({ open, onOpenChange }: ProfileDialogProps
         </span>
       }
       description="Gérez vos informations personnelles"
-      className="glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg"
+      className="glass-card backdrop-blur-sm border border-primary/20 shadow-xl"
+      showCloseButton={true}
     >
       <Form {...profileForm}>
         <form onSubmit={profileForm.handleSubmit(onSubmitProfileForm)} className="space-y-4 py-2">

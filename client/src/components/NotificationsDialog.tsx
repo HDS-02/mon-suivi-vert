@@ -72,9 +72,14 @@ export default function NotificationsDialog({ open, onOpenChange }: Notification
     <StableDialog
       open={open}
       onOpenChange={onOpenChange}
-      title="Notifications"
+      title={
+        <span className="flex items-center gap-2 text-primary-dark font-raleway text-xl">
+          <span className="material-icons">notifications</span>
+          Notifications
+        </span>
+      }
       description="Restez informé des besoins de vos plantes"
-      className="sm:max-w-md glass-card backdrop-blur-sm border border-gray-100/80 shadow-lg"
+      className="sm:max-w-md glass-card backdrop-blur-sm border border-primary/20 shadow-xl"
       showCloseButton={true}
     >
       {permission !== 'granted' && (
