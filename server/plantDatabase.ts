@@ -3,6 +3,7 @@
  */
 
 import { fruitTrees } from './fruitTreeDatabase';
+import { flowers } from './flowerDatabase';
 
 export type PlantCategory = 'interieur' | 'exterieur' | 'fruitier' | 'fleurs' | 'legumes';
 
@@ -82,6 +83,17 @@ function assignCategories(plants: Omit<PlantEntry, 'category'>[]): PlantEntry[] 
     'pommier', 'prunier', 'pawpaw', 'kaki', 'mandarinier', 'lime', 'satsuma'
   ];
   
+  // Liste des fleurs courantes
+  const fleurNames = [
+    'absinthe', 'abutilon', 'achillée', 'adonis', 'agapanthe', 'alysson', 'amaryllis', 'ancolie', 'anémone',
+    'aster', 'azalée', 'bégonia', 'bleuet', 'camélia', 'capucine', 'chrysanthème', 'clématite', 'cyclamen',
+    'dahlia', 'digitale', 'edelweiss', 'freesia', 'fuchsia', 'giroflée', 'glaïeul', 'glycine', 'hortensia',
+    'iris', 'jacinthe', 'jonquille', 'lilas', 'lys', 'marguerite', 'mimosa', 'myosotis', 'narcisse',
+    'nénuphar', 'œillet', 'orchidée', 'pâquerette', 'pavot', 'pensée', 'perce-neige', 'pervenche',
+    'pétunia', 'phlox', 'pivoine', 'pourpier', 'renoncule', 'rhododendron', 'rose', 'souci',
+    'tournesol', 'tulipe', 'violette', 'zinnia'
+  ];
+  
   return plants.map(plant => {
     let category: PlantCategory = 'interieur';
     
@@ -95,14 +107,19 @@ function assignCategories(plants: Omit<PlantEntry, 'category'>[]): PlantEntry[] 
       plant.name.toLowerCase().includes(fruit.toLowerCase())
     );
     
+    // Vérifier si le nom de la plante contient une des fleurs connues
+    const isFleur = fleurNames.some(fleur => 
+      plant.name.toLowerCase().includes(fleur.toLowerCase())
+    );
+    
     if (isLegume) {
       category = 'legumes';
     }
     else if (isFruitier) {
       category = 'fruitier';
     }
-    // Les plantes fleuries
-    else if (plant.name.toLowerCase().includes('fleur') || 
+    else if (isFleur || 
+            plant.name.toLowerCase().includes('fleur') || 
             plant.name.toLowerCase().includes('orchid') || 
             plant.name.toLowerCase().includes('rose') || 
             plant.name.toLowerCase().includes('bégonia')) {
@@ -1089,8 +1106,8 @@ const plantsWithoutCategories = [
   },
 ];
 
-// Combinons les plantes de légumes avec les arbres fruitiers
-const allPlantsWithoutCategories = [...plantsWithoutCategories, ...fruitTrees];
+// Combinons les plantes de légumes avec les arbres fruitiers et les fleurs
+const allPlantsWithoutCategories = [...plantsWithoutCategories, ...fruitTrees, ...flowers];
 
 // Application de la fonction pour assigner les catégories
 export const plantDatabase: PlantEntry[] = assignCategories(allPlantsWithoutCategories);
