@@ -1,7 +1,8 @@
-import { useState, useEffect } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
+import React, { useEffect, useState } from 'react';
+import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 
+// Interface pour les données météo
 interface WeatherData {
   temperature: number;
   humidity: number;
@@ -17,69 +18,45 @@ interface WeatherData {
   };
 }
 
-// Données météo simulées pour le mode hors ligne ou quand l'API n'est pas disponible
-const mockWeatherData: WeatherData = {
-  temperature: 22,
-  humidity: 65,
-  description: "Partiellement nuageux",
-  icon: "partly_cloudy",
-  location: "Paris, France",
-  recommendations: [
-    "Température idéale pour la plupart des plantes d'intérieur",
-    "Humidité adéquate, vos plantes devraient être confortables",
-    "Aucune action spécifique nécessaire aujourd'hui"
-  ],
-  forecast: {
-    temperature: 24,
-    humidity: 60,
-    description: "Ensoleillé",
-    icon: "clear_day"
-  }
-};
-
-// Convertir l'icône météo en icône material
-function getWeatherIcon(iconCode: string): string {
-  const iconMap: Record<string, string> = {
-    "clear_day": "wb_sunny",
-    "clear_night": "nights_stay",
-    "cloudy": "cloud",
-    "partly_cloudy": "cloud_queue",
-    "rainy": "water_drop",
-    "thunderstorm": "thunderstorm",
-    "snowy": "ac_unit",
-    "foggy": "cloud",
-    "windy": "air"
-  };
-
-  return iconMap[iconCode] || "help_outline";
-}
-
-// Générer des recommandations basées sur les conditions météo
+// Conseils d'entretien basés sur les conditions météorologiques
 function generateRecommendations(temperature: number, humidity: number): string[] {
   const recommendations: string[] = [];
-
+  
   // Recommandations basées sur la température
-  if (temperature > 30) {
-    recommendations.push("Température élevée : arrosez vos plantes plus fréquemment");
-    recommendations.push("Éloignez les plantes sensibles des fenêtres exposées au soleil");
-  } else if (temperature < 10) {
-    recommendations.push("Température basse : évitez d'arroser excessivement");
-    recommendations.push("Éloignez les plantes tropicales des sources d'air froid");
+  if (temperature > 28) {
+    recommendations.push("Arrosez vos plantes plus fréquemment à cause de la chaleur.");
+    recommendations.push("Placez vos plantes d'intérieur à l'abri du soleil direct.");
+  } else if (temperature > 22) {
+    recommendations.push("Température idéale pour la plupart des plantes. Surveillez l'humidité.");
+  } else if (temperature > 15) {
+    recommendations.push("Conditions de croissance favorables. Arrosage modéré recommandé.");
+  } else if (temperature > 10) {
+    recommendations.push("Réduisez l'arrosage, les plantes ont besoin de moins d'eau.");
   } else {
-    recommendations.push("Température idéale pour la plupart des plantes d'intérieur");
+    recommendations.push("Protégez vos plantes sensibles du froid.");
+    recommendations.push("Évitez d'arroser en fin de journée pour prévenir le gel des racines.");
   }
-
+  
   // Recommandations basées sur l'humidité
-  if (humidity < 40) {
-    recommendations.push("Humidité basse : vaporisez vos plantes ou utilisez un humidificateur");
-  } else if (humidity > 80) {
-    recommendations.push("Humidité élevée : réduisez la fréquence d'arrosage");
-    recommendations.push("Vérifiez les signes de moisissure sur les plantes sensibles");
-  } else {
-    recommendations.push("Niveau d'humidité favorable pour vos plantes");
+  if (humidity > 70) {
+    recommendations.push("Humidité élevée: attention aux maladies fongiques.");
+    recommendations.push("Assurez une bonne circulation d'air autour de vos plantes.");
+  } else if (humidity < 40) {
+    recommendations.push("Air sec: brumisez vos plantes d'intérieur régulièrement.");
   }
-
+  
   return recommendations;
+}
+
+// Associer les codes météo aux icônes Material Icons
+function getWeatherIcon(iconCode: string): string {
+  switch (iconCode) {
+    case 'clear_day': return 'wb_sunny';
+    case 'partly_cloudy': return 'partly_cloudy_day';
+    case 'cloudy': return 'cloud';
+    case 'rainy': return 'water_drop';
+    default: return 'wb_cloudy';
+  }
 }
 
 export default function WeatherWidget() {
@@ -87,12 +64,11 @@ export default function WeatherWidget() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // État pour la géolocalisation persistante
+  // État pour la géolocalisation
   useEffect(() => {
     // Forcer l'utilisation de la géolocalisation à chaque chargement
     localStorage.removeItem('userLocation');
-    // Vérifier si nous avons déjà des coordonnées en localStorage après la suppression (devrait être null)
-    const savedLocation = localStorage.getItem('userLocation');
+    
     // Définir la durée de cache à 1 jour
     const ONE_DAY_MS = 24 * 60 * 60 * 1000; // Un jour en millisecondes
     
@@ -101,7 +77,7 @@ export default function WeatherWidget() {
         setLoading(true);
         setError(null);
         
-        // Récupération de la position géographique de l'utilisateur avec durée de cache plus longue
+        // Récupération de la position géographique de l'utilisateur
         const getLocation = () => {
           return new Promise<GeolocationPosition>((resolve, reject) => {
             if (!navigator.geolocation) {
@@ -120,92 +96,69 @@ export default function WeatherWidget() {
         // Localisation par défaut
         let location = "Paris, France";
         
-        // Utiliser les données sauvegardées si disponibles et pas trop anciennes
-        if (savedLocation) {
-          try {
-            const parsedLocation = JSON.parse(savedLocation);
-            const savedTime = parsedLocation.timestamp || 0;
-            const isExpired = Date.now() - savedTime > ONE_DAY_MS;
-            
-            if (!isExpired) {
-              // Utiliser la localisation en cache
-              location = parsedLocation.name;
-              console.log("Utilisation de la localisation en cache:", location);
-            } else {
-              // Les données sont trop anciennes, on essaie d'obtenir de nouvelles données
-              throw new Error("Les données de localisation sont expirées");
-            }
-          } catch (e) {
-            console.log("Mise à jour des données de localisation...");
-            
-            // Fonction pour déterminer la ville approximative basée sur les coordonnées
-            const getNearestCity = (lat: number, lon: number): string => {
-              // Coordonnées approximatives de quelques villes françaises
-              const cities = [
-                { name: "Paris", lat: 48.86, lon: 2.35 },
-                { name: "Lyon", lat: 45.75, lon: 4.85 },
-                { name: "Marseille", lat: 43.30, lon: 5.37 },
-                { name: "Lille", lat: 50.63, lon: 3.07 },
-                { name: "Bordeaux", lat: 44.84, lon: -0.58 },
-                { name: "Toulouse", lat: 43.60, lon: 1.44 },
-                { name: "Strasbourg", lat: 48.58, lon: 7.75 },
-                { name: "Nice", lat: 43.70, lon: 7.27 },
-                { name: "Nantes", lat: 47.22, lon: -1.55 },
-                { name: "Rennes", lat: 48.11, lon: -1.68 },
-                { name: "Montpellier", lat: 43.61, lon: 3.87 },
-                { name: "Grenoble", lat: 45.19, lon: 5.72 },
-                { name: "Dijon", lat: 47.32, lon: 5.04 },
-              ];
-              
-              // Calculer la distance par rapport à chaque ville
-              const cityWithDistance = cities.map(city => {
-                const latDiff = city.lat - lat;
-                const lonDiff = city.lon - lon;
-                const distance = Math.sqrt(latDiff * latDiff + lonDiff * lonDiff);
-                return { ...city, distance };
-              });
-              
-              // Trouver la ville la plus proche
-              const nearestCity = cityWithDistance.reduce((prev, curr) => 
-                prev.distance < curr.distance ? prev : curr
-              );
-              
-              return `${nearestCity.name}, France`;
-            };
-            
-            try {
-              // Essayer d'obtenir la position actuelle
-              const position = await getLocation();
-              const coords = {
-                latitude: position.coords.latitude,
-                longitude: position.coords.longitude
-              };
-              
-              location = getNearestCity(coords.latitude, coords.longitude);
-              
-              // Sauvegarder la localisation avec une durée de vie plus longue
-              localStorage.setItem('userLocation', JSON.stringify({
-                coords,
-                name: location,
-                timestamp: Date.now()
-              }));
-              
-              console.log("Localisation mise à jour:", location);
-            } catch (locError) {
-              console.log("Impossible d'obtenir la position, utilisation de Paris par défaut");
-              // On continue avec la localisation par défaut
-            }
-          }
-        } else {
-          // Aucune donnée en cache, utilisation d'une ville par défaut pour éviter trop de demandes d'autorisation
-          console.log("Première utilisation, localisation par défaut");
+        console.log("Demande d'accès à la géolocalisation...");
+        
+        // Fonction pour déterminer la ville approximative basée sur les coordonnées
+        const getNearestCity = (lat: number, lon: number): string => {
+          // Coordonnées approximatives de nombreuses villes françaises pour plus de précision
+          const cities = [
+            { name: "Paris", lat: 48.86, lon: 2.35 },
+            { name: "Lyon", lat: 45.75, lon: 4.85 },
+            { name: "Marseille", lat: 43.30, lon: 5.37 },
+            { name: "Lille", lat: 50.63, lon: 3.07 },
+            { name: "Bordeaux", lat: 44.84, lon: -0.58 },
+            { name: "Toulouse", lat: 43.60, lon: 1.44 },
+            { name: "Strasbourg", lat: 48.58, lon: 7.75 },
+            { name: "Nice", lat: 43.70, lon: 7.27 },
+            { name: "Nantes", lat: 47.22, lon: -1.55 },
+            { name: "Rennes", lat: 48.11, lon: -1.68 },
+            { name: "Montpellier", lat: 43.61, lon: 3.87 },
+            { name: "Grenoble", lat: 45.19, lon: 5.72 },
+            { name: "Dijon", lat: 47.32, lon: 5.04 },
+            { name: "Angers", lat: 47.47, lon: -0.55 },
+            { name: "Reims", lat: 49.26, lon: 4.03 },
+            { name: "Le Havre", lat: 49.49, lon: 0.11 },
+            { name: "Saint-Étienne", lat: 45.44, lon: 4.39 },
+            { name: "Toulon", lat: 43.12, lon: 5.93 },
+            { name: "Annecy", lat: 45.90, lon: 6.12 },
+            { name: "Brest", lat: 48.39, lon: -4.49 },
+            { name: "Le Mans", lat: 48.00, lon: 0.20 },
+            { name: "Amiens", lat: 49.89, lon: 2.30 },
+            { name: "Tours", lat: 47.39, lon: 0.69 },
+            { name: "Limoges", lat: 45.83, lon: 1.26 },
+            { name: "Clermont-Ferrand", lat: 45.78, lon: 3.08 },
+            { name: "Besançon", lat: 47.24, lon: 6.02 },
+          ];
           
-          // Sauvegarder la localisation par défaut pour éviter de demander systématiquement
-          localStorage.setItem('userLocation', JSON.stringify({
-            coords: { latitude: 48.86, longitude: 2.35 },
-            name: location,
-            timestamp: Date.now()
-          }));
+          // Calculer la distance par rapport à chaque ville
+          const cityWithDistance = cities.map(city => {
+            const latDiff = city.lat - lat;
+            const lonDiff = city.lon - lon;
+            const distance = Math.sqrt(latDiff * latDiff + lonDiff * lonDiff);
+            return { ...city, distance };
+          });
+          
+          // Trouver la ville la plus proche
+          const nearestCity = cityWithDistance.reduce((prev, curr) => 
+            prev.distance < curr.distance ? prev : curr
+          );
+          
+          return `${nearestCity.name}, France`;
+        };
+        
+        try {
+          // Essayer d'obtenir la position actuelle
+          const position = await getLocation();
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          
+          location = getNearestCity(coords.latitude, coords.longitude);
+          console.log("Localisation mise à jour:", location);
+        } catch (locError) {
+          console.log("Impossible d'obtenir la position, utilisation de Paris par défaut");
+          // On continue avec la localisation par défaut de Paris
         }
         
         // Simulation de données météo pour une expérience utilisateur fiable
@@ -294,7 +247,7 @@ export default function WeatherWidget() {
             icon,
             description,
             location,
-            recommendations: [],
+            recommendations: generateRecommendations(temperature, humidity),
             forecast: {
               temperature: forecastTemperature,
               humidity: forecastHumidity,
@@ -314,17 +267,6 @@ export default function WeatherWidget() {
 
     fetchWeatherData();
   }, []);
-
-  // Générer des recommandations basées sur les données météo
-  useEffect(() => {
-    if (weatherData) {
-      const recommendations = generateRecommendations(
-        weatherData.temperature,
-        weatherData.humidity
-      );
-      setWeatherData(prev => prev ? { ...prev, recommendations } : null);
-    }
-  }, [weatherData?.temperature, weatherData?.humidity]);
 
   if (error) {
     return (
@@ -409,40 +351,43 @@ export default function WeatherWidget() {
                   Prévisions pour demain
                 </h4>
                 <div className="flex items-center justify-center gap-6">
-                  <div className="flex flex-col items-center">
-                    <span className="material-icons text-3xl text-blue-400">
-                      {getWeatherIcon(weatherData.forecast.icon)}
-                    </span>
-                    <span className="text-sm text-gray-600 mt-1">{weatherData.forecast.description}</span>
+                  <div className="text-center">
+                    <div className="bg-blue-50 rounded-full p-2 mb-1 inline-block">
+                      <span className="material-icons text-blue-500">
+                        {getWeatherIcon(weatherData.forecast.icon)}
+                      </span>
+                    </div>
+                    <div className="text-sm text-gray-500">{weatherData.forecast.description}</div>
                   </div>
-                  <div className="flex gap-4">
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500">Temp.</div>
-                      <div className="text-lg font-medium">{weatherData.forecast.temperature}°C</div>
-                    </div>
-                    <div className="text-center">
-                      <div className="text-xs text-gray-500">Hum.</div>
-                      <div className="text-lg font-medium">{weatherData.forecast.humidity}%</div>
-                    </div>
+                  <div className="text-center">
+                    <div className="text-sm text-gray-500 mb-1">Température</div>
+                    <div className="text-lg font-medium">{weatherData.forecast.temperature}°C</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-sm text-gray-500 mb-1">Humidité</div>
+                    <div className="text-lg font-medium">{weatherData.forecast.humidity}%</div>
                   </div>
                 </div>
               </div>
             )}
-
-            <div className="mt-3 bg-blue-50/50 p-4 rounded-lg">
-              <h4 className="font-medium mb-3 text-blue-700 flex items-center">
-                <span className="material-icons mr-2 text-sm">tips_and_updates</span>
-                Conseils d'entretien
-              </h4>
-              <ul className="space-y-2">
-                {weatherData.recommendations.map((recommendation, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="material-icons text-green-500 mr-2 text-sm">eco</span>
-                    <span className="text-sm text-gray-700">{recommendation}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            
+            {/* Recommandations */}
+            {weatherData.recommendations && weatherData.recommendations.length > 0 && (
+              <div className="mt-4">
+                <h4 className="font-medium mb-2 text-blue-700 flex items-center">
+                  <span className="material-icons mr-2 text-sm">tips_and_updates</span>
+                  Conseils d'entretien
+                </h4>
+                <ul className="space-y-2">
+                  {weatherData.recommendations.map((recommendation, index) => (
+                    <li key={index} className="text-sm text-gray-600 flex items-start">
+                      <span className="material-icons text-green-500 text-sm mr-2 mt-0.5">eco</span>
+                      {recommendation}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
         ) : null}
       </CardContent>
