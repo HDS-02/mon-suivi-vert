@@ -6,7 +6,15 @@ import { X } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 
-const Dialog = DialogPrimitive.Root
+// Composant Dialog modifié pour empêcher la fermeture automatique
+const Dialog = ({ children, ...props }: DialogPrimitive.DialogProps) => {
+  // Force modal à true, ce qui empêche l'interaction avec le contenu en arrière-plan
+  return (
+    <DialogPrimitive.Root modal={true} {...props}>
+      {children}
+    </DialogPrimitive.Root>
+  );
+}
 
 const DialogTrigger = DialogPrimitive.Trigger
 
@@ -34,30 +42,21 @@ const DialogContent = React.forwardRef<
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
 >(({ className, children, ...props }, ref) => (
   <DialogPortal>
-    <DialogOverlay onClick={(e) => e.stopPropagation()} />
+    <DialogOverlay onClick={e => e.stopPropagation()} />
     <DialogPrimitive.Content
       ref={ref}
-      onClick={(e) => e.stopPropagation()}
-      onPointerDownOutside={(e) => {
-        // Empêcher la fermeture complètement
-        e.preventDefault();
-      }}
-      onInteractOutside={(e) => {
-        // Empêcher toute interaction à l'extérieur qui pourrait fermer le dialogue
-        e.preventDefault();
-      }}
       className={cn(
         "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
         className
       )}
+      // Désactiver tous les événements qui pourraient fermer le dialogue
+      onPointerDownOutside={e => e.preventDefault()}
+      onInteractOutside={e => e.preventDefault()}
+      onEscapeKeyDown={e => e.preventDefault()}
+      onClick={e => e.stopPropagation()}
       {...props}
     >
       {children}
-      {/* Masqué pour éviter la fermeture automatique */}
-      {/* <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close> */}
     </DialogPrimitive.Content>
   </DialogPortal>
 ))
