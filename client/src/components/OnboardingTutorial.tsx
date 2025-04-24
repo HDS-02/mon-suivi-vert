@@ -3,13 +3,16 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from "@/components/ui/button";
 import { useToast } from '@/hooks/use-toast';
 import { useLocalStorage } from '@/hooks/use-local-storage';
+import PlantGrowth from './animations/PlantGrowth';
+import BadgeAchievement from './animations/BadgeAchievement';
+import PlantDiagnostic from './animations/PlantDiagnostic';
 
 interface OnboardingStep {
   id: number;
   title: string;
   description: string;
   icon: string;
-  illustration: string;
+  animation: React.ReactNode;
   color: string;
   position?: 'center' | 'left' | 'right';
 }
@@ -20,7 +23,13 @@ const steps: OnboardingStep[] = [
     title: "Bienvenue sur Mon Suivi Vert !",
     description: "Suivez la santé de vos plantes et obtenez des conseils personnalisés pour les aider à s'épanouir.",
     icon: "eco",
-    illustration: "🌱",
+    animation: <motion.div 
+      animate={{ rotate: [0, 10, -10, 0] }}
+      transition={{ duration: 2, repeat: Infinity }}
+      className="text-8xl"
+    >
+      🌱
+    </motion.div>,
     color: "from-green-400 to-emerald-600",
     position: "center"
   },
@@ -29,7 +38,17 @@ const steps: OnboardingStep[] = [
     title: "Ajoutez vos plantes",
     description: "Créez votre collection personnelle en ajoutant vos plantes avec leur nom, espèce et photo.",
     icon: "add_circle",
-    illustration: "🪴",
+    animation: <div className="relative w-32 h-32">
+      <PlantGrowth />
+      <motion.div 
+        className="absolute -top-3 -right-3 bg-primary text-white rounded-full w-8 h-8 flex items-center justify-center"
+        initial={{ scale: 0 }}
+        animate={{ scale: [0, 1.2, 1] }}
+        transition={{ delay: 1, duration: 0.5 }}
+      >
+        <span className="material-icons text-base">add</span>
+      </motion.div>
+    </div>,
     color: "from-blue-400 to-indigo-600",
     position: "left"
   },
@@ -38,7 +57,46 @@ const steps: OnboardingStep[] = [
     title: "Suivez leur entretien",
     description: "Recevez des rappels personnalisés pour l'arrosage et autres soins en fonction de chaque espèce.",
     icon: "water_drop",
-    illustration: "💧",
+    animation: <div className="w-32 h-32 flex items-center justify-center">
+      <motion.div 
+        className="relative"
+        animate={{ y: [0, -5, 0] }}
+        transition={{ duration: 2, repeat: Infinity }}
+      >
+        <motion.div className="text-6xl">🪴</motion.div>
+        <motion.div 
+          className="absolute -top-4 -right-4 text-4xl"
+          animate={{ 
+            y: [0, 15, 20],
+            opacity: [1, 1, 0],
+            scale: [1, 0.8, 0.6]
+          }}
+          transition={{ 
+            duration: 1.5, 
+            repeat: Infinity,
+            repeatDelay: 1
+          }}
+        >
+          💧
+        </motion.div>
+        <motion.div 
+          className="absolute -top-1 right-2 text-3xl"
+          animate={{ 
+            y: [0, 18, 25],
+            opacity: [1, 1, 0],
+            scale: [1, 0.8, 0.6]
+          }}
+          transition={{ 
+            duration: 2, 
+            repeat: Infinity,
+            delay: 0.5,
+            repeatDelay: 1
+          }}
+        >
+          💧
+        </motion.div>
+      </motion.div>
+    </div>,
     color: "from-cyan-400 to-sky-600",
     position: "right"
   },
@@ -47,7 +105,9 @@ const steps: OnboardingStep[] = [
     title: "Besoin d'aide ?",
     description: "Utilisez le bouton SOS pour diagnostiquer les problèmes de vos plantes et obtenir des conseils immédiats.",
     icon: "emergency",
-    illustration: "🔍",
+    animation: <div className="w-32 h-32 flex items-center justify-center">
+      <PlantDiagnostic />
+    </div>,
     color: "from-orange-400 to-red-600",
     position: "left"
   },
@@ -56,7 +116,9 @@ const steps: OnboardingStep[] = [
     title: "Débloquez des badges",
     description: "Collectionnez des badges en prenant soin de vos plantes et en utilisant les fonctionnalités de l'application.",
     icon: "emoji_events",
-    illustration: "🏆",
+    animation: <div className="w-32 h-32 flex items-center justify-center">
+      <BadgeAchievement />
+    </div>,
     color: "from-yellow-400 to-amber-600",
     position: "right"
   }
@@ -136,28 +198,17 @@ export default function OnboardingTutorial() {
               <p className="text-white/90">{steps[currentStep].description}</p>
             </div>
             
-            {/* Illustration animée */}
+            {/* Animation */}
             <motion.div 
-              className="absolute text-6xl"
+              className="absolute"
               style={{
                 [steps[currentStep].position === 'left' ? 'left' : 'right']: steps[currentStep].position === 'center' ? '50%' : '1rem',
-                top: steps[currentStep].position === 'center' ? '50%' : 'auto',
-                bottom: steps[currentStep].position !== 'center' ? '1rem' : 'auto',
-                opacity: 0.25,
-                transform: steps[currentStep].position === 'center' ? 'translate(-50%, -50%)' : 'none',
-              }}
-              animate={{ 
-                y: [0, -10, 0],
-                rotate: [0, 5, 0],
-                scale: [1, 1.1, 1]
-              }}
-              transition={{ 
-                duration: 3, 
-                repeat: Infinity,
-                ease: "easeInOut"
+                top: steps[currentStep].position === 'center' ? '50%' : '50%',
+                transform: steps[currentStep].position === 'center' ? 'translate(-50%, -50%)' : 'translateY(-50%)',
+                zIndex: 2
               }}
             >
-              {steps[currentStep].illustration}
+              {steps[currentStep].animation}
             </motion.div>
           </div>
 
