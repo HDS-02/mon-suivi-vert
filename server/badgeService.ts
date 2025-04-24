@@ -106,6 +106,13 @@ const userBadges: Map<number, Badge[]> = new Map();
 
 export class BadgeService {
   /**
+   * Vérifie et met à jour les badges liés aux analyses de plantes
+   */
+  public checkAnalysisBadges(userId: number, analysisCount: number): Badge[] {
+    // Rediriger vers la méthode SOS diagnostic car nous avons remplacé les analyses par les diagnostics
+    return this.checkSOSDiagnosticBadges(userId, analysisCount);
+  }
+  /**
    * Récupère les badges d'un utilisateur
    */
   public getBadgesByUserId(userId: number): Badge[] {
