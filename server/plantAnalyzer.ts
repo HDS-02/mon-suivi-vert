@@ -236,6 +236,60 @@ export class PlantAnalyzer {
         { symptom: "feuillage clairsemé", cause: "manque de soleil", severity: "warning" },
         { symptom: "pourriture du pied", cause: "mauvais drainage", severity: "danger" }
       ]
+    },
+    {
+      id: "rosier",
+      name: "Rosier",
+      commonTypes: ["Rosa", "Rosa gallica", "Rosa chinensis", "Rose de jardin"],
+      keywords: ["rose", "rosier", "roses", "épines", "fleurs roses", "boutons", "roseraie"],
+      careInstructions: {
+        watering: "Arrosez régulièrement mais sans excès, au pied de la plante et non sur le feuillage. 2-3 fois par semaine en été.",
+        light: "Plein soleil, minimum 6 heures par jour pour une floraison optimale.",
+        temperature: "10-30°C. Protection hivernale recommandée pour les variétés sensibles.",
+        additional: ["Taille annuelle en fin d'hiver", "Fertilisation régulière pendant la saison de croissance", "Paillis recommandé au pied"]
+      },
+      commonIssues: [
+        { symptom: "taches noires sur les feuilles", cause: "maladie fongique", severity: "warning" },
+        { symptom: "feuilles jaunissantes", cause: "chlorose ferrique ou excès d'eau", severity: "warning" },
+        { symptom: "pucerons", cause: "infestation d'insectes", severity: "warning" },
+        { symptom: "oïdium (poudre blanche)", cause: "maladie fongique", severity: "danger" }
+      ]
+    },
+    {
+      id: "basilic",
+      name: "Basilic",
+      commonTypes: ["Ocimum basilicum", "Basilic grand vert", "Basilic pourpre"],
+      keywords: ["basilic", "herbe aromatique", "cuisine", "méditerranéen", "feuilles vertes", "plante condimentaire"],
+      careInstructions: {
+        watering: "Arrosez régulièrement pour maintenir le sol légèrement humide. Évitez de mouiller les feuilles.",
+        light: "Soleil à mi-ombre. Évitez l'exposition directe aux rayons brûlants en été.",
+        temperature: "15-30°C. Craint le froid en dessous de 10°C.",
+        additional: ["Pincez régulièrement les sommités pour favoriser la ramification", "Récoltez les feuilles du haut pour stimuler la croissance"]
+      },
+      commonIssues: [
+        { symptom: "jaunissement des feuilles", cause: "arrosage excessif", severity: "warning" },
+        { symptom: "feuilles qui noircissent", cause: "températures trop basses", severity: "warning" },
+        { symptom: "tiges allongées", cause: "manque de luminosité", severity: "warning" },
+        { symptom: "taches brunes", cause: "maladie fongique due à l'excès d'humidité", severity: "danger" }
+      ]
+    },
+    {
+      id: "bonsai",
+      name: "Bonsaï",
+      commonTypes: ["Ficus bonsaï", "Carmona", "Pinus", "Juniperus"],
+      keywords: ["bonsaï", "miniature", "japonais", "zen", "taillé", "art", "nain"],
+      careInstructions: {
+        watering: "Arrosez quand la surface du substrat commence à sécher. Fréquence variable selon l'espèce.",
+        light: "Lumière vive indirecte, certaines espèces supportent le plein soleil.",
+        temperature: "15-25°C. Protection contre les variations extrêmes.",
+        additional: ["Taille régulière pour maintenir la forme", "Rempotage tous les 2-3 ans", "Fertilisation spécifique en période de croissance"]
+      },
+      commonIssues: [
+        { symptom: "feuilles jaunissantes", cause: "arrosage inadapté", severity: "warning" },
+        { symptom: "perte de feuilles", cause: "stress ou changement d'environnement", severity: "warning" },
+        { symptom: "signes de dessèchement", cause: "manque d'humidité ambiante", severity: "warning" },
+        { symptom: "branches mourantes", cause: "taille excessive ou maladie", severity: "danger" }
+      ]
     }
   ];
 
@@ -245,34 +299,68 @@ export class PlantAnalyzer {
    * @returns Analyse de la plante
    */
   public analyzeByDescription(description: string): PlantAnalysisResponse {
-    // Convertir en minuscules pour faciliter la comparaison
-    const lowerDesc = description.toLowerCase();
+    if (!description || description.trim().length === 0) {
+      return this.getGenericAnalysis();
+    }
     
-    // Trouver la meilleure correspondance dans notre base de données
+    // Convertir en minuscules pour faciliter la comparaison
+    const lowerDesc = description.toLowerCase().trim();
+    
+    // Vérifier d'abord les correspondances exactes pour un traitement prioritaire
+    for (const plant of this.plantDatabase) {
+      // Correspondance exacte avec le nom de la plante
+      if (lowerDesc === plant.name.toLowerCase()) {
+        console.log(`Correspondance exacte trouvée pour: ${plant.name}`);
+        return this.generateAnalysisFromPlantData(plant);
+      }
+      
+      // Correspondance exacte avec l'un des types communs
+      for (const type of plant.commonTypes) {
+        if (lowerDesc === type.toLowerCase()) {
+          console.log(`Correspondance exacte trouvée pour le type: ${type}`);
+          return this.generateAnalysisFromPlantData(plant);
+        }
+      }
+    }
+    
+    // Si aucune correspondance exacte, rechercher des correspondances partielles
     let bestMatch: PlantData | null = null;
     let highestScore = 0;
     
     for (const plant of this.plantDatabase) {
       let score = 0;
       
-      // Vérifier si le nom est mentionné
-      if (lowerDesc.includes(plant.name.toLowerCase())) {
-        score += 5;
+      // Vérifier si le nom est contenu dans la description (ou vice versa)
+      if (lowerDesc.includes(plant.name.toLowerCase()) || plant.name.toLowerCase().includes(lowerDesc)) {
+        score += 8;
       }
       
-      // Vérifier les types communs
+      // Vérifier si un des types est contenu dans la description (ou vice versa)
       for (const type of plant.commonTypes) {
-        if (lowerDesc.includes(type.toLowerCase())) {
-          score += 4;
+        const lowerType = type.toLowerCase();
+        if (lowerDesc.includes(lowerType) || lowerType.includes(lowerDesc)) {
+          score += 6;
           break;
         }
       }
       
       // Vérifier les mots-clés
+      let keywordMatches = 0;
       for (const keyword of plant.keywords) {
         if (lowerDesc.includes(keyword.toLowerCase())) {
+          keywordMatches++;
           score += 1;
         }
+        
+        // Si la recherche est exactement un des mots-clés
+        if (lowerDesc === keyword.toLowerCase()) {
+          score += 5;
+        }
+      }
+      
+      // Bonus pour les correspondances multiples de mots-clés
+      if (keywordMatches >= 2) {
+        score += 3;
       }
       
       if (score > highestScore) {
@@ -281,8 +369,12 @@ export class PlantAnalyzer {
       }
     }
     
-    // Si aucune correspondance n'est trouvée, utiliser une analyse générique
+    // Debug info
+    console.log(`Meilleur score pour "${description}": ${highestScore}${bestMatch ? ' - ' + bestMatch.name : ''}`);
+    
+    // Si aucune correspondance convaincante n'est trouvée, utiliser une analyse générique
     if (!bestMatch || highestScore < 2) {
+      console.log(`Aucune correspondance trouvée pour "${description}". Utilisation de l'analyse générique.`);
       return this.getGenericAnalysis();
     }
     

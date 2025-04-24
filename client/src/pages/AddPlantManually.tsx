@@ -276,20 +276,20 @@ export default function AddPlantManually() {
   };
   
   return (
-    <div className="organic-bg min-h-screen">
-      <div className="mb-6 px-4 pt-6">
+    <div className="organic-bg min-h-screen pb-20">
+      <div className="gradient-header bg-gradient-to-br from-primary/90 to-primary-light/90 text-white px-4 pt-6 pb-8 mb-6 shadow-md">
         <button 
-          className="flex items-center text-primary mb-4 hover:text-primary-foreground transition-colors"
-          onClick={() => navigate("/analyze")}
+          className="flex items-center text-white/90 mb-4 hover:text-white transition-colors"
+          onClick={() => navigate("/")}
         >
           <span className="material-icons mr-1">arrow_back</span>
           Retour
         </button>
-        <h2 className="text-2xl font-raleway font-semibold text-primary">Ajouter une plante</h2>
-        <p className="text-gray-600">Recherchez une plante par son nom pour remplir automatiquement ses informations</p>
+        <h2 className="text-2xl font-raleway font-semibold">Ajouter une plante</h2>
+        <p className="text-white/80 mt-1">Entrez le nom de votre plante pour remplir automatiquement les informations d'entretien</p>
       </div>
       
-      <Card className="glass-card backdrop-blur-sm mx-4 mb-8">
+      <Card className="glass-card backdrop-blur-sm mx-4 mb-8 border border-gray-100/80 shadow-lg">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
