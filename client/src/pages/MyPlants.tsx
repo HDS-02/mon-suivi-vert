@@ -94,9 +94,13 @@ export default function MyPlants() {
                 <div className="h-36 bg-gray-100/50 relative">
                   {plant.image ? (
                     <img 
-                      src={plant.image} 
+                      src={plant.image.startsWith('http') ? plant.image : `${plant.image}`}
                       alt={plant.name} 
-                      className="w-full h-full object-cover" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        e.currentTarget.src = '/placeholder-plant.jpg';
+                        console.error("Erreur de chargement d'image:", plant.image);
+                      }}
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-primary/5 to-primary-light/5">

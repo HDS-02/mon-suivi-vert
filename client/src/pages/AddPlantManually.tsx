@@ -15,6 +15,7 @@ import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, Command
 import PlantAutocomplete from "@/components/PlantAutocomplete";
 import PlantCategorySelect, { PlantCategory } from "@/components/PlantCategorySelect";
 import PlantListByCategory, { PlantEntry } from "@/components/PlantListByCategory";
+import useNotifications from "@/hooks/useNotifications";
 
 interface PlantSuggestion {
   name: string;

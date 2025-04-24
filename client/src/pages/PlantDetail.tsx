@@ -111,9 +111,14 @@ export default function PlantDetail() {
             />
           ) : plant.image ? (
             <img
-              src={plant.image}
+              src={plant.image.startsWith('http') ? plant.image : `${plant.image}`}
               alt={plant.name}
               className="w-full h-full object-cover"
+              onError={(e) => {
+                // En cas d'erreur de chargement, afficher une image par défaut ou le fallback
+                e.currentTarget.src = '/placeholder-plant.jpg';
+                console.error("Erreur de chargement d'image:", plant.image);
+              }}
             />
           ) : (
             <div className="w-full h-full flex flex-col items-center justify-center bg-primary/10">
