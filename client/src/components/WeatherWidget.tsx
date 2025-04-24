@@ -79,12 +79,14 @@ export default function WeatherWidget() {
   useEffect(() => {
     // Vérifier si nous avons déjà des coordonnées en localStorage
     const savedLocation = localStorage.getItem('userLocation');
+    const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000; // Une semaine en millisecondes
+    
     const fetchWeatherData = async () => {
       try {
         setLoading(true);
         setError(null);
         
-        // Récupération de la position géographique de l'utilisateur
+        // Récupération de la position géographique de l'utilisateur avec durée de cache plus longue
         const getLocation = () => {
           return new Promise<GeolocationPosition>((resolve, reject) => {
             if (!navigator.geolocation) {
@@ -93,9 +95,9 @@ export default function WeatherWidget() {
             }
             
             navigator.geolocation.getCurrentPosition(resolve, reject, {
-              enableHighAccuracy: true,
-              timeout: 5000,
-              maximumAge: 24 * 60 * 60 * 1000 // 24 heures en millisecondes
+              enableHighAccuracy: false, // Précision standard pour économiser la batterie
+              timeout: 10000, // 10 secondes de timeout
+              maximumAge: ONE_WEEK_MS // Utiliser les données pendant une semaine
             });
           });
         };
@@ -103,24 +105,23 @@ export default function WeatherWidget() {
         // Localisation par défaut
         let location = "Paris, France";
         
-        // Utiliser les données sauvegardées si disponibles, sinon demander la géolocalisation
+        // Utiliser les données sauvegardées si disponibles et pas trop anciennes
         if (savedLocation) {
           try {
             const parsedLocation = JSON.parse(savedLocation);
-            location = parsedLocation.name;
-          } catch (e) {
-            console.error("Erreur de lecture de la localisation sauvegardée:", e);
-          }
-        } else {
-          try {
-            const position = await getLocation();
-            const coords = {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude
-            };
+            const savedTime = parsedLocation.timestamp || 0;
+            const isExpired = Date.now() - savedTime > ONE_WEEK_MS;
             
-            // Dans une application réelle, on appellerait une API de géocodage inverse
-            // Pour simuler, on utilise les coordonnées pour créer un nom de ville fictif
+            if (!isExpired) {
+              // Utiliser la localisation en cache
+              location = parsedLocation.name;
+              console.log("Utilisation de la localisation en cache:", location);
+            } else {
+              // Les données sont trop anciennes, on essaie d'obtenir de nouvelles données
+              throw new Error("Les données de localisation sont expirées");
+            }
+          } catch (e) {
+            console.log("Mise à jour des données de localisation...");
             
             // Fonction pour déterminer la ville approximative basée sur les coordonnées
             const getNearestCity = (lat: number, lon: number): string => {
@@ -135,6 +136,10 @@ export default function WeatherWidget() {
                 { name: "Strasbourg", lat: 48.58, lon: 7.75 },
                 { name: "Nice", lat: 43.70, lon: 7.27 },
                 { name: "Nantes", lat: 47.22, lon: -1.55 },
+                { name: "Rennes", lat: 48.11, lon: -1.68 },
+                { name: "Montpellier", lat: 43.61, lon: 3.87 },
+                { name: "Grenoble", lat: 45.19, lon: 5.72 },
+                { name: "Dijon", lat: 47.32, lon: 5.04 },
               ];
               
               // Calculer la distance par rapport à chaque ville
@@ -153,18 +158,39 @@ export default function WeatherWidget() {
               return `${nearestCity.name}, France`;
             };
             
-            location = getNearestCity(coords.latitude, coords.longitude);
-            
-            // Sauvegarder la localisation
-            localStorage.setItem('userLocation', JSON.stringify({
-              coords,
-              name: location,
-              timestamp: Date.now()
-            }));
-          } catch (locError) {
-            console.error("Erreur de géolocalisation:", locError);
-            // On continue avec la localisation par défaut
+            try {
+              // Essayer d'obtenir la position actuelle
+              const position = await getLocation();
+              const coords = {
+                latitude: position.coords.latitude,
+                longitude: position.coords.longitude
+              };
+              
+              location = getNearestCity(coords.latitude, coords.longitude);
+              
+              // Sauvegarder la localisation avec une durée de vie plus longue
+              localStorage.setItem('userLocation', JSON.stringify({
+                coords,
+                name: location,
+                timestamp: Date.now()
+              }));
+              
+              console.log("Localisation mise à jour:", location);
+            } catch (locError) {
+              console.log("Impossible d'obtenir la position, utilisation de Paris par défaut");
+              // On continue avec la localisation par défaut
+            }
           }
+        } else {
+          // Aucune donnée en cache, utilisation d'une ville par défaut pour éviter trop de demandes d'autorisation
+          console.log("Première utilisation, localisation par défaut");
+          
+          // Sauvegarder la localisation par défaut pour éviter de demander systématiquement
+          localStorage.setItem('userLocation', JSON.stringify({
+            coords: { latitude: 48.86, longitude: 2.35 },
+            name: location,
+            timestamp: Date.now()
+          }));
         }
         
         // Simulation de données météo pour une expérience utilisateur fiable
@@ -314,11 +340,13 @@ export default function WeatherWidget() {
               </div>
             </div>
             
-            <div className="text-center text-gray-600 mb-2 font-medium">{weatherData.description}</div>
+            <div className="text-center text-gray-600 mb-1 font-medium">{weatherData.description}</div>
             
             <div className="flex items-center justify-center mb-4">
-              <span className="material-icons text-gray-500 text-sm mr-1">location_on</span>
-              <span className="text-sm text-gray-500">{weatherData.location}</span>
+              <div className="bg-blue-50 px-3 py-1 rounded-full flex items-center">
+                <span className="material-icons text-blue-500 text-sm mr-1">location_on</span>
+                <span className="text-sm text-blue-600 font-medium">{weatherData.location}</span>
+              </div>
             </div>
             
             <div className="mt-6 bg-blue-50/50 p-4 rounded-lg">
