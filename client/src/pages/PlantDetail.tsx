@@ -30,9 +30,9 @@ export default function PlantDetail() {
     queryKey: [`/api/plants/${id}/analyses`],
   });
 
-  function formatDate(dateString: string | Date | undefined) {
-    if (!dateString) return "";
-    const date = new Date(dateString);
+  function formatDate(dateString: string | Date | null | undefined) {
+    if (!dateString) return "Non défini";
+    const date = dateString instanceof Date ? dateString : new Date(dateString);
     return new Intl.DateTimeFormat('fr-FR', {
       day: 'numeric',
       month: 'long',
@@ -115,8 +115,9 @@ export default function PlantDetail() {
               alt={plant.name}
               className="w-full h-full object-cover"
               onError={(e) => {
-                // En cas d'erreur de chargement, afficher une image par défaut ou le fallback
-                e.currentTarget.src = '/placeholder-plant.jpg';
+                // En cas d'erreur de chargement, utiliser une div avec un icône au lieu d'une image
+                e.currentTarget.style.display = 'none';
+                // Afficher un message d'erreur pour faciliter le débogage
                 console.error("Erreur de chargement d'image:", plant.image);
               }}
             />
@@ -260,6 +261,14 @@ export default function PlantDetail() {
                               src={analysis.image}
                               alt="Image de plante"
                               className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const parent = e.currentTarget.parentElement;
+                                if (parent) {
+                                  parent.innerHTML = '<span class="material-icons text-gray-400 flex items-center justify-center h-full">image_not_supported</span>';
+                                }
+                                console.error("Erreur de chargement d'image:", analysis.image);
+                              }}
                             />
                           </div>
                         </div>
