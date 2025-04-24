@@ -24,6 +24,7 @@ export default function AddPlantManually() {
   const [wateringFrequency, setWateringFrequency] = useState(7);
   const [careNotes, setCareNotes] = useState("");
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoadingPlantInfo, setIsLoadingPlantInfo] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -43,7 +44,15 @@ export default function AddPlantManually() {
   
   // Fonction pour récupérer les informations sur la plante à partir de son nom
   const fetchPlantInfo = async (plantName: string) => {
-    if (!plantName || plantName.trim().length < 3) return;
+    if (!plantName || plantName.trim().length < 3) {
+      toast({
+        description: "Veuillez entrer au moins 3 caractères pour la recherche",
+      });
+      return;
+    }
+    
+    // Indiquer que les informations sont en cours de récupération
+    setIsLoadingPlantInfo(true);
     
     try {
       const response = await fetch(`/api/plant-info?name=${encodeURIComponent(plantName)}`);
@@ -114,9 +123,22 @@ export default function AddPlantManually() {
           }
         }
       }
+      
+      // Afficher un message de succès
+      toast({
+        title: "Informations récupérées",
+        description: "Les informations de la plante ont été automatiquement remplies",
+      });
+      
     } catch (error) {
       console.error("Erreur lors de la récupération des informations sur la plante:", error);
-      // Ne pas afficher d'erreur à l'utilisateur, simplement continuer avec les valeurs par défaut
+      toast({
+        title: "Erreur",
+        description: "Impossible de récupérer les informations pour cette plante",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoadingPlantInfo(false);
     }
   };
 
@@ -287,28 +309,50 @@ export default function AddPlantManually() {
 
               <div>
                 <Label htmlFor="name">Nom de la plante *</Label>
-                <Input
-                  id="name"
-                  value={name}
-                  onChange={(e) => {
-                    const newName = e.target.value;
-                    setName(newName);
-                    
-                    // Lorsque l'utilisateur a saisi au moins 3 caractères et s'arrête de taper,
-                    // récupérer les informations sur la plante après une courte pause
-                    if (newName.trim().length >= 3) {
-                      // Utiliser un délai pour éviter de faire des requêtes à chaque frappe
-                      const timerId = setTimeout(() => {
-                        fetchPlantInfo(newName);
-                      }, 600); // 600ms de délai
-                      
-                      // Nettoyer le timer précédent si l'utilisateur continue à taper
-                      return () => clearTimeout(timerId);
-                    }
-                  }}
-                  placeholder="Ex: Ficus Lyrata"
-                  required
-                />
+                <div className="flex gap-2 items-start">
+                  <div className="flex-1">
+                    <Input
+                      id="name"
+                      value={name}
+                      onChange={(e) => {
+                        const newName = e.target.value;
+                        setName(newName);
+                        
+                        // Lorsque l'utilisateur a saisi au moins 3 caractères et s'arrête de taper,
+                        // récupérer les informations sur la plante après une courte pause
+                        if (newName.trim().length >= 3) {
+                          // Utiliser un délai pour éviter de faire des requêtes à chaque frappe
+                          const timerId = setTimeout(() => {
+                            fetchPlantInfo(newName);
+                          }, 600); // 600ms de délai
+                          
+                          // Nettoyer le timer précédent si l'utilisateur continue à taper
+                          return () => clearTimeout(timerId);
+                        }
+                      }}
+                      placeholder="Ex: Ficus Lyrata"
+                      required
+                    />
+                  </div>
+                  <Button 
+                    type="button" 
+                    variant="outline"
+                    onClick={() => fetchPlantInfo(name)}
+                    disabled={isLoadingPlantInfo || name.trim().length < 3}
+                    className="h-10 px-3"
+                  >
+                    {isLoadingPlantInfo ? (
+                      <span className="material-icons animate-spin text-primary">refresh</span>
+                    ) : (
+                      <span className="material-icons text-primary">search</span>
+                    )}
+                  </Button>
+                </div>
+                {isLoadingPlantInfo && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Recherche des informations sur cette plante...
+                  </p>
+                )}
               </div>
               
               <div>
