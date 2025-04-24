@@ -56,13 +56,29 @@ export const plantCategories: PlantCategoryInfo[] = [
 
 // Fonction pour assigner automatiquement des catégories
 function assignCategories(plants: Omit<PlantEntry, 'category'>[]): PlantEntry[] {
+  // Liste des légumes courants
+  const legumesNames = [
+    'ail', 'artichaut', 'asperge', 'aubergine', 'betterave', 'brocoli', 'carotte', 
+    'chou', 'concombre', 'courgette', 'épinard', 'haricot', 'laitue', 'oignon', 
+    'petits pois', 'poireau', 'poivron', 'pomme de terre', 'radis', 'salade', 
+    'ciboulette', 'courge', 'échalote', 'endive', 'fenouil', 'fève', 'navet', 
+    'persil', 'potiron', 'rhubarbe', 'amarante', 'arachide', 'basilic', 'bette', 
+    'châtaigne', 'chou-rave', 'coriandre', 'cornichon', 'cresson', 'estragon', 
+    'gingembre', 'manioc', 'menthe', 'okra', 'origan', 'oseille', 'patate', 
+    'pissenlit', 'romarin', 'roquette', 'rutabaga', 'thym', 'tomate'
+  ];
+  
   return plants.map(plant => {
     let category: PlantCategory = 'interieur';
     
-    // Par défaut, les tomates sont des légumes
-    if (plant.name.toLowerCase().includes('tomate')) {
+    // Vérifier si le nom de la plante contient un des légumes connus
+    const isLegume = legumesNames.some(legume => 
+      plant.name.toLowerCase().includes(legume.toLowerCase())
+    );
+    
+    if (isLegume) {
       category = 'legumes';
-    } 
+    }
     // Les plantes qui préfèrent la lumière directe sont souvent d'extérieur
     else if (plant.light.toLowerCase().includes('directe') && !plant.name.toLowerCase().includes('éléphant') && !plant.name.toLowerCase().includes('jade')) {
       category = 'exterieur';
