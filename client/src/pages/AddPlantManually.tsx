@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { InsertPlant } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
+import { Loader2 } from "lucide-react";
 
 export default function AddPlantManually() {
   const [, navigate] = useLocation();
@@ -239,20 +240,20 @@ export default function AddPlantManually() {
   };
   
   return (
-    <div>
-      <div className="mb-6">
+    <div className="organic-bg min-h-screen">
+      <div className="mb-6 px-4 pt-6">
         <button 
-          className="flex items-center text-primary mb-4"
+          className="flex items-center text-primary mb-4 hover:text-primary-foreground transition-colors"
           onClick={() => navigate("/analyze")}
         >
           <span className="material-icons mr-1">arrow_back</span>
           Retour
         </button>
-        <h2 className="text-xl font-raleway font-semibold">Ajouter une plante manuellement</h2>
-        <p className="text-gray-600">Entrez les informations de votre plante</p>
+        <h2 className="text-2xl font-raleway font-semibold text-primary">Ajouter une plante</h2>
+        <p className="text-gray-600">Recherchez une plante par son nom pour remplir automatiquement ses informations</p>
       </div>
       
-      <Card className="bg-white rounded-lg shadow-md mb-6">
+      <Card className="glass-card backdrop-blur-sm mx-4 mb-8">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
@@ -331,6 +332,7 @@ export default function AddPlantManually() {
                         }
                       }}
                       placeholder="Ex: Ficus Lyrata"
+                      className="input-glass focus:ring-2 ring-primary/30 transition-all"
                       required
                     />
                   </div>

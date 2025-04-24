@@ -107,3 +107,62 @@
   direction: ltr;
   vertical-align: middle;
 }
+
+/* Effets de transparence et styles modernes */
+.glass-card {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.organic-bg {
+  background-color: hsl(var(--background));
+  background-image: 
+    radial-gradient(at 47% 33%, hsla(123, 46%, 34%, 0.15) 0, transparent 59%), 
+    radial-gradient(at 82% 65%, hsla(122, 43%, 57%, 0.15) 0, transparent 55%);
+}
+
+.form-container {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  padding: 2rem;
+}
+
+.input-glass {
+  background: rgba(255, 255, 255, 0.6) !important;
+  border: 1px solid rgba(255, 255, 255, 0.5) !important;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+}
+
+.input-glass:focus, .input-glass:focus-visible {
+  background: rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 0 0 2px rgba(var(--primary), 0.3) !important;
+}
+
+.btn-gradient {
+  background: linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%);
+  border: none;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.btn-gradient:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+  filter: brightness(1.05);
+}
