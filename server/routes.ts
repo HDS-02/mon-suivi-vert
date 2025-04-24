@@ -20,7 +20,7 @@ const upload = multer({
 });
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), "dist/public/uploads");
+const uploadsDir = path.join(process.cwd(), "uploads");
 if (!fs.existsSync(uploadsDir)) {
   fs.mkdirSync(uploadsDir, { recursive: true });
 }
