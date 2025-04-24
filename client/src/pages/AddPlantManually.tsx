@@ -11,6 +11,7 @@ import { InsertPlant } from "@shared/schema";
 import { apiRequest } from "@/lib/queryClient";
 import { queryClient } from "@/lib/queryClient";
 import { Loader2 } from "lucide-react";
+import { Command, CommandInput, CommandEmpty, CommandGroup, CommandItem, CommandList } from "@/components/ui/command";
 
 export default function AddPlantManually() {
   const [, navigate] = useLocation();
