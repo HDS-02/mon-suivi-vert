@@ -186,7 +186,10 @@ export default function Analyze() {
       });
       
       setShowSaveDialog(false);
-      navigate(`/plants/${plant.id}`);
+      // Ajout d'un court délai pour s'assurer que les données sont bien invalidées
+      setTimeout(() => {
+        navigate(`/plants`);
+      }, 100);
     } catch (error) {
       toast({
         title: "Erreur",

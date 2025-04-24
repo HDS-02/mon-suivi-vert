@@ -47,12 +47,13 @@ export default function MyPlants() {
   return (
     <div>
       <div className="mb-6">
-        <Link href="/">
-          <a className="flex items-center text-primary mb-4">
-            <span className="material-icons mr-1">arrow_back</span>
-            Retour
-          </a>
-        </Link>
+        <button 
+          onClick={() => window.history.back()}
+          className="flex items-center text-primary mb-4"
+        >
+          <span className="material-icons mr-1">arrow_back</span>
+          Retour
+        </button>
         <h2 className="text-xl font-raleway font-semibold">Mes plantes</h2>
         <p className="text-gray-600">Gérez votre collection de plantes</p>
       </div>
@@ -77,8 +78,11 @@ export default function MyPlants() {
       ) : plants && plants.length > 0 ? (
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {plants.map((plant: Plant) => (
-            <Link key={plant.id} href={`/plants/${plant.id}`}>
-              <a className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
+            <div
+              key={plant.id}
+              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow cursor-pointer"
+              onClick={() => window.location.href = `/plants/${plant.id}`}
+            >
                 <div className="h-32 bg-gray-200 relative">
                   {plant.image ? (
                     <img 
@@ -102,16 +106,16 @@ export default function MyPlants() {
                     <span className="text-xs text-gray-500">{getPlantStatusText(plant.status)}</span>
                   </div>
                 </div>
-              </a>
-            </Link>
+            </div>
           ))}
           
-          <Link href="/analyze">
-            <a className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border-2 border-dashed border-gray-300 flex flex-col items-center justify-center h-[120px]">
-              <span className="material-icons text-primary text-3xl mb-2">add</span>
-              <span className="text-sm font-medium text-gray-700">Ajouter une plante</span>
-            </a>
-          </Link>
+          <div
+            className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow border-2 border-dashed border-gray-300 flex flex-col items-center justify-center h-[120px] cursor-pointer"
+            onClick={() => window.location.href = "/analyze"}
+          >
+            <span className="material-icons text-primary text-3xl mb-2">add</span>
+            <span className="text-sm font-medium text-gray-700">Ajouter une plante</span>
+          </div>
         </div>
       ) : (
         <div className="bg-white rounded-lg p-8 text-center">
@@ -120,12 +124,13 @@ export default function MyPlants() {
           </div>
           <h3 className="text-lg font-medium mb-2">Aucune plante</h3>
           <p className="text-gray-500 mb-4">Commencez à ajouter des plantes à votre collection pour les suivre</p>
-          <Link href="/analyze">
-            <a className="bg-primary text-white px-4 py-2 rounded-lg inline-flex items-center">
-              <span className="material-icons mr-2">add</span>
-              Ajouter une plante
-            </a>
-          </Link>
+          <button
+            className="bg-primary text-white px-4 py-2 rounded-lg inline-flex items-center"
+            onClick={() => window.location.href = "/analyze"}
+          >
+            <span className="material-icons mr-2">add</span>
+            Ajouter une plante
+          </button>
         </div>
       )}
     </div>

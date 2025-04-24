@@ -1,4 +1,4 @@
-import type { Express, Request, Response, NextFunction } from "express";
+import express, { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { z } from "zod";
@@ -28,6 +28,10 @@ if (!fs.existsSync(uploadsDir)) {
 export async function registerRoutes(app: Express): Promise<Server> {
   // Setup authentication routes
   setupAuth(app);
+
+  // Serve uploaded files statically
+  app.use('/uploads', express.static(uploadsDir));
+  
   // USER ROUTES
   // Middleware pour vérifier si l'utilisateur est authentifié
   const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
