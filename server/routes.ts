@@ -383,17 +383,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
   
   // SOS ASSISTANCE PLANTE - Endpoint de diagnostic
   app.post("/api/plants/:id/sos-diagnostic", async (req: Request, res: Response) => {
+    console.log("🚨 Endpoint SOS diagnostic appelé pour la plante ID:", req.params.id);
+    console.log("📝 Données reçues:", JSON.stringify(req.body, null, 2));
+    
     try {
       const plantId = parseInt(req.params.id);
       if (isNaN(plantId)) {
+        console.log("❌ ID de plante invalide:", req.params.id);
         return res.status(400).json({ message: "ID de plante invalide" });
       }
       
       // Récupérer les informations de la plante
       const plant = await storage.getPlant(plantId);
       if (!plant) {
+        console.log("❌ Plante non trouvée avec ID:", plantId);
         return res.status(404).json({ message: "Plante non trouvée" });
       }
+      
+      console.log("✅ Plante trouvée:", plant.name);
       
       // Valider les données d'entrée avec Zod
       const diagnosticInputSchema = z.object({
@@ -461,14 +468,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         unlockedBadges: unlockedBadges.length > 0 ? unlockedBadges : undefined
       });
     } catch (error: any) {
-      console.error("Erreur lors du diagnostic SOS:", error);
+      console.error("❌ Erreur lors du diagnostic SOS:", error);
       
       if (error instanceof z.ZodError) {
+        console.log("❌ Erreur de validation Zod:", JSON.stringify(error.errors, null, 2));
         return res.status(400).json({ 
           message: "Données invalides pour le diagnostic", 
           errors: error.errors 
         });
       }
+      
+      console.log("❌ Erreur générale:", error.message);
+      console.log("❌ Stack trace:", error.stack);
       
       res.status(500).json({ 
         message: "Une erreur est survenue lors du diagnostic",

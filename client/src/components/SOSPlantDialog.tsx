@@ -98,14 +98,19 @@ export default function SOSPlantDialog({
   const onSubmit = async (data: SOSDiagnosticFormValues) => {
     try {
       setIsSubmitting(true);
+      console.log("Envoi du diagnostic SOS pour la plante:", plant);
+      console.log("Données formulaire:", data);
 
       // Envoyer les données à l'API
-      const response = await apiRequest("POST", `/api/plants/${plant.id}/sos-diagnostic`, {
+      const payload = {
         ...data,
         plantId: plant.id,
         plantName: plant.name,
         plantSpecies: plant.species,
-      });
+      };
+      console.log("Payload complet:", payload);
+      
+      const response = await apiRequest("POST", `/api/plants/${plant.id}/sos-diagnostic`, payload);
 
       if (!response.ok) {
         throw new Error("Une erreur est survenue lors de l'envoi du diagnostic");
