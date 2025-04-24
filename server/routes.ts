@@ -112,7 +112,72 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   app.post("/api/plants", async (req: Request, res: Response) => {
     try {
-      const validatedData = insertPlantSchema.parse(req.body);
+      let validatedData = insertPlantSchema.parse(req.body);
+      
+      // Ajouter des informations par défaut pour les maladies fréquentes et la taille de pot
+      // si elles ne sont pas déjà définies
+      if (!validatedData.commonDiseases || 
+          (Array.isArray(validatedData.commonDiseases) && validatedData.commonDiseases.length === 0)) {
+        // Maladies communes génériques basées sur le type de plante
+        let commonDiseases;
+        
+        // Vérifier si c'est une plante d'intérieur ou d'extérieur basé sur les termes dans le nom ou l'espèce
+        const isIndoorPlant = validatedData.name.toLowerCase().includes("monstera") ||
+                             validatedData.name.toLowerCase().includes("ficus") ||
+                             validatedData.name.toLowerCase().includes("sansevieria") ||
+                             validatedData.name.toLowerCase().includes("aglaonema") ||
+                             validatedData.name.toLowerCase().includes("yucca") ||
+                             validatedData.name.toLowerCase().includes("palmier") ||
+                             validatedData.light?.toLowerCase().includes("indirecte");
+        
+        const isVegetable = validatedData.name.toLowerCase().includes("tomate") ||
+                           validatedData.name.toLowerCase().includes("carotte") ||
+                           validatedData.name.toLowerCase().includes("chou") ||
+                           validatedData.name.toLowerCase().includes("poivron") ||
+                           validatedData.name.toLowerCase().includes("haricot") ||
+                           validatedData.name.toLowerCase().includes("laitue") ||
+                           validatedData.name.toLowerCase().includes("salade");
+        
+        if (isVegetable) {
+          commonDiseases = [
+            {name: "Mildiou", description: "Maladie fongique qui apparaît par temps humide, formant des taches jaunes à brunes sur les feuilles", treatment: "Favoriser la circulation d'air, éviter d'arroser le feuillage et utiliser un fongicide bio si nécessaire"},
+            {name: "Pucerons", description: "Petits insectes qui se nourrissent de la sève et peuvent transmettre des virus", treatment: "Pulvériser de l'eau savonneuse ou introduire des prédateurs naturels comme les coccinelles"},
+            {name: "Oïdium", description: "Champignon qui forme un duvet blanc sur les feuilles", treatment: "Appliquer une solution de bicarbonate de soude ou un fongicide adapté"}
+          ];
+        } else if (isIndoorPlant) {
+          commonDiseases = [
+            {name: "Cochenilles", description: "Insectes qui forment des amas blancs cotonneux sur les feuilles", treatment: "Nettoyer avec un chiffon imbibé d'alcool à 70° ou utiliser une huile horticole"},
+            {name: "Araignées rouges", description: "Minuscules acariens qui apparaissent en conditions sèches, causant des taches claires sur les feuilles", treatment: "Augmenter l'humidité ambiante et vaporiser régulièrement le feuillage"},
+            {name: "Pourriture des racines", description: "Causée par un arrosage excessif, se manifeste par un jaunissement des feuilles et un pourrissement à la base", treatment: "Réduire l'arrosage et rempoter dans un substrat frais avec un bon drainage"}
+          ];
+        } else {
+          commonDiseases = [
+            {name: "Taches foliaires", description: "Diverses maladies fongiques qui causent des taches sur les feuilles", treatment: "Éliminer les feuilles affectées et éviter de mouiller le feuillage lors de l'arrosage"},
+            {name: "Rouille", description: "Maladie fongique qui forme des pustules orangées sur les feuilles", treatment: "Utiliser un fongicide à base de cuivre et améliorer la circulation d'air"},
+            {name: "Ravageurs divers", description: "Insectes et acariens qui peuvent endommager le feuillage", treatment: "Identifier le ravageur spécifique et traiter avec des méthodes appropriées, de préférence biologiques"}
+          ];
+        }
+        
+        validatedData.commonDiseases = commonDiseases;
+      }
+      
+      // Ajouter une taille de pot recommandée si non définie
+      if (!validatedData.potSize) {
+        // Taille de pot générique basée sur le type de plante
+        if (validatedData.name.toLowerCase().includes("cactus") || 
+            validatedData.name.toLowerCase().includes("succulente")) {
+          validatedData.potSize = "Pot de 10-15 cm de diamètre avec très bon drainage";
+        } else if (validatedData.name.toLowerCase().includes("monstera") ||
+                  validatedData.name.toLowerCase().includes("ficus") ||
+                  validatedData.name.toLowerCase().includes("palmier")) {
+          validatedData.potSize = "Pot de 25-30 cm de diamètre avec bon drainage";
+        } else if (validatedData.wateringFrequency >= 7) {
+          validatedData.potSize = "Pot de 15-20 cm de diamètre avec drainage adapté";
+        } else {
+          validatedData.potSize = "Pot de 20-25 cm de diamètre avec bon drainage";
+        }
+      }
+      
       const plant = await storage.createPlant(validatedData);
       res.status(201).json(plant);
     } catch (error: any) {
