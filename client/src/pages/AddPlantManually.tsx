@@ -30,6 +30,23 @@ export default function AddPlantManually() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
+  // États pour suivre quels champs ont été remplis automatiquement
+  const [autofilledFields, setAutofilledFields] = useState<{
+    species: boolean;
+    status: boolean;
+    light: boolean;
+    temperature: boolean;
+    wateringFrequency: boolean;
+    careNotes: boolean;
+  }>({
+    species: false,
+    status: false,
+    light: false,
+    temperature: false,
+    wateringFrequency: false,
+    careNotes: false,
+  });
+  
   // Gérer le changement de fichier d'image
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -66,24 +83,38 @@ export default function AddPlantManually() {
       
       // Remplir automatiquement les champs avec les informations récupérées
       if (plantInfo) {
+        // Réinitialiser l'état des champs auto-remplis
+        const newAutofilledFields = {
+          species: false,
+          status: false,
+          light: false,
+          temperature: false,
+          wateringFrequency: false,
+          careNotes: false,
+        };
+        
         // Ne pas écraser l'espèce si elle est déjà remplie
         if (plantInfo.species && !species) {
           setSpecies(plantInfo.species);
+          newAutofilledFields.species = true;
         }
         
         // Mettre à jour l'état de santé
         if (plantInfo.status) {
           setStatus(plantInfo.status);
+          newAutofilledFields.status = true;
         }
         
         // Mettre à jour les informations d'entretien
         if (plantInfo.careInstructions) {
           if (plantInfo.careInstructions.light) {
             setLight(plantInfo.careInstructions.light);
+            newAutofilledFields.light = true;
           }
           
           if (plantInfo.careInstructions.temperature) {
             setTemperature(plantInfo.careInstructions.temperature);
+            newAutofilledFields.temperature = true;
           }
           
           // Mettre à jour les notes d'entretien avec les recommandations
@@ -99,6 +130,7 @@ export default function AddPlantManually() {
           
           if (notes) {
             setCareNotes(notes);
+            newAutofilledFields.careNotes = true;
           }
           
           // Tenter d'extraire une fréquence d'arrosage approximative à partir du texte
@@ -121,8 +153,12 @@ export default function AddPlantManually() {
             }
             
             setWateringFrequency(frequency);
+            newAutofilledFields.wateringFrequency = true;
           }
         }
+        
+        // Mise à jour de l'état des champs auto-remplis
+        setAutofilledFields(newAutofilledFields);
       }
       
       // Afficher un message de succès
@@ -341,10 +377,10 @@ export default function AddPlantManually() {
                     variant="outline"
                     onClick={() => fetchPlantInfo(name)}
                     disabled={isLoadingPlantInfo || name.trim().length < 3}
-                    className="h-10 px-3"
+                    className="h-10 px-3 bg-primary/10 backdrop-blur-sm hover:bg-primary/20 hover:text-primary-foreground transition-all"
                   >
                     {isLoadingPlantInfo ? (
-                      <span className="material-icons animate-spin text-primary">refresh</span>
+                      <Loader2 className="h-5 w-5 animate-spin text-primary" />
                     ) : (
                       <span className="material-icons text-primary">search</span>
                     )}
@@ -362,18 +398,36 @@ export default function AddPlantManually() {
                 <Input
                   id="species"
                   value={species}
-                  onChange={(e) => setSpecies(e.target.value)}
+                  onChange={(e) => {
+                    setSpecies(e.target.value);
+                    setAutofilledFields((prev) => ({ ...prev, species: false }));
+                  }}
                   placeholder="Ex: Ficus lyrata"
+                  className={`input-glass focus:ring-2 ring-primary/30 transition-all ${
+                    autofilledFields.species ? 'border-primary bg-primary/5' : ''
+                  }`}
                 />
+                {autofilledFields.species && (
+                  <p className="text-xs text-primary mt-1 flex items-center">
+                    <span className="material-icons text-xs mr-1">auto_awesome</span>
+                    Champ rempli automatiquement
+                  </p>
+                )}
               </div>
               
               <div>
                 <Label htmlFor="status">État de santé</Label>
                 <Select
                   value={status}
-                  onValueChange={(value) => setStatus(value)}
+                  onValueChange={(value) => {
+                    setStatus(value);
+                    setAutofilledFields((prev) => ({ ...prev, status: false }));
+                  }}
                 >
-                  <SelectTrigger id="status">
+                  <SelectTrigger 
+                    id="status" 
+                    className={`input-glass ${autofilledFields.status ? 'border-primary bg-primary/5' : ''}`}
+                  >
                     <SelectValue placeholder="Sélectionnez l'état de santé" />
                   </SelectTrigger>
                   <SelectContent>
@@ -382,6 +436,12 @@ export default function AddPlantManually() {
                     <SelectItem value="danger">Besoin d'aide</SelectItem>
                   </SelectContent>
                 </Select>
+                {autofilledFields.status && (
+                  <p className="text-xs text-primary mt-1 flex items-center">
+                    <span className="material-icons text-xs mr-1">auto_awesome</span>
+                    Champ rempli automatiquement
+                  </p>
+                )}
               </div>
               
               <div>
@@ -392,8 +452,20 @@ export default function AddPlantManually() {
                   min={1}
                   max={30}
                   value={wateringFrequency}
-                  onChange={(e) => setWateringFrequency(parseInt(e.target.value))}
+                  onChange={(e) => {
+                    setWateringFrequency(parseInt(e.target.value));
+                    setAutofilledFields((prev) => ({ ...prev, wateringFrequency: false }));
+                  }}
+                  className={`input-glass focus:ring-2 ring-primary/30 transition-all ${
+                    autofilledFields.wateringFrequency ? 'border-primary bg-primary/5' : ''
+                  }`}
                 />
+                {autofilledFields.wateringFrequency && (
+                  <p className="text-xs text-primary mt-1 flex items-center">
+                    <span className="material-icons text-xs mr-1">auto_awesome</span>
+                    Champ rempli automatiquement
+                  </p>
+                )}
               </div>
               
               <div>
@@ -401,9 +473,21 @@ export default function AddPlantManually() {
                 <Input
                   id="light"
                   value={light}
-                  onChange={(e) => setLight(e.target.value)}
+                  onChange={(e) => {
+                    setLight(e.target.value);
+                    setAutofilledFields((prev) => ({ ...prev, light: false }));
+                  }}
                   placeholder="Ex: Lumière indirecte"
+                  className={`input-glass focus:ring-2 ring-primary/30 transition-all ${
+                    autofilledFields.light ? 'border-primary bg-primary/5' : ''
+                  }`}
                 />
+                {autofilledFields.light && (
+                  <p className="text-xs text-primary mt-1 flex items-center">
+                    <span className="material-icons text-xs mr-1">auto_awesome</span>
+                    Champ rempli automatiquement
+                  </p>
+                )}
               </div>
               
               <div>
@@ -411,9 +495,21 @@ export default function AddPlantManually() {
                 <Input
                   id="temperature"
                   value={temperature}
-                  onChange={(e) => setTemperature(e.target.value)}
+                  onChange={(e) => {
+                    setTemperature(e.target.value);
+                    setAutofilledFields((prev) => ({ ...prev, temperature: false }));
+                  }}
                   placeholder="Ex: 18-24°C"
+                  className={`input-glass focus:ring-2 ring-primary/30 transition-all ${
+                    autofilledFields.temperature ? 'border-primary bg-primary/5' : ''
+                  }`}
                 />
+                {autofilledFields.temperature && (
+                  <p className="text-xs text-primary mt-1 flex items-center">
+                    <span className="material-icons text-xs mr-1">auto_awesome</span>
+                    Champ rempli automatiquement
+                  </p>
+                )}
               </div>
               
               <div>
@@ -421,22 +517,34 @@ export default function AddPlantManually() {
                 <Textarea
                   id="notes"
                   value={careNotes}
-                  onChange={(e) => setCareNotes(e.target.value)}
+                  onChange={(e) => {
+                    setCareNotes(e.target.value);
+                    setAutofilledFields((prev) => ({ ...prev, careNotes: false }));
+                  }}
                   placeholder="Entrez des détails sur l'entretien de votre plante..."
                   rows={4}
+                  className={`input-glass focus:ring-2 ring-primary/30 transition-all ${
+                    autofilledFields.careNotes ? 'border-primary bg-primary/5' : ''
+                  }`}
                 />
+                {autofilledFields.careNotes && (
+                  <p className="text-xs text-primary mt-1 flex items-center">
+                    <span className="material-icons text-xs mr-1">auto_awesome</span>
+                    Champ rempli automatiquement
+                  </p>
+                )}
               </div>
             </div>
             
             <div className="flex justify-end">
               <Button
                 type="submit"
-                className="bg-primary text-white"
+                className="btn-gradient px-6 py-2 font-medium rounded-full shadow-md hover:shadow-lg"
                 disabled={isSaving}
               >
                 {isSaving ? (
                   <>
-                    <span className="material-icons animate-spin mr-2">refresh</span>
+                    <Loader2 className="h-5 w-5 animate-spin mr-2" />
                     Enregistrement...
                   </>
                 ) : (
@@ -446,6 +554,12 @@ export default function AddPlantManually() {
                   </>
                 )}
               </Button>
+              {/* Afficher un récapitulatif des champs auto-remplis */}
+              {Object.values(autofilledFields).some(Boolean) && (
+                <p className="text-xs text-primary mt-4 border border-primary/20 bg-primary/5 p-3 rounded-lg">
+                  <span className="font-medium">Information :</span> Certains champs ont été remplis automatiquement en fonction du nom de la plante. Vous pouvez modifier ces valeurs si nécessaire.
+                </p>
+              )}
             </div>
           </form>
         </CardContent>
