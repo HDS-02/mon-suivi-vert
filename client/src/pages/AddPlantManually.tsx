@@ -345,7 +345,10 @@ export default function AddPlantManually() {
               </div>
 
               <div>
-                <Label htmlFor="name">Nom de la plante *</Label>
+                <Label htmlFor="name" className="flex items-center">
+                  Nom de la plante * 
+                  <span className="text-xs ml-2 text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full">Auto-complétion</span>
+                </Label>
                 <div className="flex gap-2 items-start">
                   <div className="flex-1">
                     <Input
@@ -367,10 +370,15 @@ export default function AddPlantManually() {
                           return () => clearTimeout(timerId);
                         }
                       }}
-                      placeholder="Ex: Ficus Lyrata"
-                      className="input-glass focus:ring-2 ring-primary/30 transition-all"
+                      placeholder="Ex: Rosier, Ficus, Basilic..."
+                      className="input-glass focus:ring-2 ring-primary/30 transition-all pl-10"
                       required
                     />
+                    <div className="relative">
+                      <span className="material-icons text-primary/70 absolute -top-9 left-3">
+                        auto_awesome
+                      </span>
+                    </div>
                   </div>
                   <Button 
                     type="button" 
@@ -386,9 +394,14 @@ export default function AddPlantManually() {
                     )}
                   </Button>
                 </div>
-                {isLoadingPlantInfo && (
-                  <p className="text-xs text-muted-foreground mt-1">
+                {isLoadingPlantInfo ? (
+                  <p className="text-xs text-primary mt-2 flex items-center animate-pulse">
+                    <span className="material-icons text-xs mr-1">hourglass_empty</span>
                     Recherche des informations sur cette plante...
+                  </p>
+                ) : name.trim().length >= 3 && (
+                  <p className="text-xs text-gray-500 mt-1">
+                    Saisissez le nom d'une plante et appuyez sur le bouton pour remplir automatiquement ses informations
                   </p>
                 )}
               </div>
@@ -536,10 +549,10 @@ export default function AddPlantManually() {
               </div>
             </div>
             
-            <div className="flex justify-end">
+            <div className="flex justify-end pt-2">
               <Button
                 type="submit"
-                className="btn-gradient px-6 py-2 font-medium rounded-full shadow-md hover:shadow-lg"
+                className="bg-gradient-to-r from-primary to-primary-light text-white px-8 py-2 font-medium rounded-full shadow-md hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200"
                 disabled={isSaving}
               >
                 {isSaving ? (
@@ -549,7 +562,7 @@ export default function AddPlantManually() {
                   </>
                 ) : (
                   <>
-                    <span className="material-icons mr-2">add</span>
+                    <span className="material-icons mr-2">add_circle</span>
                     Ajouter à ma collection
                   </>
                 )}
