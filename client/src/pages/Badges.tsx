@@ -33,8 +33,7 @@ export default function Badges() {
   const simulateUnlockBadge = () => {
     toast({
       title: "🏆 Nouveau badge débloqué !",
-      description: "Premier pas vert - Ajoutez votre première plante à l'application",
-      variant: "success",
+      description: "Premier pas vert - Ajoutez votre première plante à l'application"
     });
   };
 

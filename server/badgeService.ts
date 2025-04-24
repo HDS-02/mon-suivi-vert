@@ -1,271 +1,295 @@
 import { Badge } from "@shared/schema";
 
-// Liste des badges disponibles
-const defaultBadges: Badge[] = [
+// Liste des badges disponibles dans l'application
+const availableBadges: Omit<Badge, "unlocked" | "unlockedAt">[] = [
+  // Badges de collection de plantes
   {
-    id: "first-plant",
+    id: "plant-collector-1",
     name: "Premier pas vert",
     description: "Ajoutez votre première plante à l'application",
     icon: "local_florist",
     category: "collection",
-    unlocked: false,
+    progress: 0,
+    maxProgress: 1
   },
   {
-    id: "plant-collection-5",
+    id: "plant-collector-5",
     name: "Jardinier amateur",
-    description: "Ajoutez 5 plantes à votre collection",
-    icon: "spa",
+    description: "Constituez une collection de 5 plantes",
+    icon: "eco",
     category: "collection",
-    unlocked: false,
     progress: 0,
-    maxProgress: 5,
+    maxProgress: 5
   },
   {
-    id: "plant-collection-10",
+    id: "plant-collector-10",
     name: "Jardinier passionné",
-    description: "Ajoutez 10 plantes à votre collection",
-    icon: "park",
+    description: "Constituez une collection de 10 plantes",
+    icon: "yard",
     category: "collection",
-    unlocked: false,
     progress: 0,
-    maxProgress: 10,
+    maxProgress: 10
+  },
+  
+  // Badges de tâches d'entretien
+  {
+    id: "task-complete-1",
+    name: "Premier soin",
+    description: "Complétez votre première tâche d'entretien",
+    icon: "task_alt",
+    category: "entretien",
+    progress: 0,
+    maxProgress: 1
   },
   {
-    id: "first-analysis",
-    name: "Analyste débutant",
-    description: "Effectuez votre première analyse de plante",
-    icon: "analytics",
+    id: "task-complete-10",
+    name: "Soigneur attentif",
+    description: "Complétez 10 tâches d'entretien",
+    icon: "checklist",
+    category: "entretien",
+    progress: 0,
+    maxProgress: 10
+  },
+  {
+    id: "task-streak-7",
+    name: "Constance verte",
+    description: "Complétez au moins une tâche par jour pendant 7 jours consécutifs",
+    icon: "sprint",
+    category: "entretien",
+    progress: 0,
+    maxProgress: 7
+  },
+  
+  // Badges d'analyse
+  {
+    id: "analysis-1",
+    name: "Observateur débutant",
+    description: "Analysez votre première plante",
+    icon: "search",
     category: "analyse",
-    unlocked: false,
+    progress: 0,
+    maxProgress: 1
   },
   {
     id: "analysis-5",
-    name: "Analyste expérimenté",
-    description: "Effectuez 5 analyses de plantes",
-    icon: "bar_chart",
+    name: "Analyste en herbe",
+    description: "Analysez 5 plantes différentes",
+    icon: "analytics",
     category: "analyse",
-    unlocked: false,
     progress: 0,
-    maxProgress: 5,
+    maxProgress: 5
   },
+  
+  // Badges de progression
   {
-    id: "tasks-completed-10",
-    name: "Entretien régulier",
-    description: "Complétez 10 tâches d'entretien",
-    icon: "task_alt",
-    category: "entretien",
-    unlocked: false,
+    id: "login-streak-7",
+    name: "Fidélité hebdomadaire",
+    description: "Connectez-vous à l'application 7 jours consécutifs",
+    icon: "calendar_month",
+    category: "progression",
     progress: 0,
-    maxProgress: 10,
-  },
-  {
-    id: "tasks-completed-25",
-    name: "Main verte",
-    description: "Complétez 25 tâches d'entretien",
-    icon: "eco",
-    category: "entretien",
-    unlocked: false,
-    progress: 0,
-    maxProgress: 25,
+    maxProgress: 7
   },
   {
     id: "healthy-plants-5",
-    name: "Gardien des plantes",
-    description: "Maintenez 5 plantes en bonne santé simultanément",
-    icon: "healing",
+    name: "Main verte",
+    description: "Maintenez 5 plantes en parfaite santé simultanément",
+    icon: "favorite",
     category: "progression",
-    unlocked: false,
     progress: 0,
-    maxProgress: 5,
-  },
-  {
-    id: "consecutive-login-7",
-    name: "Jardinier assidu",
-    description: "Connectez-vous 7 jours consécutifs",
-    icon: "calendar_month",
-    category: "progression",
-    unlocked: false,
-    progress: 0,
-    maxProgress: 7,
+    maxProgress: 5
   }
 ];
 
-// Map pour stocker les badges par utilisateur
-const userBadges = new Map<number, Badge[]>();
+// Map pour stocker les badges des utilisateurs (dans une application réelle, cela serait en base de données)
+const userBadges: Map<number, Badge[]> = new Map();
 
 export class BadgeService {
-  // Récupérer les badges d'un utilisateur
+  /**
+   * Récupère les badges d'un utilisateur
+   */
   public getBadgesByUserId(userId: number): Badge[] {
     if (!userBadges.has(userId)) {
-      // Copie profonde pour éviter de modifier les badges par défaut
-      userBadges.set(userId, JSON.parse(JSON.stringify(defaultBadges)));
+      // Initialiser les badges pour l'utilisateur s'ils n'existent pas encore
+      const badges = availableBadges.map(badge => ({
+        ...badge,
+        unlocked: false
+      }));
+      userBadges.set(userId, badges);
     }
+    
     return userBadges.get(userId) || [];
   }
 
-  // Déverrouiller un badge
+  /**
+   * Débloque un badge spécifique pour un utilisateur
+   */
   public unlockBadge(userId: number, badgeId: string): Badge | null {
     const badges = this.getBadgesByUserId(userId);
-    const badge = badges.find(b => b.id === badgeId);
+    const badgeIndex = badges.findIndex(badge => badge.id === badgeId);
     
-    if (badge && !badge.unlocked) {
-      badge.unlocked = true;
-      badge.unlockedAt = new Date();
-      return badge;
-    }
+    if (badgeIndex === -1) return null;
     
-    return null;
+    const badge = badges[badgeIndex];
+    if (badge.unlocked) return badge; // Déjà débloqué
+    
+    const updatedBadge: Badge = {
+      ...badge,
+      unlocked: true,
+      unlockedAt: new Date(),
+      progress: badge.maxProgress,
+    };
+    
+    badges[badgeIndex] = updatedBadge;
+    userBadges.set(userId, badges);
+    
+    return updatedBadge;
   }
 
-  // Mettre à jour la progression d'un badge
+  /**
+   * Met à jour la progression d'un badge
+   */
   public updateBadgeProgress(userId: number, badgeId: string, progress: number): Badge | null {
     const badges = this.getBadgesByUserId(userId);
-    const badge = badges.find(b => b.id === badgeId);
+    const badgeIndex = badges.findIndex(badge => badge.id === badgeId);
     
-    if (badge && badge.maxProgress !== undefined) {
-      badge.progress = progress;
-      if (progress >= badge.maxProgress && !badge.unlocked) {
-        badge.unlocked = true;
-        badge.unlockedAt = new Date();
-      }
-      return badge;
-    }
+    if (badgeIndex === -1) return null;
     
-    return null;
+    const badge = badges[badgeIndex];
+    if (badge.unlocked) return badge; // Déjà débloqué
+    
+    const updatedProgress = Math.min(progress, badge.maxProgress || 0);
+    const shouldUnlock = updatedProgress >= (badge.maxProgress || 0);
+    
+    const updatedBadge: Badge = {
+      ...badge,
+      unlocked: shouldUnlock,
+      progress: updatedProgress,
+      unlockedAt: shouldUnlock ? new Date() : undefined
+    };
+    
+    badges[badgeIndex] = updatedBadge;
+    userBadges.set(userId, badges);
+    
+    return updatedBadge;
   }
 
-  // Vérifier et mettre à jour les badges liés à l'ajout de plantes
+  /**
+   * Vérifie et met à jour les badges liés à la collection de plantes
+   */
   public checkPlantCollectionBadges(userId: number, plantCount: number): Badge[] {
     const unlockedBadges: Badge[] = [];
-    const badges = this.getBadgesByUserId(userId);
     
-    // Premier plant
-    if (plantCount >= 1) {
-      const firstPlantBadge = badges.find(b => b.id === "first-plant");
-      if (firstPlantBadge && !firstPlantBadge.unlocked) {
-        firstPlantBadge.unlocked = true;
-        firstPlantBadge.unlockedAt = new Date();
-        unlockedBadges.push(firstPlantBadge);
-      }
-    }
+    // Badges à vérifier
+    const badgesToCheck = [
+      { id: "plant-collector-1", threshold: 1 },
+      { id: "plant-collector-5", threshold: 5 },
+      { id: "plant-collector-10", threshold: 10 }
+    ];
     
-    // 5 plantes
-    const plantCollection5Badge = badges.find(b => b.id === "plant-collection-5");
-    if (plantCollection5Badge) {
-      plantCollection5Badge.progress = Math.min(plantCount, plantCollection5Badge.maxProgress || 5);
-      if (plantCount >= 5 && !plantCollection5Badge.unlocked) {
-        plantCollection5Badge.unlocked = true;
-        plantCollection5Badge.unlockedAt = new Date();
-        unlockedBadges.push(plantCollection5Badge);
-      }
-    }
-    
-    // 10 plantes
-    const plantCollection10Badge = badges.find(b => b.id === "plant-collection-10");
-    if (plantCollection10Badge) {
-      plantCollection10Badge.progress = Math.min(plantCount, plantCollection10Badge.maxProgress || 10);
-      if (plantCount >= 10 && !plantCollection10Badge.unlocked) {
-        plantCollection10Badge.unlocked = true;
-        plantCollection10Badge.unlockedAt = new Date();
-        unlockedBadges.push(plantCollection10Badge);
+    for (const badgeInfo of badgesToCheck) {
+      const updatedBadge = this.updateBadgeProgress(userId, badgeInfo.id, plantCount);
+      
+      if (updatedBadge && updatedBadge.unlocked && updatedBadge.unlockedAt) {
+        // Vérifier si le badge vient juste d'être débloqué
+        const justUnlocked = new Date().getTime() - updatedBadge.unlockedAt.getTime() < 5000;
+        if (justUnlocked) {
+          unlockedBadges.push(updatedBadge);
+        }
       }
     }
     
     return unlockedBadges;
   }
 
-  // Vérifier et mettre à jour les badges liés aux analyses
+  /**
+   * Vérifie et met à jour les badges liés aux analyses de plantes
+   */
   public checkAnalysisBadges(userId: number, analysisCount: number): Badge[] {
     const unlockedBadges: Badge[] = [];
-    const badges = this.getBadgesByUserId(userId);
     
-    // Première analyse
-    if (analysisCount >= 1) {
-      const firstAnalysisBadge = badges.find(b => b.id === "first-analysis");
-      if (firstAnalysisBadge && !firstAnalysisBadge.unlocked) {
-        firstAnalysisBadge.unlocked = true;
-        firstAnalysisBadge.unlockedAt = new Date();
-        unlockedBadges.push(firstAnalysisBadge);
-      }
-    }
+    // Badges à vérifier
+    const badgesToCheck = [
+      { id: "analysis-1", threshold: 1 },
+      { id: "analysis-5", threshold: 5 }
+    ];
     
-    // 5 analyses
-    const analysis5Badge = badges.find(b => b.id === "analysis-5");
-    if (analysis5Badge) {
-      analysis5Badge.progress = Math.min(analysisCount, analysis5Badge.maxProgress || 5);
-      if (analysisCount >= 5 && !analysis5Badge.unlocked) {
-        analysis5Badge.unlocked = true;
-        analysis5Badge.unlockedAt = new Date();
-        unlockedBadges.push(analysis5Badge);
+    for (const badgeInfo of badgesToCheck) {
+      const updatedBadge = this.updateBadgeProgress(userId, badgeInfo.id, analysisCount);
+      
+      if (updatedBadge && updatedBadge.unlocked && updatedBadge.unlockedAt) {
+        // Vérifier si le badge vient juste d'être débloqué
+        const justUnlocked = new Date().getTime() - updatedBadge.unlockedAt.getTime() < 5000;
+        if (justUnlocked) {
+          unlockedBadges.push(updatedBadge);
+        }
       }
     }
     
     return unlockedBadges;
   }
 
-  // Vérifier et mettre à jour les badges liés aux tâches
+  /**
+   * Vérifie et met à jour les badges liés à la complétion de tâches
+   */
   public checkTaskCompletionBadges(userId: number, taskCount: number): Badge[] {
     const unlockedBadges: Badge[] = [];
-    const badges = this.getBadgesByUserId(userId);
     
-    // 10 tâches
-    const tasks10Badge = badges.find(b => b.id === "tasks-completed-10");
-    if (tasks10Badge) {
-      tasks10Badge.progress = Math.min(taskCount, tasks10Badge.maxProgress || 10);
-      if (taskCount >= 10 && !tasks10Badge.unlocked) {
-        tasks10Badge.unlocked = true;
-        tasks10Badge.unlockedAt = new Date();
-        unlockedBadges.push(tasks10Badge);
-      }
-    }
+    // Badges à vérifier
+    const badgesToCheck = [
+      { id: "task-complete-1", threshold: 1 },
+      { id: "task-complete-10", threshold: 10 }
+    ];
     
-    // 25 tâches
-    const tasks25Badge = badges.find(b => b.id === "tasks-completed-25");
-    if (tasks25Badge) {
-      tasks25Badge.progress = Math.min(taskCount, tasks25Badge.maxProgress || 25);
-      if (taskCount >= 25 && !tasks25Badge.unlocked) {
-        tasks25Badge.unlocked = true;
-        tasks25Badge.unlockedAt = new Date();
-        unlockedBadges.push(tasks25Badge);
+    for (const badgeInfo of badgesToCheck) {
+      const updatedBadge = this.updateBadgeProgress(userId, badgeInfo.id, taskCount);
+      
+      if (updatedBadge && updatedBadge.unlocked && updatedBadge.unlockedAt) {
+        // Vérifier si le badge vient juste d'être débloqué
+        const justUnlocked = new Date().getTime() - updatedBadge.unlockedAt.getTime() < 5000;
+        if (justUnlocked) {
+          unlockedBadges.push(updatedBadge);
+        }
       }
     }
     
     return unlockedBadges;
   }
 
-  // Vérifier le badge de plantes en bonne santé
+  /**
+   * Vérifie et met à jour le badge des plantes en bonne santé
+   */
   public checkHealthyPlantsBadge(userId: number, healthyPlantsCount: number): Badge | null {
-    const badges = this.getBadgesByUserId(userId);
-    const healthyPlantsBadge = badges.find(b => b.id === "healthy-plants-5");
+    const updatedBadge = this.updateBadgeProgress(userId, "healthy-plants-5", healthyPlantsCount);
     
-    if (healthyPlantsBadge) {
-      healthyPlantsBadge.progress = Math.min(healthyPlantsCount, healthyPlantsBadge.maxProgress || 5);
-      if (healthyPlantsCount >= 5 && !healthyPlantsBadge.unlocked) {
-        healthyPlantsBadge.unlocked = true;
-        healthyPlantsBadge.unlockedAt = new Date();
-        return healthyPlantsBadge;
+    if (updatedBadge && updatedBadge.unlocked && updatedBadge.unlockedAt) {
+      // Vérifier si le badge vient juste d'être débloqué
+      const justUnlocked = new Date().getTime() - updatedBadge.unlockedAt.getTime() < 5000;
+      if (justUnlocked) {
+        return updatedBadge;
       }
     }
     
-    return null;
+    return updatedBadge;
   }
 
-  // Mettre à jour le badge de connexion consécutive
+  /**
+   * Met à jour le badge de connexion consécutive
+   */
   public updateConsecutiveLoginBadge(userId: number, days: number): Badge | null {
-    const badges = this.getBadgesByUserId(userId);
-    const consecutiveLoginBadge = badges.find(b => b.id === "consecutive-login-7");
+    const updatedBadge = this.updateBadgeProgress(userId, "login-streak-7", days);
     
-    if (consecutiveLoginBadge) {
-      consecutiveLoginBadge.progress = Math.min(days, consecutiveLoginBadge.maxProgress || 7);
-      if (days >= 7 && !consecutiveLoginBadge.unlocked) {
-        consecutiveLoginBadge.unlocked = true;
-        consecutiveLoginBadge.unlockedAt = new Date();
-        return consecutiveLoginBadge;
+    if (updatedBadge && updatedBadge.unlocked && updatedBadge.unlockedAt) {
+      // Vérifier si le badge vient juste d'être débloqué
+      const justUnlocked = new Date().getTime() - updatedBadge.unlockedAt.getTime() < 5000;
+      if (justUnlocked) {
+        return updatedBadge;
       }
     }
     
-    return null;
+    return updatedBadge;
   }
 }
 
+// Singleton pour être utilisé dans toute l'application
 export const badgeService = new BadgeService();

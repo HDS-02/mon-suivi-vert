@@ -28,11 +28,13 @@ export default function NotificationsDialog({ open, onOpenChange }: Notification
     permission,
   } = useNotifications();
   
-  const { tasks, isTasksLoading } = useTasks();
+  const tasksQuery = useTasks();
+  const tasks = tasksQuery.data || [];
+  const isTasksLoading = tasksQuery.isLoading;
 
   // Vérifier les notifications de tâches lorsque le dialogue s'ouvre
   useEffect(() => {
-    if (open && tasks && !isTasksLoading) {
+    if (open && tasks.length > 0 && !isTasksLoading) {
       // Ici, nous utiliserions createTaskNotifications, mais comme c'est un prototype,
       // nous ne voulons pas générer de notifications à chaque ouverture du dialogue
     }

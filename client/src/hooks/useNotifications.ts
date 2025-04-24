@@ -15,32 +15,49 @@ export interface Notification {
 export default function useNotifications() {
   const { toast } = useToast();
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [permission, setPermission] = useState<NotificationPermission>('default');
+  const [permission, setPermission] = useState<'default' | 'granted' | 'denied'>('default');
 
-  // Demander la permission pour les notifications lors du premier chargement
+  // Vérification simplifiée pour les notifications du navigateur
   useEffect(() => {
-    if (Notification && 'permission' in Notification) {
-      setPermission(Notification.permission);
-    }
+    // Nous utilisons une approche simplifiée pour éviter les problèmes d'environnement
+    const checkNotificationSupport = () => {
+      if (typeof window !== 'undefined' && 'Notification' in window) {
+        try {
+          // @ts-ignore - Nous savons que Notification existe ici
+          setPermission(window.Notification.permission);
+        } catch (e) {
+          console.log('Erreur lors de la vérification des permissions de notification:', e);
+        }
+      }
+    };
+    
+    checkNotificationSupport();
   }, []);
 
   // Demander l'autorisation pour les notifications du navigateur
   const requestPermission = async () => {
-    if (!('Notification' in window)) {
+    if (typeof window === 'undefined' || !('Notification' in window)) {
       // Les notifications ne sont pas supportées par le navigateur
       console.log('Ce navigateur ne supporte pas les notifications.');
       return false;
     }
 
-    if (Notification.permission === 'granted') {
-      setPermission('granted');
-      return true;
-    }
+    try {
+      // @ts-ignore - Nous savons que Notification existe ici
+      if (window.Notification.permission === 'granted') {
+        setPermission('granted');
+        return true;
+      }
 
-    if (Notification.permission !== 'denied') {
-      const result = await Notification.requestPermission();
-      setPermission(result);
-      return result === 'granted';
+      // @ts-ignore - Nous savons que Notification existe ici
+      if (window.Notification.permission !== 'denied') {
+        // @ts-ignore - Nous savons que Notification existe ici
+        const result = await window.Notification.requestPermission();
+        setPermission(result as 'default' | 'granted' | 'denied');
+        return result === 'granted';
+      }
+    } catch (e) {
+      console.log('Erreur lors de la demande de permission:', e);
     }
 
     return false;
@@ -65,9 +82,10 @@ export default function useNotifications() {
     });
 
     // Envoyer une notification du navigateur si autorisé
-    if (permission === 'granted') {
+    if (permission === 'granted' && typeof window !== 'undefined' && 'Notification' in window) {
       try {
-        new Notification(notification.title, {
+        // @ts-ignore - Nous savons que Notification existe ici
+        new window.Notification(notification.title, {
           body: notification.message,
           icon: '/favicon.ico',
         });
