@@ -122,9 +122,19 @@ export default function SOSPlantDialog({
       });
     } catch (error) {
       console.error("Erreur lors de l'envoi du diagnostic:", error);
+      
+      // Afficher des détails plus spécifiques sur l'erreur
+      let errorMessage = "Impossible d'obtenir un diagnostic pour votre plante pour le moment.";
+      
+      // Si c'est une erreur réseau
+      if (error instanceof Error) {
+        errorMessage += " Détails: " + error.message;
+        console.log("Erreur complète:", JSON.stringify(error));
+      }
+      
       toast({
         title: "Erreur lors de la demande",
-        description: "Impossible d'obtenir un diagnostic pour votre plante pour le moment.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
