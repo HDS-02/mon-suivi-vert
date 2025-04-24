@@ -1,21 +1,5 @@
-import OpenAI from "openai";
-import Anthropic from '@anthropic-ai/sdk';
 import { PlantAnalyzer } from "./plantAnalyzer";
 import { PlantAnalysisResponse } from "@shared/schema";
-
-// The newest OpenAI model is "gpt-4o" which was released May 13, 2024.
-// Do not change this unless explicitly requested by the user
-const openai = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY || "", 
-  timeout: 60000, // Augmenter le timeout à 60 secondes
-  maxRetries: 3 // Essayer jusqu'à 3 fois en cas d'erreur temporaire
-});
-
-// Configuration de l'API Anthropic Claude
-// The newest Anthropic model is "claude-3-7-sonnet-20250219" which was released February 24, 2025
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || "",
-});
 
 // Nouvel analyseur de plantes basé sur des règles (ne nécessite pas d'API)
 const plantAnalyzer = new PlantAnalyzer();

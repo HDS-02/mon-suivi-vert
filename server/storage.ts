@@ -115,94 +115,38 @@ export class MemStorage implements IStorage {
   }
 
   private initSampleData() {
-    // Plantes existantes pour la démo
-    const ficusPlant: InsertPlant = {
-      name: "Ficus Lyrata",
-      species: "Ficus lyrata",
+    // Une seule plante de démonstration avec une image
+    const monstera: InsertPlant = {
+      name: "Monstera Deliciosa",
+      species: "Monstera deliciosa",
       status: "healthy",
-      image: "/ficus.jpg",
+      image: "https://images.unsplash.com/photo-1682086248531-77cd5fbdc3b4?q=80&w=300&auto=format",
       wateringFrequency: 7,
-      light: "Indirecte",
-      temperature: "18-24°C",
-      careNotes: "Arrosez lorsque les 2-3 premiers cm du terreau sont secs. Placez dans un endroit lumineux mais sans soleil direct. Essuyez régulièrement les feuilles pour enlever la poussière.",
+      light: "Indirecte brillante",
+      temperature: "18-27°C",
+      careNotes: "Arrosez uniquement lorsque les premiers centimètres du sol sont secs. Préfère une lumière vive mais indirecte. Apprécie l'humidité. Nettoyez régulièrement les grandes feuilles pour qu'elles puissent bien respirer.",
+      userId: 1 // Associée à l'utilisateur de test
     };
     
-    const orchideePlant: InsertPlant = {
-      name: "Orchidée",
-      species: "Phalaenopsis",
-      status: "warning",
-      image: "/orchidee.jpg",
-      wateringFrequency: 10,
-      light: "Indirecte",
-      temperature: "18-25°C",
-      careNotes: "Arrosez uniquement lorsque le substrat est complètement sec. Placez dans un endroit lumineux sans soleil direct. Vaporisez les racines aériennes.",
-    };
+    // Créer une seule plante de démonstration
+    const plant = this.createPlant(monstera);
     
-    const aloePlant: InsertPlant = {
-      name: "Aloe Vera",
-      species: "Aloe barbadensis miller",
-      status: "healthy",
-      image: "/aloe.jpg",
-      wateringFrequency: 14,
-      light: "Directe",
-      temperature: "20-29°C",
-      careNotes: "Arrosez uniquement lorsque le terreau est complètement sec. Peut supporter le soleil direct. Idéal pour les endroits ensoleillés.",
-    };
-    
-    const basilicPlant: InsertPlant = {
-      name: "Basilic",
-      species: "Ocimum basilicum",
-      status: "danger",
-      image: "/basilic.jpg",
-      wateringFrequency: 3,
-      light: "Directe",
-      temperature: "18-30°C",
-      careNotes: "Arrosez régulièrement pour garder le sol humide. Préfère une exposition ensoleillée. Récoltez les feuilles régulièrement pour stimuler la croissance.",
-    };
-    
-    // Créer seulement les 4 plantes de base pour la démo
-    const ficus = this.createPlant(ficusPlant);
-    const orchidee = this.createPlant(orchideePlant);
-    const aloe = this.createPlant(aloePlant);
-    const basilic = this.createPlant(basilicPlant);
-    
-    // Sample tasks
+    // Une tâche d'exemple
     this.createTask({
-      plantId: ficus.id,
+      plantId: plant.id,
       type: "water",
-      description: "Il n'a pas été arrosé depuis 5 jours",
+      description: "Arroser la Monstera cette semaine",
       dueDate: new Date(),
       completed: false
     });
     
-    this.createTask({
-      plantId: orchidee.id,
-      type: "light",
-      description: "Placer dans un endroit plus lumineux",
-      dueDate: new Date(),
-      completed: false
-    });
-    
-    this.createTask({
-      plantId: basilic.id,
-      type: "water",
-      description: "Besoin d'eau urgent",
-      dueDate: new Date(),
-      completed: false
-    });
-    
-    // Sample analyses
+    // Une analyse d'exemple
     this.createPlantAnalysis({
-      plantId: ficus.id,
+      plantId: plant.id,
       status: "healthy",
-      image: "/ficus-analyse.jpg",
-      aiAnalysis: {
-        plantName: "Ficus Lyrata",
-        status: "healthy",
-        recommendations: ["Continuer l'entretien actuel", "Nettoyer les feuilles régulièrement"]
-      },
+      image: "https://images.unsplash.com/photo-1682086248531-77cd5fbdc3b4?q=80&w=300&auto=format",
       healthIssues: "",
-      recommendations: "La plante est en parfaite santé."
+      recommendations: "La plante est en excellente santé. Continuez avec les soins actuels."
     });
   }
 
